@@ -957,7 +957,7 @@ function scanFiles($dir)
     $files = array();
     // Is there actually such a folder/file?
     if(file_exists($dir)){
-        foreach(scanFilesdir($dir) as $f) {
+        foreach(scandir($dir) as $f) {
             if(!$f || $f[0] == '.') {
                 continue; // Ignore hidden files
             }

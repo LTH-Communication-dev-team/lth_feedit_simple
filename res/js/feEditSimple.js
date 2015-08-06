@@ -309,6 +309,10 @@ $(document).ready(function() {
     } else {
         $('.lth_feeditsimple_content.hidden-1').closest('.csc-default').css('display', 'none');
     }
+    
+    $(".csc-default").hover(function(e) { 
+        $(this).css("background-color",e.type === "mouseenter"?"yellow":"transparent");
+    });
 
     //document ready ends**************************************************************************************************
 });
@@ -379,7 +383,7 @@ function cute()
         url : 'index.php',
         data: {
             eID : 'lth_feedit_simple',
-            cmd : 'cute',
+            cmd : 'getFiles',
             sid : Math.random(),
         },
         dataType: "json",
@@ -577,7 +581,7 @@ function cute()
             }
 
             // Locates a file by path
-            function searchByPath(dir,type)
+            function searchByPath(dir, type)
             {
                 var path = dir.split('/'),
                     demo = [data],
@@ -898,12 +902,14 @@ function makeEditable(selector, type, okMessage)
             "</li>" +
             "<li>" +*/
             return "<li><div class=\"btn-group\">" +
-            "<a class=\"btn feeditSimple-h2\" data-wysihtml5-command=\"h2\" title=\"H2\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">H2</a>" +
+            "<a class=\"btn feeditSimple-h2\" data-wysihtml5-command=\"formatBlock\" data-wysihtml5-command-value=\"h2\" title=\"H2\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">H2</a>" +
+"<a class=\"btn feeditSimple-code\" data-wysihtml5-command=\"formatBlock\" data-wysihtml5-command-value=\"code\" title=\"Code\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">C</a>" +
             "<a class=\"btn\" data-wysihtml5-command=\"bold\" title=\"CTRL+B\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">B</a>" +
             "<a class=\"btn\" data-wysihtml5-command=\"italic\" title=\"CTRL+I\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">I</a>" +
             "</div>" +
             "</li>";
         },
+        //<a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h2" tabindex="-1" href="javascript:;" unselectable="on">Heading 2</a>
         image : function(locale) {
             return "<li>" +
             "<a class=\"btn feeditSimple-insertImage\" data-wysihtml5-command=\"insertImage\" title=\"Insert image\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\"><i class=\"icon-picture\"></i></a>" +
@@ -954,7 +960,7 @@ function makeEditable(selector, type, okMessage)
             },
             wysihtml5: {
                 "emphasis": true,
-                //"customTemplates": myCustomTemplates,
+                "customTemplates": myCustomTemplates,
                 "font-styles": false,
                 //"html": true, //Button which allows you to edit the generated HTML. Default false
                 "image": true, //Button to insert an image. Default true,    
@@ -972,10 +978,19 @@ function makeEditable(selector, type, okMessage)
                     return response.responseText;
                 }
             },
-            onblur: 'ignore',
+            //onblur: 'ignore',
             toggle: 'dblclick'
         });
+        $('.lth_feeditsimple_content').on('hidden', function(e, editable) {
+            $(".csc-default").hover(function(e) { 
+                $(this).css("background-color",e.type === "mouseenter"?"yellow":"transparent");
+            });
+        });
         $('.lth_feeditsimple_content').on('shown', function(e, editable) {
+            $(".csc-default").hover(function() {
+                $(this).css("background-color","transparent");
+                $(this).css("background-color",e.type === "mouseenter"?"transparent":"transparent");
+            });
             
             var el = this;
             //console.log(editable);
@@ -1069,7 +1084,7 @@ function makeEditable(selector, type, okMessage)
                     var formEl = container.find('.form-inline');
                     formEl.html(getSettings(id,elHeader));
                     container.show();*/
-                    var urlInput = $('.bootstrap-wysihtml5-insert-link-url').after('<button title="File or image" type="button" class="btn editable-filemanager">' +
+                    var urlInput = $('.bootstrap-wysihtml5-insert-link-url').after('<button title="Files and images" type="button" class="btn editable-filemanager">' +
                             '<i class="icon-folder-open"></i></button>' +
                             '<button title="Typo3 page-tree" type="button" class="btn editable-pagebrowser">' +
                             '<i class="icon-list-alt"></i></button>');
@@ -1086,6 +1101,7 @@ function makeEditable(selector, type, okMessage)
                                 openEffect: 'none',
                                 closeEffect: 'none',
                                 type: 'iframe',
+                                modal: false,
                                 href: 'typo3conf/ext/lth_feedit_simple/vendor/cute/index.html',
                                 afterLoad:function() {
                                     cute();
@@ -1107,6 +1123,7 @@ function makeEditable(selector, type, okMessage)
                                 openEffect: 'none',
                                 closeEffect: 'none',
                                 type: 'iframe',
+                                modal: false,
                                 href: 'typo3conf/ext/lth_feedit_simple/vendor/bootstraptreeview/index.html',
                                 afterLoad:function() {
                                     getPageTree();
@@ -1157,7 +1174,7 @@ function makeEditable(selector, type, okMessage)
                     return response.responseText;
                 }
             },*/
-            onblur: 'ignore',
+            //onblur: 'ignore',
             title: 'Enter src, title and target',
             /*toggle: 'dblclick',
             value: {
@@ -1205,7 +1222,7 @@ function makeEditable(selector, type, okMessage)
                                 openEffect: 'none',
                                 closeEffect: 'none',
                                 type: 'iframe',
-                                modal: true,
+                                modal: false,
                                 href: 'typo3conf/ext/lth_feedit_simple/vendor/cute/index.html',
                                 afterLoad:function() {
                                     cute();

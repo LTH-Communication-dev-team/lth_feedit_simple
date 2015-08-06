@@ -186,8 +186,7 @@ class user_feeditsimple_adminpanel {
 
 
 	/**
-	  * Gets the CSS and Javascript includes needed for the top panel.
-	  *
+	  * Gets the CSS and Javascript includes needed for the top panel
 	  * @return		void
 	  */
 	protected function getIncludes()
@@ -195,33 +194,24 @@ class user_feeditsimple_adminpanel {
 	    $extPath = t3lib_extMgm::siteRelPath('lth_feedit_simple');
 	    $includes = array(
                 
-                //CSS:
-		'bootstrap.min.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap.min.css'),
+                //bootstrap
+		'bootstrap.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap.css'),
 		'bootstrap-responsive.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-responsive.css'),
-                'bootstrap-theme.min.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-theme.min.css'),
-                'font-awesome.min.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/font-awesome.min.css'),
-                'bootstrap-editable.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-editable.css'),
- 		'bootstrap3-wysihtml5.min.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap3-wysihtml5.min.css'),
-                'datetimepicker.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/datetimepicker.css'),
-                'bootstrap-treeview.css' => $this->getLinkTag($extPath . 'vendor/bootstraptreeview/css/bootstrap-treeview.css'),
-                'lth_feedit_simple.css' => $this->getLinkTag($extPath . 'res/css/lth_feedit_simple.css'),
-
-                //JS:
-                //'wysihtml5x-toolbar.min.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/wysihtml5x-toolbar.min.js'),
-		'bootstrap.min.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap.min.js'),
-                //'handlebars.runtime.min.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/handlebars.runtime.min.js'),
-      		'bootstrap3-wysihtml5.min.js'    => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap3-wysihtml5.all.min.js'),
-
-		'datetimepicker.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-datetimepicker.js'),
+                'bootstrap.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap.js'),
                 
-                //X-editable:
+                //bootstrap-datetimepicker
+                'datetimepicker.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/datetimepicker.css'),
+		'datetimepicker.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-datetimepicker.js'),
+ 
+                //x-editable (bootstrap) 
+                'bootstrap-editable.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-editable.css'),
                 'bootstrap-editable.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-editable.js'),
-
-                //bootstrap3-wysihtml5:
-		//'wysihtml5-0.3.0.min.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/wysihtml5-0.3.0.min.js'),
+                
+                //wysihtml5
+                'bootstrap-wysihtml5.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-wysihtml5.css'),
+		'wysihtml5-0.3.0.min.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/wysihtml5-0.3.0.js'),               
+                'bootstrap-wysihtml5-0.0.2.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-wysihtml5-0.0.2.js'),
 		'wysihtml5.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/wysihtml5.js'),
-
-		
 
                 // load files needed for jquery file upload
                 'jquery.ui.widget.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/vendor/jquery.ui.widget.js'),
@@ -229,12 +219,14 @@ class user_feeditsimple_adminpanel {
                 'jquery.fileupload.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.fileupload.js'),
                 
                 //load files for bootstrap-treeview
+                'bootstrap-treeview.css' => $this->getLinkTag($extPath . 'vendor/bootstraptreeview/css/bootstrap-treeview.css'),
                 'bootstrap-treeview.js' => $this->getScriptTag($extPath . 'vendor/bootstraptreeview/js/bootstrap-treeview.js'),
                 
                 //load files needed for bootstrap-contextmenu
                 'bootstrap-contextmenu.js' => $this->getScriptTag($extPath . 'vendor/bootstrapcontextmenu/bootstrap-contextmenu.js'),
                 
-                // load AJAX handling functions
+                // load files needed for extension itself
+                'lth_feedit_simple.css' => $this->getLinkTag($extPath . 'res/css/lth_feedit_simple.css'), 		
 		'feeditsimple.js' => $this->getScriptTag($extPath . 'res/js/feEditSimple.js'),
 	    );
 
