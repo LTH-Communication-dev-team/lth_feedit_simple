@@ -1,0 +1,159 @@
+<h1>Main Template</h1>
+<!-- ###MAIN_TEMPLATE### begin -->
+###INCLUDES###
+<!-- this allows csshover3-source.htc to be put at top of page -->
+<div id="###CSSPREFIX###-bodyattach"></div>
+<div id="###CSSPREFIX###-container">
+###MENU_BAR###
+</div>
+<!-- Your custom menu with dropdown-menu as default styling -->
+<div id="context-menu">
+    <ul class="dropdown-menu" role="menu">
+        <li><a tabindex="-1">Delete</a></li>
+        <li><a tabindex="-1">Cut</a></li>
+        <li><a tabindex="-1">Copy</a></li>
+        <li><a tabindex="-1">Paste</a></li>
+        <li><a tabindex="-1">Hide</a></li>
+        <li><a tabindex="-1">Show</a></li>
+        <li class="menu-item dropdown dropdown-submenu"><a tabindex="-1">Image orientation</a>
+            <ul class="dropdown-menu">
+                <li><a class=\"feeditSimple-imageorient-0\" href=\"#\">Above, center</a></li>
+                <li><a class=\"feeditSimple-imageorient-1\" href=\"#\">Above, right</a></li>
+                <li><a class=\"feeditSimple-imageorient-2\" href=\"#\">Above, left</a></li>
+                <li><a class=\"feeditSimple-imageorient-8\" href=\"#\">Below, center</a></li>
+                <li><a class=\"feeditSimple-imageorient-9\" href=\"#\">Below, right</a></li>
+                <li><a class=\"feeditSimple-imageorient-10\" href=\"#\">Below, left</a></li>
+                <li><a class=\"feeditSimple-imageorient-17\" href=\"#\">In text, right</a></li>
+                <li><a class=\"feeditSimple-imageorient-18\" href=\"#\">In text, left</a></li>
+                <li>__No wrap:__</a></li>
+                <li><a class=\"feeditSimple-imageorient-25\" href=\"#\">Beside Text, Right</a></li>
+                <li><a class=\"feeditSimple-imageorient-26\" href=\"#\">Beside Text, Left</a></li>
+            </ul>
+        </li>
+        <li class="menu-item dropdown dropdown-submenu"><a tabindex="-1">Image quality and type</a>
+            <ul class="dropdown-menu">
+                <li><a class=\"feeditSimple-image_compression-1\" href=\"#\">None (ignores all other options)</a></li>
+                <li><a class=\"feeditSimple-image_compression-10\" href=\"#\">GIF/256</a></li>
+                <li><a class=\"feeditSimple-image_compression-11\" href=\"#\">GIF/128</a></li>
+                <li><a class=\"feeditSimple-image_compression-12\" href=\"#\">GIF/64</a></li>
+                <li><a class=\"feeditSimple-image_compression-13\" href=\"#\">GIF/32</a></li>
+                <li><a class=\"feeditSimple-image_compression-14\" href=\"#\">GIF/16</a></li>
+                <li><a class=\"feeditSimple-image_compression-15\" href=\"#\">GIF/8</a></li>
+                <li><a class=\"feeditSimple-image_compression-39\" href=\"#\">PNG</a></li>
+                <li><a class=\"feeditSimple-image_compression-30\" href=\"#\">PNG/256</a></li>
+                <li><a class=\"feeditSimple-image_compression-31\" href=\"#\">PNG/128</a></li>
+                <li><a class=\"feeditSimple-image_compression-32\" href=\"#\">PNG/64</a></li>
+                <li><a class=\"feeditSimple-image_compression-33\" href=\"#\">PNG/32</a></li>
+                <li><a class=\"feeditSimple-image_compression-34\" href=\"#\">PNG/16</a></li>
+                <li><a class=\"feeditSimple-image_compression-35\" href=\"#\">PNG/8</a></li>
+                <li><a class=\"feeditSimple-image_compression-21\" href=\"#\">JPG/Very High</a></li>
+                <li><a class=\"feeditSimple-image_compression-22\" href=\"#\">JPG/High</a></li>
+                <li><a class=\"feeditSimple-image_compression-24\" href=\"#\">JPG/Medium</a></li>
+                <li><a class=\"feeditSimple-image_compression-26\" href=\"#\">JPG/Low</a></li>
+                <li><a class=\"feeditSimple-image_compression-28\" href=\"#\">JPG/Very Low</a></li>
+            </ul>
+        </li>
+
+        <li class="menu-item dropdown dropdown-submenu"><a tabindex="-1">Image effect</a>
+            <ul class="dropdown-menu">
+                <li><a class=\"feeditSimple-image_effects-1\" href=\"#\">Rotate 90 CW</a></li>
+                <li><a class=\"feeditSimple-image_effects-2\" href=\"#\">Rotate -90 CCW</a></li>
+                <li><a class=\"feeditSimple-image_effects-3\" href=\"#\">Rotate 180</a></li>
+                <li><a class=\"feeditSimple-image_effects-10\" href=\"#\">Grayscale</a></li>
+                <li><a class=\"feeditSimple-image_effects-11\" href=\"#\">Sharpen</a></li>
+                <li><a class=\"feeditSimple-image_effects-20\" href=\"#\">Normalize</a></li>
+                <li><a class=\"feeditSimple-image_effects-23\" href=\"#\">Contrast</a></li>
+                <li><a class=\"feeditSimple-image_effects-25\" href=\"#\">Brighter</a></li>
+                <li><a class=\"feeditSimple-image_effects-26\" href=\"#\">Darker</a></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+<input type="hidden" name="TSFE_ADMIN_PANEL[preview_showHiddenRecords]" value="1" id="TSFE_ADMIN_PANEL-preview_showHiddenRecords" />
+<!-- ###MAIN_TEMPLATE### end -->
+
+
+
+<h1>Template, to show the button "Activate editing" when editing is enabled but not active</h1>
+<!-- ###MENU_CLOSED### begin -->
+<div id="###CSSPREFIX###-menuBar" class="###CSSPREFIX###-closedMenu closedMenu">
+	<a class="###CSSPREFIX###-smallButton" href="#" onclick="document.TSFE_ADMIN_PANEL_Form.elements['TSFE_ADMIN_PANEL[menuOpen]'].value = 1; document.TSFE_ADMIN_PANEL_Form.submit(); return false;" title="###OPEN_EDIT_MODE_TOOLTIP###">
+		<span class="feEditSimple-smallButtonText">###OPEN_EDIT_MODE###</span>
+	</a>
+</div>
+<!-- ###MENU_CLOSED### end -->
+
+
+
+<h1>Template, holding the menubar</h1>
+<!-- ###MENU_OPENED### begin -->
+<div id="###CSSPREFIX###-menuBar">
+	<div class="###CSSPREFIX###-firstRow">
+		<div id="###CSSPREFIX###-pageEditToolbar" class="###CSSPREFIX###-menuToolbar">###PAGE_EDIT_PANEL###</div>
+		<!-- ###SECTIONS_FIRST_ROW### begin -->
+			<!-- ###SECTION### begin -->
+				<div id="###SECTION_CSSID###" class="###CSSPREFIX###-menuToolbar connectedSortable" ###SECTION_INLINECSS###>###SECTION_ITEMS###</div>
+			<!-- ###SECTION### end -->
+			<!-- ###SINGLE_ITEM### begin -->###ITEM_SEPARATOR######ITEM_NAME###<!-- ###SINGLE_ITEM### end -->
+			<!-- ###SEPARATOR### begin --><span class="###CSSPREFIX###-separator separatorBar"></span><!-- ###SEPARATOR### end -->
+				
+		<!-- ###SECTIONS_FIRST_ROW### end -->
+		
+		<!-- ###USERLISTING### begin -->
+			<dl class="###CSSPREFIX###-menuUserlist"><dt>###USER_LABEL###</dt><dd>###USER_LIST###</dd></dl>
+		<!-- ###USERLISTING### end -->
+	</div>
+	<div class="###CSSPREFIX###-secondRow">
+	<!-- ###SECTIONS_SECOND_ROW### begin -->
+		Templates from first Row are used!
+	<!-- ###SECTIONS_SECOND_ROW### end-->
+		<div id="###CSSPREFIX###-logo">
+			<a href="http://www.typo3.com/">
+				<img src="###EXTPATH###/res/icons/typo3logo_mini_transparent.gif" alt="" />
+			</a>
+		</div>
+	</div>
+        <div class="###CSSPREFIX###-thirdRow">
+            <form class="form-inline">
+
+            </form>
+        </div>
+        <div class="###CSSPREFIX###-fourthRow">
+        </div>
+</div>
+<!-- ###MENU_OPENED### end -->
+
+
+
+<h1>Default edit-panel</h1>
+<!-- ###EDITPANEL### begin -->
+<div class="feEditSimple-allWrapper###ALLWRAPPER_CLASS###" id="###EDITPANEL_ID###">
+	<!-- ###HOVERFORM### start -->
+	<form name="###FORM_NAME###" id="###FORM_NAME###" action="###FORM_URL###" method="post" enctype="###FORM_ENCTYPE###">
+		###FORM_HIDDENFIELDS###
+		###FORM_CONTENT###	
+		<div class="feEditSimple-editPanelDiv" style="display: none;">
+			###EDITPANEL_ACTIONS###
+		</div>
+	</form>	
+	<!-- ###HOVERFORM### end -->
+	<div class="feEditSimple-contentWrapper###CWRAPPER_CLASS###" ###CWRAPPER_EXTRA###>
+				
+		<!-- ###EDITFORM### start -->
+		<form accept-charset="UTF-8" name="###EDITFORM_NAME###" id="###EDITFORM_NAME###" action="###EDITFORM_URL###" method="post" enctype="###FORM_ENCTYPE###" onsubmit="###FORM_ONSUBMIT###">
+			<input type="hidden" name="cod_hack" value="&#153;">
+			###EDITFORM_HIDDENFIELDS###
+			###EDITFORM_CONTENT###
+		</form>
+		<!-- ###EDITFORM### end -->
+		###CONTENT_ELEMENT###
+	</div>
+</div>
+<!-- ###EDITPANEL### end-->
+
+
+
+<h1>Default editpanel Action</h1>
+<!-- ###EDITPANEL_ACTION### start -->
+<input type="button" class="feEditSimple-editButton ###ACTION_CLASS###" value="###ACTION_VALUE###" title="###ACTION_LABEL###" ###ACTION_PARAMS###/>
+<!-- ###EDITPANEL_ACTION### end -->
