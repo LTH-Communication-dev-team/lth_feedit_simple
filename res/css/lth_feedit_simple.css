@@ -25,6 +25,11 @@ body {
 
 }
 
+.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0; // remove the gap so it doesn't close
+ }
+
 div#feEditSimple-bodyattach {
 	behavior: url(typo3conf/ext/lth_feedit_simple/res/css/csshover3-source.htc);
 }
@@ -50,11 +55,9 @@ div#feEditSimple-menuBar {
 	left: 0;
 	top: 0;
 	width: 100%;
-	color: #fff;
 	padding: 0;
 	margin: 0;
 	z-index: 8000;
-	font-family: Helvetica, Arial, sans-serif;
 	font-size: 90%;
         min-width: 992px;
 }
@@ -75,6 +78,9 @@ div.feEditSimple-menuToolbar div.feEditSimple-spacer {
 	width: 20px;
 }
 
+.dropdown a {
+    text-decoration: none;
+}
 
 div#feEditSimple-menuBar .feEditSimple-firstRow a.feEditSimple-smallButton,
 div#feEditSimple-menuBar .feEditSimple-firstRow div.feEditSimple-smallButton,
@@ -925,7 +931,7 @@ div.feEditSimple-contentWrapperSmall .start-grid-8 {
 }
 
 .feEditSimple-secondRow {
-    visibility: hidden;
+    display: none;
 }
 
 #lth_feedit_simple_create_news {

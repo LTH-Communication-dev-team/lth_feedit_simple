@@ -340,6 +340,11 @@ function moveContent($cmd, $table, $uid, $pid, $pageUid, $oldUid = null)
 
     try {
         $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($uid), array('pid' => intval($pageUid), 'sorting' => intval($newSorting)));
+        if($GLOBALS['TYPO3_DB']->sql_affected_rows() > 0) {
+            $returnArray['result'] = 200;
+        } else {
+        $returnArray['result'] = 500;
+        }
         if($cmd == 'cut' || $cmd == 'copy') {
             $returnArray = getClipboard();
             $returnArray['oldUid'] = $oldUid;

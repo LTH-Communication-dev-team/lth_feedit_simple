@@ -32,7 +32,17 @@ var saveBeforeStopUid = function(input) {
     beforeStopUid = input;
 };
 
-$(document).ready(function() {
+$(document).ready(function()
+{
+    //Hide new content elements row on blur
+    $("html").mouseup(function(e)
+    {
+        var subject = $("#feEditSimple-secondRow");
+        if(e.target.id != subject.attr('id') && !subject.has(e.target).length)
+        {
+            subject.fadeOut();
+        }
+    });
     ////console.log($('#feEditSimple-normalColWrapper').is(':empty'));
     //add empty div if no content
     if($('#feEditSimple-normalColWrapper').is(':empty')) {
@@ -44,25 +54,27 @@ $(document).ready(function() {
         connectWith: '.connectedSortable',
         placeholder: 'ui-state-highlight',
         cursor: 'move',
-        stop: function( event, ui ) {
-            var pid = '';
-            var pageUid = 0;
-            
-            if(!ui.item.context.previousSibling) {
-                // Sorting number is in the top
-                pid = $('body').attr('id').toString(); //pid=6
-                pageUid = pid;
-            } else {
-                // Sorting number is inside the list
-                pid = '-'+ui.item.context.previousSibling.id.toString(); //pid = -63
-                pageUid = $('body').attr('id');
-            }
-            
-            var table = 'tt_content';
-            var uid = ui.item.context.id;
-            var okMessage = {'header' : 'Move', 'message': 'Content element succefully moved'};
-            ajaxCall('moveContent', table, uid, pid, pageUid, okMessage);
-            //function getSortNumber($table,$uid,$pid)
+        update: function( event, ui ) {
+            if(ui.item.attr('class').indexOf('feEditSimple-contentTypeItem') < 0) {
+
+                var pid = '';
+                var pageUid = 0;
+                if(!ui.item.context.previousSibling) {
+                    // Sorting number is in the top
+                    pid = $('body').attr('id').toString(); //pid=6
+                    pageUid = pid;
+                } else {
+                    // Sorting number is inside the list
+                    pid = '-'+ui.item.context.previousSibling.id.toString(); //pid = -63
+                    pageUid = $('body').attr('id');
+                }
+
+                var table = 'tt_content';
+                var uid = ui.item.context.id;
+                var okMessage = {'header' : 'Move', 'message': 'Content element succefully moved'};
+                ajaxCall('moveContent', table, uid, pid, pageUid, okMessage);
+                //function getSortNumber($table,$uid,$pid)
+            };
         }
     }).disableSelection();
     
@@ -73,8 +85,9 @@ $(document).ready(function() {
         connectToSortable:'#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper',
        
         stop: function( e, ui ) {
-            //console.log(ui);
+            
             var templateArray = getContentTemplate(ui.helper.context.rel);
+            
             var newUid = templateArray[0];
             var template = templateArray[1];
             var CType = getCtype(ui.helper.context.rel);
@@ -82,6 +95,9 @@ $(document).ready(function() {
             $('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper').find('.ui-draggable').replaceWith(template);
             makeEditable('#'+newUid+' .lth_feeditsimple_content', CType, okMessage);
             $('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper').sortable('refresh');
+            if(okMessage) {
+                showMessage(okMessage);
+            }
            //$(ui.helper).remove();
             /*var templateArray = getContentTemplate(ui.item.context.rel);
             var newUid = templateArray[0];
@@ -292,11 +308,12 @@ $(document).ready(function() {
           // execute code before context menu if shown
         },
         onItem: function(context,e) {
-            console.log($(e.target).text());
+            //console.log($(e.target).text());
             feeditSimpleContentCommand(context, e);// execute on menu item selection
         }
     });
     
+    //hide och show hidden content elements at startup
     var displayString = feeditSimpleGetCookie('feeditSimple-usersettings');
     if(displayString) {
         var displayObject = JSON.parse(unescape(displayString));
@@ -316,6 +333,7 @@ $(document).ready(function() {
 
     //document ready ends**************************************************************************************************
 });
+
 
 function feeditSimpleContentCommand(context, e)
 {
@@ -370,6 +388,12 @@ function feeditSimpleContentCommand(context, e)
         case 'Show':
             var okMessage = {'header' : 'Show', 'message': 'Content element succefully displayed'};
             ajaxCall('showContent', 'tt_content', uid, '', '', okMessage);
+            break;
+        case 'Above, center':
+        case 'Above, left':
+        case 'Above, right':
+            console.log(cmd);
+            //showMessage({'header' : 'Image', 'message': 'Image orient succefully updated'});
             break;
         default:
             //default code block
@@ -776,8 +800,7 @@ function toggleItem(selector,eType)
 
 function newContent()
 {
-    $('.feEditSimple-secondRow').css('visibility','visible');
-    $('#lth_feedit_simple_top_menu_hide_content_elements_row').show();
+    $('.feEditSimple-secondRow').fadeIn();
 }
 
 //extract cType
@@ -797,7 +820,7 @@ function getContentTemplate(rel)
         '<div id="lth_feeditsimple_img_NEW" data-type="address" data-pk="img_NEW" class="lth_feeditsimple_img">' +
         '<div class="csc-textpic-text">' +
         '<div id="lth_feeditsimple_NEW" data-type="wysihtml5" data-pk="NEW" class="lth_feeditsimple_content">' +
-        '<p class="feEditSimple-empty">Empty</p>' +
+        //'<p class="feEditSimple-empty">Empty</p>' +
         '</div>' +
         '</div>' +
         '</div>' +
@@ -902,8 +925,8 @@ function makeEditable(selector, type, okMessage)
             "</li>" +
             "<li>" +*/
             return "<li><div class=\"btn-group\">" +
-            "<a class=\"btn feeditSimple-h2\" data-wysihtml5-command=\"formatBlock\" data-wysihtml5-command-value=\"h2\" title=\"H2\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">H2</a>" +
-"<a class=\"btn feeditSimple-code\" data-wysihtml5-command=\"formatBlock\" data-wysihtml5-command-value=\"code\" title=\"Code\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">C</a>" +
+            "<a class=\"btn feeditSimple-h2\" data-wysihtml5-command=\"formatBlock\" data-wysihtml5-command-value=\"h2\" title=\"H2\" tabindex=\"-1\" unselectable=\"on\">H2</a>" +
+"<a class=\"btn feeditSimple-formatCode\" data-wysihtml5-command=\"formatCode\" data-wysihtml5-command-value=\"code\" title=\"Code\" tabindex=\"-1\" unselectable=\"on\">C</a>" +
             "<a class=\"btn\" data-wysihtml5-command=\"bold\" title=\"CTRL+B\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">B</a>" +
             "<a class=\"btn\" data-wysihtml5-command=\"italic\" title=\"CTRL+I\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">I</a>" +
             "</div>" +
@@ -915,12 +938,14 @@ function makeEditable(selector, type, okMessage)
             "<a class=\"btn feeditSimple-insertImage\" data-wysihtml5-command=\"insertImage\" title=\"Insert image\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\"><i class=\"icon-picture\"></i></a>" +
             "</li>";
         }
-    };
         
+    };
+
     if(type==='text' || type==='textpic') {
         //console.log(type+selector);
         $(selector).editable({
             mode: 'inline',
+            defaultValue: 'Empty',
             url: 'typo3/alt_doc.php?doSave=1',
             params: function(params) {
                 var theImages = '';
@@ -962,6 +987,7 @@ function makeEditable(selector, type, okMessage)
                 "emphasis": true,
                 "customTemplates": myCustomTemplates,
                 "font-styles": false,
+                "format-code": true,
                 //"html": true, //Button which allows you to edit the generated HTML. Default false
                 "image": true, //Button to insert an image. Default true,    
             },
@@ -1183,7 +1209,9 @@ function makeEditable(selector, type, okMessage)
                 target: "15"
             }*/
         });
+
         $('.lth_feeditsimple_img').on('shown', function(e, editable) {
+            
             //input-small bootstrap-wysihtml5-insert-link-url
             var id = $(this).attr('id');
             id = id.split('_').pop();
@@ -1256,7 +1284,7 @@ function makeEditable(selector, type, okMessage)
                 },
                 error: function(data){
                     //console.log(data);
-                    showMessage({message : 'no', header : 'no'});
+                    showMessage({message : 'no', header : '1276'});
                 }
             });
 
@@ -1341,11 +1369,11 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
             if(data.result == 200 && okMessage) {
                 showMessage(okMessage);
             } else if(okMessage) {
-                showMessage({message : 'no', header : 'no'});
+                showMessage({message : 'no'+cmd, header : '1361'});
             }
         },
         error: function(data){
-            showMessage({message : 'no', header : 'no'});
+            showMessage({message : 'no', header : '1365'});
         }
     });
 }
@@ -1538,4 +1566,38 @@ function toggleHiddenObject(inputClass, myType)
         formEl.html('');
         container.hide();
     });*/
-    
+    //Add Code button
+(function(wysihtml5) {
+var undef;
+
+wysihtml5.commands.formatCode = {
+    exec: function(composer) {
+    var pre = this.state(composer);
+    if (pre) {
+      // caret is already within a <pre><code>...</code></pre>
+      composer.selection.executeAndRestore(function() {
+        var code = pre.querySelector("code");
+        wysihtml5.dom.replaceWithChildNodes(pre);
+        if (code) {
+          wysihtml5.dom.replaceWithChildNodes(pre);
+        }
+      });
+    } else {
+      // Wrap in <pre><code>...</code></pre>
+      var range = composer.selection.getRange(),
+          selectedNodes = range.extractContents(),
+          pre = composer.doc.createElement("pre"),
+          code = composer.doc.createElement("code");
+      pre.appendChild(code);
+      code.appendChild(selectedNodes);
+      range.insertNode(pre);
+      composer.selection.selectNode(pre);
+    }
+    },
+    state: function(composer) {
+        var selectedNode = composer.selection.getSelectedNode();
+        return wysihtml5.dom.getParentElement(selectedNode, { nodeName: "CODE" }) && wysihtml5.dom.getParentElement(selectedNode, { nodeName: "PRE" });
+    }
+};
+
+})(wysihtml5);

@@ -203,119 +203,117 @@ class lth_feeditsimple_menu {
             $nav_hide = $GLOBALS['TSFE']->page['nav_hide'];
             $content = '';
             $content .= $extraCSS;
+            /*
+             * lth_feedit_simple_top_menu
+             * <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+             */
             $content .= '
-            <ul class="lth_feedit_simple_top_menu">
+            <ul class="nav">
                 
-                <li id="lth_feedit_simple_top_menu_page" class="top_menu_item" onmouseenter="toggleItem(\'.feEditSimple-pageItemsMenu\',\'me\');return false;" onmouseleave="toggleItem(\'.feEditSimple-pageItemsMenu\');return false;" >
-                    <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageTooltip').'">
-                        <span class="icon-white-edit"></span>
-                        <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:page').'</span>
+                <li id="" class="dropdown" title="">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageTooltip').'">
+                        <span class="icon-edit"></span>
+                        '.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:page').'
                     </a>
-                    <div class="feEditSimple-pageItemsMenu top_menu_div">
-                        <ul>
-                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageEditPageTooltip').'" href="#" onclick="editPage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageEditPage').'</a></li>
-                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageMovePageTooltip').'" href="#" onclick="movePage(\'\');return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageMovePage').'</a></li>
-                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageCopyPageTooltip').'" href="#" onclick="movePage(\'copy\');return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageCopyPage').'</a></li>
-                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageDeletePageTooltip').'" href="#" onclick="deletePage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageDeletePage').'</a></li>';
-                            if($hidden) {
-                                $content .= '<li id="hideShowPage"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageShowPageTooltip').'" href="#" onclick="showPage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageShowPage').'</a></li>';
-                            } else {
-                                $content .= '<li id="hideShowPage"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageHidePageTooltip').'" href="#" onclick="hidePage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageHidePage').'</a></li>';
-                            }
-                            if($nav_hide) {
-                                $content .= '<li id="hideShowPageInMenu"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageShowPageInMenuTooltip').'" href="#" onclick="showPageInMenu();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageShowPageInMenu').'</a></li>';
-                            } else {
-                                $content .= '<li id="hideShowPageInMenu"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageHidePageInMenuTooltip').'" href="#" onclick="hidePageInMenu();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageHidePageInMenu').'</a></li>';
-                            }
-                        $content .= '</ul>
-                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageEditPageTooltip').'" href="#" onclick="editPage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageEditPage').'</a></li>
+                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageMovePageTooltip').'" href="#" onclick="movePage(\'\');return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageMovePage').'</a></li>
+                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageCopyPageTooltip').'" href="#" onclick="movePage(\'copy\');return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageCopyPage').'</a></li>
+                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageDeletePageTooltip').'" href="#" onclick="deletePage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageDeletePage').'</a></li>';
+                        if($hidden) {
+                            $content .= '<li id="hideShowPage"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageShowPageTooltip').'" href="#" onclick="showPage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageShowPage').'</a></li>';
+                        } else {
+                            $content .= '<li id="hideShowPage"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageHidePageTooltip').'" href="#" onclick="hidePage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageHidePage').'</a></li>';
+                        }
+                        if($nav_hide) {
+                            $content .= '<li id="hideShowPageInMenu"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageShowPageInMenuTooltip').'" href="#" onclick="showPageInMenu();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageShowPageInMenu').'</a></li>';
+                        } else {
+                            $content .= '<li id="hideShowPageInMenu"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageHidePageInMenuTooltip').'" href="#" onclick="hidePageInMenu();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageHidePageInMenu').'</a></li>';
+                        }
+                    $content .= '</ul>
                 </li>
 
-		<li id="lth_feedit_simple_top_menu_new" class="top_menu_item" onmouseenter="toggleItem(\'.feEditSimple-newItemsMenu\',\'me\');return false;" onmouseleave="toggleItem(\'.feEditSimple-newItemsMenu\');return false;">
-                    <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newTooltip').'">
-                        <span class="icon-white-plus"></span>
+		<li id="" class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newTooltip').'">
+                        <span class="icon-plus"></span>
                         <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:new').'</span>
                     </a>
-                    <div class="feEditSimple-newItemsMenu top_menu_div">
-                        <ul>
+                    <ul class="dropdown-menu">
                             <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newPageTooltip').'" href="#" onclick="newPage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newPage').'</a></li>
                             <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newContentTooltip').'" href="#" onclick="newContent();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newContent').'</a></li>
                             <!-- <li id="lth_feedit_simple_create_news"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newNewsTooltip').'" href="#" onclick="createNews();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newNews').'</a></li> -->
                             <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newInsertRightColumnTooltip').'" href="#" onclick="addRightColumn();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newInsertRightColumn').'</a></li>
-                        </ul>
-                    </div>
+                    </ul>
                 </li>
-                
-                <li id="lth_feedit_simple_top_menu_tool" class="top_menu_item" onmouseenter="toggleItem(\'.feEditSimple-toolItemsMenu\',\'me\');return false;" onmouseleave="toggleItem(\'.feEditSimple-toolItemsMenu\');return false;">
-                    <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolTooltip').'">
-                        <span class="icon-white-cog"></span>
+             
+                <li id="" class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolTooltip').'">
+                        <span class="icon-cog"></span>
                         <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:tool').'</span>
                     </a>
-                    <div class="feEditSimple-toolItemsMenu top_menu_div">
-                        <ul>
+                        <ul class="dropdown-menu">
                             <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolFileManagerTooltip').'" href="#" onclick="fileManager();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolFileManager').'</a></li>
                             <li id="formHandlerManagerMenu"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolMailFormManagerTooltip').'" href="#" onclick="mailFormAdmin();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolMailFormManager').'</a></li>
-                       </ul>
-                    </div>
+                        </ul>
                 </li>                
 
-                <li id="lth_feedit_simple_top_menu_display" class="top_menu_item" onmouseenter="toggleItem(\'.feEditSimple-displayItemsMenu\',\'me\');return false;" onmouseleave="toggleItem(\'.feEditSimple-displayItemsMenu\');return false;">
-                    <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayTooltip').'">
-                        <span class="icon-white-eye-open"></span>
+                <li id="" class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayTooltip').'">
+                        <span class="icon-eye-open"></span>
                         <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:display').'</span>
                     </a>
-                    <div class="feEditSimple-displayItemsMenu top_menu_div">
-                        <ul>
-                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenContentTooltip').'" href="#" onclick="toggleHiddenObject(\'.hidden-1\',\'hiddenElement\');return false;"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenContent').'</span><span id="hiddenElement" style="display:' . str_replace('block','inline-block',$userSettingsArray['hiddenElement']) . '" class="icon-white-ok"></span></a></li>
-                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenInMenuTooltip').'" href="#" onclick="toggleHiddenObject(\'.feEditSimple-hiddenInMenu-1\',\'hiddenInMenu\');return false;"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenInMenu').'</span><span id="hiddenInMenu" style="display:' . str_replace('block','inline-block',$userSettingsArray['hiddenInMenu']) . '" class="icon-white-ok"></span></a></li>
-                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenPageTooltip').'" href="#" onclick="toggleHiddenObject(\'.feEditSimple-hiddenPage-1\',\'hiddenPage\');return false;"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenPage').'</span><span id="hiddenPage" style="display:' . str_replace('block','inline-block',$userSettingsArray['hiddenPage']) . '" class="icon-white-ok"></a></li>
+                        <ul class="dropdown-menu">
+                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenContentTooltip').'" href="#" onclick="toggleHiddenObject(\'.hidden-1\',\'hiddenElement\');return false;"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenContent').'</span><span id="hiddenElement" style="display:' . str_replace('block','inline-block',$userSettingsArray['hiddenElement']) . '" class="icon-ok"></span></a></li>
+                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenInMenuTooltip').'" href="#" onclick="toggleHiddenObject(\'.feEditSimple-hiddenInMenu-1\',\'hiddenInMenu\');return false;"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenInMenu').'</span><span id="hiddenInMenu" style="display:' . str_replace('block','inline-block',$userSettingsArray['hiddenInMenu']) . '" class="icon-ok"></span></a></li>
+                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenPageTooltip').'" href="#" onclick="toggleHiddenObject(\'.feEditSimple-hiddenPage-1\',\'hiddenPage\');return false;"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenPage').'</span><span id="hiddenPage" style="display:' . str_replace('block','inline-block',$userSettingsArray['hiddenPage']) . '" class="icon-ok"></a></li>
                         </ul>
-                    </div>
                 </li>
-                
-                <li id="lth_feedit_simple_top_menu_help" class="top_menu_item">
+             
+                <li id="" class="">
                     <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:helpTooltip').'" onclick="loadHelp(\''.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:langsel') . '\');return false;" href="#">
-                        <span class="icon-white-question-sign"></span>
+                        <span class="icon-question-sign"></span>
                         <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:help').'</span>
                     </a>
-                </li>';
+                </li>
+                ';
                         
-                $hiddenStyle = ' style="display:none;"';
+                /*$hiddenStyle = ' style="display:none;"';
                 if ($_COOKIE['lth_feedit_simple_copycutitem']) {
                     $hiddenStyle ='';
                 }
                 $content .= '<li id="lth_feedit_simple_top_menu_paste" class="top_menu_item"'.$hiddenStyle.'>
                     <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pasteTooltip').'" onclick="pasteAction(\'\');return false;" href="#">
-                    <span class="icon-white-download-alt"></span>
+                    <span class="icon-download-alt"></span>
                     <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:paste').'</span>
                     </a>
                 </li>';
 		
 		$content .= '<li id="lth_feedit_simple_top_menu_hide_content_elements_row" class="top_menu_item"'.$hiddenStyle.'>
                     <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:hideContentElementsRowTooltip').'" onclick="hideContentElementsRow(\'\');return false;" href="#">
-                    <span class="icon-white-remove"></span>
+                    <span class="icon-remove"></span>
                     <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:hideContentElementsRow').'</span>
                     </a>
-                </li>';
+                </li>';*/
                 
-                $content .= '<li id="lth_feedit_simple_top_menu_message" class="top_menu_item">
+                $content .= '<li id="" class="">
                     <div id="msg-div"></div>
                 </li>
                 
-                <li id="lth_feedit_simple_top_logo"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:topLogoTooltip').'" href="http://typo3.org"><div class="lth_feedit_simple_top_logo"></div></a></li>
+                <li class="lth_feedit_simple_top_logo" id="">
+                    <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:topLogoTooltip').'" href="http://typo3.org">
+                    <span class="lth_feedit_simple_top_logo"></span></a>
+                </li>
                 
-                <li id="lth_feedit_simple_top_menu_user" class="top_menu_item" onmouseenter="toggleItem(\'.feEditSimple-userItemsMenu\',\'me\');return false;" onmouseleave="toggleItem(\'.feEditSimple-userItemsMenu\');return false;">
-                    <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userTooltip').'">
-                        <span class="icon-white-user"></span>
-                        <span>' . $GLOBALS['BE_USER']->user['username'] . '</span>
+                <li id="" class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userTooltip').'">
+                        <span class="icon-user"></span>
+                        ' . $GLOBALS['BE_USER']->user['username'] . '
                     </a>
-                    <div class="feEditSimple-userItemsMenu top_menu_div">
-                        <ul>
-                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userSettingsTooltip').'" href="#" onclick="userSettings();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userSettings').'</a></li>
-                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userBackendTooltip').'" href="/typo3/">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userBackend').'</a></li>
-                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogoutTooltip').'" href="#" onclick="feeditsimple_logout(\'' . t3lib_div::getIndpEnv('TYPO3_REQUEST_URL') . '\');return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogout').'</a></li>
-                        </ul>
-                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userSettingsTooltip').'" href="#" onclick="userSettings();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userSettings').'</a></li>
+                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userBackendTooltip').'" href="/typo3/">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userBackend').'</a></li>
+                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogoutTooltip').'" href="#" onclick="feeditsimple_logout(\'' . t3lib_div::getIndpEnv('TYPO3_REQUEST_URL') . '\');return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogout').'</a></li>
+                    </ul>
                 </li>
                 
                 

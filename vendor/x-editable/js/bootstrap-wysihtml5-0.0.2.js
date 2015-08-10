@@ -121,7 +121,6 @@
         this.el = el;
         var toolbarOpts = options || defaultOptions;
         for(var t in toolbarOpts.customTemplates) {
-            console.log(t);
           tpl[t] = toolbarOpts.customTemplates[t];
         }
         this.toolbar = this.createToolbar(el, toolbarOpts);

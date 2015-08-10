@@ -9,6 +9,7 @@
 <!-- Your custom menu with dropdown-menu as default styling -->
 <div id="context-menu">
     <ul class="dropdown-menu" role="menu">
+        <li class="dropdown-header">Content elements</li>
         <li><a tabindex="-1">Delete</a></li>
         <li><a tabindex="-1">Cut</a></li>
         <li><a tabindex="-1">Copy</a></li>
@@ -87,12 +88,12 @@
 
 <h1>Template, holding the menubar</h1>
 <!-- ###MENU_OPENED### begin -->
-<div id="###CSSPREFIX###-menuBar">
-	<div class="###CSSPREFIX###-firstRow">
-		<div id="###CSSPREFIX###-pageEditToolbar" class="###CSSPREFIX###-menuToolbar">###PAGE_EDIT_PANEL###</div>
+<div class="" id="###CSSPREFIX###-menuBar">
+	<div class="navbar" style="margin-bottom:0px;">
+		<div id="" class="navbar-inner">###PAGE_EDIT_PANEL###</div>
 		<!-- ###SECTIONS_FIRST_ROW### begin -->
 			<!-- ###SECTION### begin -->
-				<div id="###SECTION_CSSID###" class="###CSSPREFIX###-menuToolbar connectedSortable" ###SECTION_INLINECSS###>###SECTION_ITEMS###</div>
+				<div id="###SECTION_CSSID###" class="###CSSPREFIX###-menuToolbar" ###SECTION_INLINECSS###>###SECTION_ITEMS###</div>
 			<!-- ###SECTION### end -->
 			<!-- ###SINGLE_ITEM### begin -->###ITEM_SEPARATOR######ITEM_NAME###<!-- ###SINGLE_ITEM### end -->
 			<!-- ###SEPARATOR### begin --><span class="###CSSPREFIX###-separator separatorBar"></span><!-- ###SEPARATOR### end -->
@@ -103,7 +104,7 @@
 			<dl class="###CSSPREFIX###-menuUserlist"><dt>###USER_LABEL###</dt><dd>###USER_LIST###</dd></dl>
 		<!-- ###USERLISTING### end -->
 	</div>
-	<div class="###CSSPREFIX###-secondRow">
+	<div id="###CSSPREFIX###-secondRow" class="###CSSPREFIX###-secondRow">
 	<!-- ###SECTIONS_SECOND_ROW### begin -->
 		Templates from first Row are used!
 	<!-- ###SECTIONS_SECOND_ROW### end-->
