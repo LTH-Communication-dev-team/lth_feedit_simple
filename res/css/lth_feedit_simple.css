@@ -25,6 +25,16 @@ body {
 
 }
 
+.csc-default {
+    border-bottom: 1px #08C dashed;
+    margin-bottom: 10px;
+}
+
+.editable-click {
+    border: none;
+    padding: 0px;
+}
+
 .dropdown:hover .dropdown-menu {
     display: block;
     margin-top: 0; // remove the gap so it doesn't close
@@ -80,6 +90,11 @@ div.feEditSimple-menuToolbar div.feEditSimple-spacer {
 
 .dropdown a {
     text-decoration: none;
+}
+
+.dropdown-header {
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 div#feEditSimple-menuBar .feEditSimple-firstRow a.feEditSimple-smallButton,
@@ -746,31 +761,88 @@ div#feEditSimple-menuBar div#feEditSimple-pageEditToolbar {
 	width: 16px;
 }
 
+/**************************************TYPO3 MESSAGE BOX****************************************************/
+
 .t3-icon-message-ok-close {
 	background-position: -162px -36px !important;
 
 }
 
 .typo3-message {
-	background-position: 1.2em 1.8em;
-	background-repeat: no-repeat;
-	border: 1px solid;
-	color: #9e7d4a;
-	padding: 1.5em 1.5em 1em 3.5em;
+    background-position: 1.2em 1.8em;
+    background-repeat: no-repeat;
+    border: 1px solid;
+    color: #9e7d4a;
+    padding: 1.5em 1.5em 1em 3.5em;
+}
+
+.message-ok, .message-warning, .message-error, .message-notice {
+    /*color: #3b7826;
+    background-color: #cdeaca;
+    background-image: url('../icons/gfx/ok.png');
+    border-color: #58b548;*/
+    position: absolute;
+    z-index: 15000;
+    top: 42px;
+}
+
+.typo3-message .message-header {
+    font-weight: bold;
+ }
+ 
+.message-notice {
+    color: #777;
+    background-color: #f6f7fa;
+    background-image: url('../icons/gfx/notice.png');
+    border-color: #c2cbcf;
+}
+
+.message-notice a {
+    color: #777;
+}
+
+.message-information {
+    color: #4c73a1;
+    background-color: #eaf7ff;
+    background-image: url('../icons/gfx/information.png');
+    border-color: #c5dbe6;
+}
+
+.message-information a {
+    color: #4c73a1;
 }
 
 .message-ok {
-	color: #3b7826;
-	background-color: #cdeaca;
-	background-image: url('../icons/gfx/ok.png');
-	border-color: #58b548;
-        position: absolute;
-        z-index: 15000;
-        top: 34px;
+    color: #3b7826;
+    background-color: #cdeaca;
+    background-image: url('../icons/gfx/ok.png');
+    border-color: #58b548;
 }
 
 .message-ok a {
-	color: #3b7826;
+    color: #3b7826;
+}
+
+.message-warning {
+    color: #9e7d4a;
+    background-color:#fbf6de;
+    background-image: url("../icons/gfx/warning.png");
+    border-color: #b1905c;
+}
+
+.message-warning a {
+    color: #9e7d4a;
+}
+
+.message-error {
+    color: #aa0225;
+    background-color: #f6d3cf;
+    background-image: url('../icons/gfx/error.png');
+    border-color: #d66c68;
+}
+
+.message-error a {
+    color: #aa0225;
 }
 
 /*-------------------Extend specific---------------------------------*/

@@ -34,6 +34,7 @@ var saveBeforeStopUid = function(input) {
 
 $(document).ready(function()
 {
+    $('.csc-textpic-image').attr('data-type', 'address');
     //Hide new content elements row on blur
     $("html").mouseup(function(e)
     {
@@ -71,7 +72,7 @@ $(document).ready(function()
 
                 var table = 'tt_content';
                 var uid = ui.item.context.id;
-                var okMessage = {'header' : 'Move', 'message': 'Content element succefully moved'};
+                var okMessage = {'header' : 'Move', 'message': 'Content element successfully moved'};
                 ajaxCall('moveContent', table, uid, pid, pageUid, okMessage);
                 //function getSortNumber($table,$uid,$pid)
             };
@@ -91,7 +92,7 @@ $(document).ready(function()
             var newUid = templateArray[0];
             var template = templateArray[1];
             var CType = getCtype(ui.helper.context.rel);
-            var okMessage = {'header' : 'Move', 'message': 'Content element succefully created'};
+            var okMessage = {'header' : 'Move', 'message': 'Content element successfully created'};
             $('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper').find('.ui-draggable').replaceWith(template);
             makeEditable('#'+newUid+' .lth_feeditsimple_content', CType, okMessage);
             $('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper').sortable('refresh');
@@ -142,7 +143,7 @@ $(document).ready(function()
 	},
         stop : function(event, ui) {
             var cType = getCtype(ui.item.context.rel);
-            var okMessage = {'header' : 'Move', 'message': 'Content element succefully created'};
+            var okMessage = {'header' : 'Move', 'message': 'Content element successfully created'};
             $(this).sortable('cancel');
             makeEditable('#'+beforeStopUid+' .lth_feeditsimple_content', cType, okMessage);
             $('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper').sortable('refresh');
@@ -280,41 +281,73 @@ $(document).ready(function()
            });
        }     */  
     });
-
+/*
+ * $('.bootstrap-wysihtml5-insert-link-url').after('<button title="File or image" type="button" class="btn editable-filemanager">' +
+                            '<i class="icon-folder-open"></i></button>');
+ */
     Address.defaults = $.extend({}, $.fn.editabletypes.abstractinput.defaults, {
-        tpl: '<div class="editable-address"><label><span>Src: </span></label><input type="text" name="src" class="input bootstrap-wysihtml5-insert-link-url"></div>'+
-             '<div class="editable-address"><label><span>Title: </span></label><input type="text" name="title" class="input"></div>' +
-             '<div class="editable-address"><label><span>Target: </span></label><input type="text" name="target" class="input"></div>' +
-             '<div class="editable-address"><label><span>Width: </span></label><input type="text" name="width" class="input"></div>' +
-             '<div class="editable-address"><label><span>Height: </span></label><input type="text" name="height" class="input"></div>' +
-             '<div class="editable-address"><label><span>Process: </span></label><input type="text" name="process" class="input"></div>',
+        tpl: '<div class="control-group">' + 
+            '<div class="controls">' +
+            '<input type="text" id="src" placeholder="Src" name="src" class="input bootstrap-wysihtml5-insert-link-url">' +
+            '<button title="File or image" type="button" class="btn editable-filemanager">' +
+            '<i class="icon-folder-open"></i></button>' +
+            '</div>'+
+            '<div class="controls"><input type="text" id="title" placeholder="Title" name="title" class="input"></div>' +
+            '<div class="controls"><input type="text" id="target" placeholder="Target" name="target" class="input"></div>' +
+            '<div class="controls"><input type="text" id="width" placeholder="Width" name="width" class="input"></div>' +
+            '<div class="controls"><input type="text" id="height" placeholder="Height" name="height" class="input"></div>' +
+            '<div class="controls"><input type="text" id="process" placeholder="Process" name="process" class="input"></div>' +
+            '</div>'
+        ,
         inputclass: ''
     });
 
     $.fn.editabletypes.address = Address;
     
-    var okMessage = {'header' : 'Move', 'message': 'Content element succefully updated'};
+    var okMessage = {'header' : 'Move', 'message': 'Content element successfully updated'};
     
     //make text elements editable
+    $('.csc-default').dblclick(function(e, ui){
+        //console.log('dblclick');
+        e.stopPropagation();
+        $(this).find('.lth_feeditsimple_content').editable('toggle');
+    });
+    
     makeEditable('.lth_feeditsimple_content', 'text', okMessage);
         
     //make image elements editable
-    makeEditable('.lth_feeditsimple_img', 'image', okMessage);
+    makeEditable('.csc-textpic-image', 'image', okMessage);
     
     //bootstrap-contextmenu
     $('.csc-default').contextmenu({
         target:'#context-menu', 
         before: function(e,context) {
           // execute code before context menu if shown
+            //console.log($(e.target));
         },
         onItem: function(context,e) {
-            //console.log($(e.target).text());
             feeditSimpleContentCommand(context, e);// execute on menu item selection
+            e.stopPropagation();
+            this.closemenu(e);
         }
     });
+    /*
+     * 
+     * @type {String|@exp;c@call;substring}
+     * before: function (e, element, target) {
+      e.preventDefault();
+      if (e.target.tagName == 'SPAN') {
+          e.preventDefault();
+          this.closemenu();
+          return false;
+      }
+      return true;
+  }
+     */
     
     //hide och show hidden content elements at startup
     var displayString = feeditSimpleGetCookie('feeditSimple-usersettings');
+    //console.log(displayString);
     if(displayString) {
         var displayObject = JSON.parse(unescape(displayString));
         if(displayObject['hiddenElement'] === 'none') {
@@ -327,13 +360,17 @@ $(document).ready(function()
         $('.lth_feeditsimple_content.hidden-1').closest('.csc-default').css('display', 'none');
     }
     
-    $(".csc-default").hover(function(e) { 
+    /*$(".csc-default").hover(function(e) { 
         $(this).css("background-color",e.type === "mouseenter"?"yellow":"transparent");
-    });
+    });*/
 
     //document ready ends**************************************************************************************************
 });
 
+
+/***************************************************************************************************************************
+************************************************************HELP FUNCTIONS**************************************************
+****************************************************************************************************************************/
 
 function feeditSimpleContentCommand(context, e)
 {
@@ -345,7 +382,7 @@ function feeditSimpleContentCommand(context, e)
         case 'Delete':
             //console.log(context);
             if(confirm('Are you sure?')) {
-                var okMessage = {'header' : 'Delete', 'message': 'Content element succefully deleted'};
+                var okMessage = {'header' : 'Delete', 'message': 'Content element successfully deleted'};
                 
                 $(context).remove();
                 ajaxCall('deleteContent', 'tt_content', uid, '', '', okMessage);
@@ -357,43 +394,51 @@ function feeditSimpleContentCommand(context, e)
             if(feeditSimpleSetCookie('feeditSimple-copycutitem', 'cut:tt_content:'+uid,1)) {
                 var content = $(context).html();
                 $(context).remove();
-                var okMessage = {'header' : 'Cut', 'message': 'Content element succefully cut'};
+                var okMessage = {'header' : 'Cut', 'message': 'Content element successfully cut'};
                 ajaxCall('setClipboard', 'tt_content', uid, '', '', okMessage, content);
             } else {
-                showMessage({'header' : 'no', 'message': 'no'});
+                showMessage({'header' : '500', 'message': 'no'});
             }
             break;
         case 'Copy':
             if(feeditSimpleSetCookie('feeditSimple-copycutitem', 'copy:tt_content:'+uid,1)) {
                 var content = $(context).html();
-                var okMessage = {'header' : 'Copy', 'message': 'Content element succefully copied'};
+                var okMessage = {'header' : 'Copy', 'message': 'Content element successfully copied'};
                 ajaxCall('setClipboard', 'tt_content', uid, '', '', okMessage, content);
             } else {
-                showMessage({'header' : 'no', 'message': 'no'});
+                showMessage({'header' : '500', 'message': 'no'});
             }
             break;
         case 'Paste':
             var pasteContent = feeditSimpleGetCookie('feeditSimple-copycutitem');
             if(pasteContent) {
-                var okMessage = {'header' : 'Paste', 'message': 'Content element succefully pasted'};
+                var okMessage = {'header' : 'Paste', 'message': 'Content element successfully pasted'};
                 ajaxCall('pasteContent', 'tt_content', pasteContent, uid, pageUid, okMessage);
             } else {
-                showMessage({'header' : 'no', 'message': 'no'});
+                showMessage({'header' : '500', 'message': 'no'});
             }
             break;
         case 'Hide':
-            var okMessage = {'header' : 'Hide', 'message': 'Content element succefully hidden'};
+            var okMessage = {'header' : 'Hide', 'message': 'Content element successfully hidden'};
             ajaxCall('hideContent', 'tt_content', uid, '', '', okMessage);
             break;
         case 'Show':
-            var okMessage = {'header' : 'Show', 'message': 'Content element succefully displayed'};
+            var okMessage = {'header' : 'Show', 'message': 'Content element successfully displayed'};
             ajaxCall('showContent', 'tt_content', uid, '', '', okMessage);
             break;
         case 'Above, center':
         case 'Above, left':
         case 'Above, right':
-            console.log(cmd);
-            //showMessage({'header' : 'Image', 'message': 'Image orient succefully updated'});
+        case 'Below, center':
+        case 'Below, right':
+        case 'Below, left':
+        case 'In text, right':
+        case 'In text, left':
+        case 'Beside Text, Right':
+        case 'Beside Text, Left':
+            //console.log(cmd.toLowerCase().replace(',','').replace(' ', '-'));
+            var okMessage = {'header' : 'Image', 'message': 'Image orientation successfully updated'};
+            changeImageOrientation(cmd.toLowerCase().replace(', ','-').replace(' ', '-'), uid, okMessage);
             break;
         default:
             //default code block
@@ -817,13 +862,13 @@ function getContentTemplate(rel)
     //array={key1: 'value1',key2:'value2'};
     var noOfNewIds = $('#feeditSimple-new').length;
     var templateArray = {'textpic': '<div id="feeditSimple-new-' + noOfNewIds + '" class="csc-default">' +
-        '<div id="lth_feeditsimple_img_NEW" data-type="address" data-pk="img_NEW" class="lth_feeditsimple_img">' +
+        //'<div id="lth_feeditsimple_img_NEW" data-pk="img_NEW" class="lth_feeditsimple_img">' +
         '<div class="csc-textpic-text">' +
         '<div id="lth_feeditsimple_NEW" data-type="wysihtml5" data-pk="NEW" class="lth_feeditsimple_content">' +
         //'<p class="feEditSimple-empty">Empty</p>' +
         '</div>' +
         '</div>' +
-        '</div>' +
+        //'</div>' +
         '<input type="hidden" name="CType" value="textpic" />' +
         '</div>'
     };
@@ -852,8 +897,14 @@ function getContentTemplate(rel)
 
 var imgSrc = '';
 //params for editable
-function makeEditable(selector, type, okMessage)
+function makeEditable(selector, type, okMessage, disabled)
 {
+    //console.log(disabled);
+    if(disabled===false) {
+        disabled = false;
+    } else {
+        disabled = true;
+    }
     var myCustomTemplates = {
         emphasis : function(locale) {
             /*return "<li>" +
@@ -926,7 +977,7 @@ function makeEditable(selector, type, okMessage)
             "<li>" +*/
             return "<li><div class=\"btn-group\">" +
             "<a class=\"btn feeditSimple-h2\" data-wysihtml5-command=\"formatBlock\" data-wysihtml5-command-value=\"h2\" title=\"H2\" tabindex=\"-1\" unselectable=\"on\">H2</a>" +
-"<a class=\"btn feeditSimple-formatCode\" data-wysihtml5-command=\"formatCode\" data-wysihtml5-command-value=\"code\" title=\"Code\" tabindex=\"-1\" unselectable=\"on\">C</a>" +
+            "<a class=\"btn feeditSimple-formatCode\" data-wysihtml5-command=\"formatCode\" data-wysihtml5-command-value=\"code\" title=\"Code\" tabindex=\"-1\" unselectable=\"on\">C</a>" +
             "<a class=\"btn\" data-wysihtml5-command=\"bold\" title=\"CTRL+B\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">B</a>" +
             "<a class=\"btn\" data-wysihtml5-command=\"italic\" title=\"CTRL+I\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">I</a>" +
             "</div>" +
@@ -945,7 +996,8 @@ function makeEditable(selector, type, okMessage)
         //console.log(type+selector);
         $(selector).editable({
             mode: 'inline',
-            defaultValue: 'Empty',
+            //disabled: true,
+            defaultValue: '<p class="feeditSimple-empty">Empty</p>',
             url: 'typo3/alt_doc.php?doSave=1',
             params: function(params) {
                 var theImages = '';
@@ -1004,19 +1056,22 @@ function makeEditable(selector, type, okMessage)
                     return response.responseText;
                 }
             },
-            //onblur: 'ignore',
-            toggle: 'dblclick'
+            onblur: 'ignore',
+            toggle: 'manual'
         });
         $('.lth_feeditsimple_content').on('hidden', function(e, editable) {
-            $(".csc-default").hover(function(e) { 
+            /*$(".csc-default").hover(function(e) { 
                 $(this).css("background-color",e.type === "mouseenter"?"yellow":"transparent");
-            });
+            });*/
+            $(this).closest('.csc-default').find('.csc-textpic-image').editable('option', 'disabled', true);
         });
         $('.lth_feeditsimple_content').on('shown', function(e, editable) {
-            $(".csc-default").hover(function() {
+            //console.log($(this).closest('.csc-default').find('.csc-textpic-image'));
+            $(this).closest('.csc-default').find('.csc-textpic-image').editable('option', 'disabled', false);
+            /*$(".csc-default").hover(function() {
                 $(this).css("background-color","transparent");
                 $(this).css("background-color",e.type === "mouseenter"?"transparent":"transparent");
-            });
+            });*/
             
             var el = this;
             //console.log(editable);
@@ -1027,49 +1082,53 @@ function makeEditable(selector, type, okMessage)
                 });
             });*/
             
-            //$(el).find('.feEditSimple-empty').remove();
-            //placeholder?????????????????????????????
+            //remove empty
+            $('body',$('.wysihtml5-sandbox').contents()).find('.feeditSimple-empty').remove();
+
             
             $('.feeditSimple-insertImage').click(function() {
-                if($(this).closest('.csc-textpic').find('.csc-textpic-imagewrap').length > 0) {
-                    //console.log('There is an image');
+                if($(this).closest('.csc-default').find('.csc-textpic-imagewrap').length > 0) {
                     //There is an image
-                    var afterContent = '<div class="csc-textpic-imagerow">' +
+                    
+                    //<div class="csc-textpic-center-outer"><<div class="csc-textpic-center-inner">
+                    //
+                    var newIndex = $(this).closest('.csc-default').find('.feeditSimple-placeHolder').length;
+                    var afterContent = '<div class="csc-textpic-imagerow csc-textpic-imagerow-last">' +
                         '<div class="csc-textpic-imagecolumn csc-textpic-firstcol csc-textpic-lastcol">' +
-                        '<figure class="csc-textpic-image csc-textpic-last">' +
+                        '<figure class="csc-textpic-image csc-textpic-last csc-textpic-new-' + newIndex + '">' +
                         '<img class="feeditSimple-placeHolder" src="typo3conf/ext/lth_feedit_simple/res/icons/placeholder.png" alt="">' +
                         '</figure>' +
                         '</div>' +
                         '</div>';
-                    if($(this).closest('.csc-textpic').find('.csc-textpic-imagerow').length > 0) {
+                    if($(this).closest('.csc-default').find('.csc-textpic-imagerow').length > 0) {
                         //There is more than one image
-                        //console.log('There is more than one image');
-                        $(this).closest('.csc-textpic').find('.csc-textpic-imagerow').after(afterContent);
+                        $(this).closest('.csc-default').last('.csc-textpic-imagerow').removeClass('csc-textpic-imagerow-last');
+                        $(this).closest('.csc-default').last('.csc-textpic-imagerow').after(afterContent);
                     } else {
-                        //console.log('There is one image');
                         //There is only one image
-                        var content = $(this).closest('.csc-textpic').find('.csc-textpic-imagewrap').html();
-                        var existingContent = '<div class="csc-textpic-imagerow">' +
+                        $(this).closest('.csc-default').find('.csc-textpic-imagewrap').wrap('<div class="csc-textpic-imagerow">' +
                             '<div class="csc-textpic-imagecolumn csc-textpic-firstcol csc-textpic-lastcol">' +
-                            '<figure class="csc-textpic-image csc-textpic-last">' +
-                            content +
+                            '<figure class="csc-textpic-image csc-textpic-last csc-textpic-new-' + newIndex + '">' +
                             '</figure>' +
                             '</div>' +
-                            '</div>';
-                        $(this).closest('.csc-textpic').find('.csc-textpic-imagewrap').html(existingContent+afterContent);
+                            '</div>');
+                        $(this).closest('.csc-default').find('.csc-textpic-imagerow').after(afterContent);
+                        if($(this).closest('.csc-textpic-above').length > 0) {
+                            $(this).closest('.csc-default').find('.csc-textpic-imagerow').wrapAll('<div class="csc-textpic-center-outer"><div class="csc-textpic-center-inner"></div></div>');
+                        }
                     }
                 } else {
                     //console.log('There is no image');
                     //There is no image
                     var prependContent = '<div class="csc-textpic-imagewrap">' +
-                        '<figure class="csc-textpic-image csc-textpic-last">' +
+                        '<figure class="csc-textpic-image csc-textpic-last csc-textpic-new-' + newIndex + '">' +
                         '<img class="feeditSimple-placeHolder" src="typo3conf/ext/lth_feedit_simple/res/icons/placeholder.png" alt="">' +
                         '</figure>' +
                         '</div>';
                     $(this).closest('.csc-textpic-text').toggleClass('csc-textpic csc-textpic-intext-right').prepend(prependContent);
                 }
                 //make editable
-                makeEditable('.feeditSimple-placeHolder', 'image', okMessage);
+                makeEditable('.csc-textpic-new-' + newIndex, 'image', okMessage, false);
             });           
             
             var id = $(this).closest('.lth_feeditsimple_content').attr('id');
@@ -1098,18 +1157,13 @@ function makeEditable(selector, type, okMessage)
 
             $.ajax({
                 url: url,
-                type: 'get',
+                type: 'post',
                 dataType: 'json',
-                complete: function(data){
+                complete: function(data) {
                     formToken = $(data.responseText).find('input[name="formToken"]').val();
-                    //elHeader = $(data.responseText).find('input[name="data[tt_content]['+id+'][header]"]').val();
                     $(that).append('<input type="hidden" name="formToken" value="' + formToken + '" />' +
                             '<input type="hidden" name="pid" value="' + pid + '" />' +
                             '<input type="hidden" name="absolutePath" />');
-                    /*var container = $('.feEditSimple-thirdRow');
-                    var formEl = container.find('.form-inline');
-                    formEl.html(getSettings(id,elHeader));
-                    container.show();*/
                     var urlInput = $('.bootstrap-wysihtml5-insert-link-url').after('<button title="Files and images" type="button" class="btn editable-filemanager">' +
                             '<i class="icon-folder-open"></i></button>' +
                             '<button title="Typo3 page-tree" type="button" class="btn editable-pagebrowser">' +
@@ -1162,7 +1216,7 @@ function makeEditable(selector, type, okMessage)
         });
     } else if(type=='image') {
         $(selector).editable({
-            selector: 'img',
+            //selector: 'img',
             //url: 'typo3/alt_doc.php?doSave=1',
             url: function() {
                 var selectedImage = $('.bootstrap-wysihtml5-insert-link-url').val();
@@ -1183,8 +1237,10 @@ function makeEditable(selector, type, okMessage)
                 //params['data[tt_content]['+uid+'][colPos]'] = 0;
                 return params;
             },*/
+            disabled: disabled,
             display: function(value, sourceData) {
-                imgSrc = $(this).context.src.split('/').pop();
+                //console.log($(this).find('img').attr('src'));
+                imgSrc = $(this).find('img').attr('src').split('/').pop();
             },
             /*success: function(response, newValue) {
                 ////console.log('Tjo!!!');
@@ -1202,19 +1258,19 @@ function makeEditable(selector, type, okMessage)
             },*/
             //onblur: 'ignore',
             title: 'Enter src, title and target',
-            /*toggle: 'dblclick',
-            value: {
+            /*toggle: 'dblclick',*/
+            /*value: {
                 src: imgSrc, 
                 title: "Lenina", 
                 target: "15"
             }*/
         });
 
-        $('.lth_feeditsimple_img').on('shown', function(e, editable) {
+        $('.csc-textpic-image').on('shown', function(e, editable) {
             
             //input-small bootstrap-wysihtml5-insert-link-url
-            var id = $(this).attr('id');
-            id = id.split('_').pop();
+            var id = $(this).closest('.csc-default').attr('id').substring(1);
+            //id = id.split('_').pop();
             var that = this;
             var formToken = '';
             
@@ -1228,15 +1284,17 @@ function makeEditable(selector, type, okMessage)
                     sid : Math.random()
                 },
                 success: function(data) {
-                    ////console.log(data.content);
+                    console.log(data.content);
                     var absolutePath = data.content;
                     $('input[name="absolutePath"]').val(absolutePath);
                     //var otherImages = '';
                     $('.bootstrap-wysihtml5-insert-link-url').val(imgSrc);
-                            //console.log($('.editable-filemanager').length);
+                    //console.log($('.editable-filemanager').length);
                     //if($('.editable-filemanager').length==1) {
-                    if($('.editable-filemanager').length === 0)('.bootstrap-wysihtml5-insert-link-url').after('<button title="File or image" type="button" class="btn editable-filemanager">' +
-                            '<i class="icon-folder-open"></i></button>');
+                    //if($('.editable-filemanager').length === 1) {
+                        //$('.bootstrap-wysihtml5-insert-link-url').after('<button title="File or image" type="button" class="btn editable-filemanager">' +
+                        //    '<i class="icon-folder-open"></i></button>');
+                    //}
                     $('.editable-filemanager').click(function() {
                         $.fancybox.open([
                             {
@@ -1369,27 +1427,40 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
             if(data.result == 200 && okMessage) {
                 showMessage(okMessage);
             } else if(okMessage) {
-                showMessage({message : 'no'+cmd, header : '1361'});
+                showMessage({message : '500'+cmd, header : '1361'});
             }
         },
         error: function(data){
-            showMessage({message : 'no', header : '1365'});
+            showMessage({message : '500', header : '1365'});
         }
     });
 }
 
+
 //display message to user
 function showMessage(message)
 {
-    var content = '<div class="typo3-message message-ok" style="width: 400px">';
-    content += '<div onclick="hideMessage(\'.typo3-message\');return false;" class="t3-icon t3-icon-actions t3-icon-actions-message t3-icon-actions-message-close t3-icon-message-ok-close" id=""></div>';
-    content += '<div class="header-container"><div class="message-header">'+message['header']+'</div></div>';
-    content += '<div class="message-body">'+message['message']+'</div></div>';
+    if(message['header'] == 'warning') {
+        var content = '<div class="typo3-message message-warning" style="width: 400px">';
+        content += '<div onclick="hideMessage(\'.typo3-message\');return false;" class="t3-icon t3-icon-actions t3-icon-actions-message t3-icon-actions-message-close t3-icon-message-ok-close" id=""></div>';
+        content += '<div class="header-container"><div class="message-header">Warning</div></div>';
+        content += '<div class="message-body">'+message['message']+'</div></div>';
+    } else if(message['header'] == 'error') {
+        var content = '<div class="typo3-message message-error" style="width: 400px">';
+        content += '<div onclick="hideMessage(\'.typo3-message\');return false;" class="t3-icon t3-icon-actions t3-icon-actions-message t3-icon-actions-message-close t3-icon-message-ok-close" id=""></div>';
+        content += '<div class="header-container"><div class="message-header">Error</div></div>';
+        content += '<div class="message-body">'+message['message']+'</div></div>';
+    } else {
+        var content = '<div class="typo3-message message-ok" style="width: 400px">';
+        content += '<div onclick="hideMessage(\'.typo3-message\');return false;" class="t3-icon t3-icon-actions t3-icon-actions-message t3-icon-actions-message-close t3-icon-message-ok-close" id=""></div>';
+        content += '<div class="header-container"><div class="message-header">'+message['header']+'</div></div>';
+        content += '<div class="message-body">'+message['message']+'</div></div>';
+    }
     $('.feEditSimple-fourthRow').html(content);
     $('.feEditSimple-fourthRow').slideDown('slow').delay(1500).slideUp('slow');
 }
 
-function feeditSimpleContentCommand_old(cmd, el)
+/*function feeditSimpleContentCommand_old(cmd, el)
 {
     var uid = $(el).attr('id').split('_').pop();
     var pageUid = $('body').attr('id');
@@ -1397,46 +1468,46 @@ function feeditSimpleContentCommand_old(cmd, el)
     switch(cmd) {
         case 'delete':
             
-            /*FrontendEditing.editPanels.removeKey(this.parent.record);
+            FrontendEditing.editPanels.removeKey(this.parent.record);
                 this.parent.removeContent();
                 var noColumn = $("#content_sidebar_wrapper").find(".feEditAdvanced-allWrapper").length;
                 if(noColumn==0 && $("#content_sidebar_wrapper").length>0) {
                     removeRightColumn();
-                }*/
+                }
             break;
         case 'cut':
             if(feeditSimpleSetCookie('feeditSimple-copycutitem', 'cut:tt_content:'+uid,1)) {
                 var content = $(el).closest('.csc-default').html();
                 $(el).remove();
-                var okMessage = {'header' : 'Cut', 'message': 'Content element succefully cut'};
+                var okMessage = {'header' : 'Cut', 'message': 'Content element successfully cut'};
                 ajaxCall('setClipboard', 'tt_content', uid, '', '', okMessage, content);
             } else {
-                showMessage({'header' : 'no', 'message': 'no'});
+                showMessage({'header' : '500', 'message': 'no'});
             }
             break;
         case 'copy':
             if(feeditSimpleSetCookie('feeditSimple-copycutitem', 'copy:tt_content:'+uid,1)) {
                 var content = $(el).closest('.csc-default').html();
-                var okMessage = {'header' : 'Copy', 'message': 'Content element succefully copied'};
+                var okMessage = {'header' : 'Copy', 'message': 'Content element successfully copied'};
                 ajaxCall('setClipboard', 'tt_content', uid, '', '', okMessage, content);
             } else {
-                showMessage({'header' : 'no', 'message': 'no'});
+                showMessage({'header' : '500', 'message': 'no'});
             }
             break;
         case 'paste':
             var pasteContent = feeditSimpleGetCookie('feeditSimple-copycutitem');
             if(pasteContent) {
-                var okMessage = {'header' : 'Paste', 'message': 'Content element succefully pasted'};
+                var okMessage = {'header' : 'Paste', 'message': 'Content element successfully pasted'};
                 ajaxCall('pasteContent', 'tt_content', pasteContent, uid, pageUid, okMessage, el.html());
             } else {
-                showMessage({'header' : 'no', 'message': 'no'});
+                showMessage({'header' : '500', 'message': 'no'});
             }
             break;
         default:
             //default code block
     }
 }
-
+*/
 
 function feeditSimpleGetCookie(cname)
 {
@@ -1488,6 +1559,9 @@ function toggleHiddenObject(inputClass, myType)
 
         if(displayObject[myType]=='none') {
             displayObject[myType] = 'block';
+            $(inputClass).closest('.csc-default').css('opacity', '0.5');
+            $(inputClass).closest('.csc-default').css('-ms-filter', 'alpha(opacity=50)');
+
             $(inputClass).closest('.csc-default').css('display','block');
             $('#'+myType).css('display','inline-block');
         } else {
@@ -1498,6 +1572,104 @@ function toggleHiddenObject(inputClass, myType)
         feeditSimpleSetCookie('feeditSimple-usersettings', JSON.stringify(displayObject),0);
     }
 }
+
+
+function changeImageOrientation(cmd, uid, okMessage)
+{
+    console.log(cmd + uid);
+    
+    try {
+        var outerContainer = $('#c'+uid);
+        var innerContainer = $(outerContainer).find('.lth_feeditsimple_img');
+        $.get('/typo3conf/ext/lth_feedit_simple/res/template/contentelement.html', function( response ) {
+            //console.log($(parentElement).find('.csc-textpicHeader'));
+            if(innerContainer.find('.csc-textpicHeader').length > 0) {
+                var header = $(innerContainer).find('.csc-textpicHeader').text();
+            } else if(innerContainer.prev('h2').length > 0) {
+                var header = $(innerContainer).prev('h2').text();
+            }
+            
+            //Replace content in template
+            var image = $(innerContainer).find('.csc-textpic-image').html();
+            var content = $(innerContainer).find('.lth_feeditsimple_content').html();
+            var responseContent = $(response).filter("#"+cmd).html();
+            responseContent = responseContent.replace('###IMAGE###', image);
+            responseContent = responseContent.replace('###CONTENT###', content);
+            console.log(responseContent);
+            responseContent = responseContent.replace('lth_feeditsimple_###UID###', 'lth_feeditsimple_' + uid);
+            console.log(responseContent);
+ 
+            if(header) {
+                //there is a header :( and we have to deal with it
+                if($(responseContent).find('.csc-textpicHeader').length > 0 && innerContainer.prev('h2').length > 0) {
+                    //There is a header in the template and a header ouside in the original
+                    //put header in the template and remove the outside header
+                    responseContent = responseContent.replace('###HEADER###', '<h2>' + header + '</h2>');
+                    $(innerContainer).prev('h2').remove();
+                } else if($(responseContent).find('.csc-textpicHeader').length > 0 && innerContainer.prev('h2').length == 0) {
+                    //put header in the template
+                    responseContent = responseContent.replace('###HEADER###', '<h2>' + header + '</h2>');
+                } else if($(responseContent).find('.csc-textpicHeader').length == 0 && innerContainer.prev('h2').length == 0) {
+                    //put header in outer container and remove template header
+                    $(outerContainer).prepend('<h2>' + header + '</h2>');
+                    $(responseContent).find('.csc-textpicHeader').remove();
+                }
+            } else {
+                //remove template header
+                $(responseContent).find('.csc-textpicHeader').remove();
+            }
+            //replace the content
+            $(innerContainer).html(responseContent);
+            //restore editable
+            makeEditable('#lth_feeditsimple_'+ uid, 'textpic', '');
+            makeEditable('#lth_feeditsimple_'+ uid, 'image', '');
+            showMessage(okMessage);
+        });
+    }
+    catch(err) {
+        //console.log(err);
+        showMessage({'header' : '500', 'message': err});
+    }
+}
+//<div class="csc-textpicHeader csc-textpicHeader-###UID###"><h2>###HEADER###</h2></div>
+
+
+//***************************************************************EXTEND X-EDITABLE**********************************************************/
+    //Add Code button
+(function(wysihtml5) {
+var undef;
+
+wysihtml5.commands.formatCode = {
+    exec: function(composer) {
+    var pre = this.state(composer);
+    if (pre) {
+      // caret is already within a <pre><code>...</code></pre>
+      composer.selection.executeAndRestore(function() {
+        var code = pre.querySelector("code");
+        wysihtml5.dom.replaceWithChildNodes(pre);
+        if (code) {
+          wysihtml5.dom.replaceWithChildNodes(pre);
+        }
+      });
+    } else {
+      // Wrap in <pre><code>...</code></pre>
+      var range = composer.selection.getRange(),
+          selectedNodes = range.extractContents(),
+          pre = composer.doc.createElement("pre"),
+          code = composer.doc.createElement("code");
+      pre.appendChild(code);
+      code.appendChild(selectedNodes);
+      range.insertNode(pre);
+      composer.selection.selectNode(pre);
+    }
+    },
+    state: function(composer) {
+        var selectedNode = composer.selection.getSelectedNode();
+        return wysihtml5.dom.getParentElement(selectedNode, { nodeName: "CODE" }) && wysihtml5.dom.getParentElement(selectedNode, { nodeName: "PRE" });
+    }
+};
+})(wysihtml5);
+
 
 //old code
 /*   
@@ -1566,38 +1738,3 @@ function toggleHiddenObject(inputClass, myType)
         formEl.html('');
         container.hide();
     });*/
-    //Add Code button
-(function(wysihtml5) {
-var undef;
-
-wysihtml5.commands.formatCode = {
-    exec: function(composer) {
-    var pre = this.state(composer);
-    if (pre) {
-      // caret is already within a <pre><code>...</code></pre>
-      composer.selection.executeAndRestore(function() {
-        var code = pre.querySelector("code");
-        wysihtml5.dom.replaceWithChildNodes(pre);
-        if (code) {
-          wysihtml5.dom.replaceWithChildNodes(pre);
-        }
-      });
-    } else {
-      // Wrap in <pre><code>...</code></pre>
-      var range = composer.selection.getRange(),
-          selectedNodes = range.extractContents(),
-          pre = composer.doc.createElement("pre"),
-          code = composer.doc.createElement("code");
-      pre.appendChild(code);
-      code.appendChild(selectedNodes);
-      range.insertNode(pre);
-      composer.selection.selectNode(pre);
-    }
-    },
-    state: function(composer) {
-        var selectedNode = composer.selection.getSelectedNode();
-        return wysihtml5.dom.getParentElement(selectedNode, { nodeName: "CODE" }) && wysihtml5.dom.getParentElement(selectedNode, { nodeName: "PRE" });
-    }
-};
-
-})(wysihtml5);
