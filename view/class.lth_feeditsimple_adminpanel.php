@@ -213,11 +213,11 @@ class user_feeditsimple_adminpanel {
                 'bootstrap-wysihtml5-0.0.2.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-wysihtml5-0.0.2.js'),
 		'wysihtml5.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/wysihtml5.js'),
 
-                // load files needed for jquery file upload
+                /* load files needed for jquery file upload
                 'jquery.ui.widget.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/vendor/jquery.ui.widget.js'),
                 'jquery.iframe-transport.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.iframe-transport.js'),
-                'jquery.fileupload.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.fileupload.js'),
-                
+                'jquery.fileupload.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.fileupload.js'),*/
+                 
                 //load files for bootstrap-treeview
                 'bootstrap-treeview.css' => $this->getLinkTag($extPath . 'vendor/bootstraptreeview/css/bootstrap-treeview.css'),
                 'bootstrap-treeview.js' => $this->getScriptTag($extPath . 'vendor/bootstraptreeview/js/bootstrap-treeview.js'),

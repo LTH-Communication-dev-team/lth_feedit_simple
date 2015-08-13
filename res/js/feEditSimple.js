@@ -289,8 +289,8 @@ $(document).ready(function()
         tpl: '<div class="control-group">' + 
             '<div class="controls">' +
             '<input type="text" id="src" placeholder="Src" name="src" class="input bootstrap-wysihtml5-insert-link-url">' +
-            '<button title="File or image" type="button" class="btn editable-filemanager">' +
-            '<i class="icon-folder-open"></i></button>' +
+            '<button title="File or image" type="button" class="btn editable-filemanager"><i class="icon-folder-open"></i></button>' +
+            '<button title="Delete image" type="button" class="btn editable-delete-image"><i class="icon-trash"></i></button>' +
             '</div>'+
             '<div class="controls"><input type="text" id="title" placeholder="Title" name="title" class="input"></div>' +
             '<div class="controls"><input type="text" id="target" placeholder="Target" name="target" class="input"></div>' +
@@ -371,6 +371,18 @@ $(document).ready(function()
 /***************************************************************************************************************************
 ************************************************************HELP FUNCTIONS**************************************************
 ****************************************************************************************************************************/
+
+function convertFileadmin(fPath)
+{
+    ////console.log(fPath);
+    if(fPath) {
+        var fPathArray = fPath.split('/fileadmin');
+        fPath = '/fileadmin' + fPathArray[1];
+        return fPath.replace('//','/');
+    }
+
+}
+            
 
 function feeditSimpleContentCommand(context, e)
 {
@@ -460,9 +472,8 @@ function cute()
             var filemanager = $('body',$('.fancybox-iframe').contents()).find('.filemanager');
             var breadcrumbs = $('body',$('.fancybox-iframe').contents()).find('.breadcrumbs');
             var fileList = filemanager.find('.data');
-            
             var breadcrumbsUrls = [];
-            
+
             // Hiding and showing the search box
             filemanager.find('.search').click(function(){
                 var search = $(this);
@@ -471,48 +482,73 @@ function cute()
             });
             
             // Hiding and showing upload
-            filemanager.find('.uploads a').click(function(){
-                var uploads = filemanager.find('.uploads');
-                uploads.find('span').hide();
-                uploads.find('input[type=file]').show();
+            filemanager.find('.upload-icon').click(function() {
+                filemanager.find('.uploads').toggle();
             });
+            
+            //handle fileuplad
+            // Initialize the jQuery File Upload widget:
             
             filemanager.find('#fileupload').fileupload({
-                dataType: 'json',
-                /*
-                add: function (e, data) {
-                    data.context = $('<button/>').text('Upload')
-                        .appendTo(document.body)
-                        .click(function () {
-                            data.context = $('<p/>').text('Uploading...').replaceAll($(this));
-                            data.submit();
-                        });
-                },
-                 */
-                progressall: function (e, data) {
-                    var progress = parseInt(data.loaded / data.total * 100, 10);
-                    filemanager.find('#progress .bar').css(
-                        'width',
-                        progress + '%'
-                    );
-                },
-                done: function (e, data) {
-                    if(data.files) {
-                        console.log(data.files);
-                        $.each(data.files, function (index, file) {
-                            console.log(file.name);
-                            $('<p/>').text(file.name).appendTo(filemanager.find('.uploads'));
-                        });
-                    } else {
-                        console.log('no'+data.files);
-                    }
-                },
-                fail: function(e, data) {
-                    console.log('Fail!');
-                }
+                // Uncomment the following to send cross-domain cookies:
+                //xhrFields: {withCredentials: true},
+                //url: 'typo3conf/ext/lth_feedit_simple/vendor/jqueryfileupload/server/php/'
+                //url: 'index.php?eID=lth_feedit_simple&cmd=fileupload&path=' + getPath(breadcrumbs) + '&sid=' + Math.random()
             });
-            
-            
+
+            // Enable iframe cross-domain access via redirect option:
+            filemanager.find('#fileupload').fileupload(
+                'option',
+                'redirect',
+                window.location.href.replace(
+                    /\/[^\/]*$/,
+                    'typo3conf/ext/lth_feedit_simple/vendor/jqueryfileupload/js/cors/result.html?%s'
+                )
+            );
+
+            // Load existing files:
+            filemanager.find('#fileupload').addClass('fileupload-processing');
+
+            /*$.ajax({
+                // Uncomment the following to send cross-domain cookies:
+                //xhrFields: {withCredentials: true},
+                url: $(filemanager).find('#fileupload').fileupload('option', 'url'),
+                dataType: 'json',
+                context: filemanager.find('#fileupload')[0]
+            }).always(function () {
+                $(this).removeClass('fileupload-processing');
+            }).done(function (result) {
+                console.log(result);
+                $(this).fileupload('option', 'done')
+                    .call(this, $.Event('done'), {result: result});
+            });*/
+    
+            filemanager.find('#fileupload').bind('fileuploaddone', function (e, results) {
+                results.result.files.forEach(function(d) {
+                    //console.log(d.name + d.url + d.size);
+                    var dArray = d.url.split('/');
+                    dArray.pop();
+                    var thePath = data.root + dArray.join('/') + '/';
+                    thePath = thePath.replace('//', '/');
+                    //console.log(thePath.replace('//', '/'));
+                    var resArray = $.grep(data.items, function(n, i) {
+                        if(n.path === thePath) {
+                            n.items.push({'name':d.name, 'path':data.root + d.url, 'size': d.size, 'type': 'file'});
+                            //return n.path === thePath.replace('//', '/');
+                        }
+                    });
+                    
+                    var file = $('<li class="files">' +
+                        '<a href="#" title="' + d.url + '" class="files">' +
+                        '<div style="display:inline-block;margin:20px 30px 0px 25px;border-radius:8px;width:60px;height:70px;background-position: ' +
+                        'center center;background-size: cover; background-repeat:no-repeat;background-image: url(' + d.url + ');"></div>' +
+                        '<span class="name">' + d.name + '</span>' +
+                        '<span class="details">' + d.size + '</span></a></li>');
+                
+                    file.appendTo(fileList);
+                    addClickToFile(file);
+                });
+            });
             
             // Listening for keyboard input on the search field.
 		// We are using the "input" event which detects cut and paste
@@ -592,51 +628,52 @@ function cute()
             // Navigates to the given path
             function goto(nextDir)
             {
+                
                 var currentPath = '';
-                //hash = decodeURIComponent(hash).slice(1).split('=');
 
-                //if (hash.length) {
-                    var rendered = '';
+                var rendered = '';
 
-                    // if hash has search in it
-
-                    if (nextDir === 'search') {
-
-                        filemanager.addClass('searching');
-                        rendered = searchData(data, nextDir.toLowerCase());
-
-                        if (rendered.length) {
-                            currentPath = nextDir;
-                            render(rendered);
-                        } else {
-                            render(rendered);
-                        }
-
-                    } else if (nextDir != '') {
-                        // if hash is some path
-                        // Empty the old result and make the new one
-                        fileList.html('');
-                        rendered = searchByPath(nextDir.replace('fileadmin','sucker'),'next');
-                        if (rendered.length) {
-                            currentPath = nextDir;
-                            breadcrumbsUrls = generateBreadcrumbs(nextDir);
-                            render(rendered);
-                        } else {
-                            currentPath = nextDir;
-                            breadcrumbsUrls = generateBreadcrumbs(nextDir);
-                            render(rendered);
-                        }
+                // if hash has search in it
+                if (nextDir === 'search') {
+                    filemanager.addClass('searching');
+                    rendered = searchData(data, nextDir.toLowerCase());
+                    if (rendered.length) {
+                        currentPath = nextDir;
+                        render(rendered);
                     } else {
-                        // if there is no nextDir
-                       
-                        rendered = searchByPath(data.path,'');
-                        for(var i=0;i<rendered.length;i++){
-                            render([rendered[i]]);
-                        }
-                        //currentPath = convertFileadmin(data.path);
-                        //breadcrumbsUrls.push(currentPath);
+                        render(rendered);
                     }
-                //}
+                } else if (nextDir != '' && nextDir != '/fileadmin') {
+                    
+                    filemanager.find('.upload-icon').show();
+                    // if hash is some path
+                    // Empty the old result and make the new one
+                    fileList.html('');
+                    rendered = searchByPath(nextDir,'next');
+                    if (rendered.length) {
+                        //currentPath = nextDir;
+                        breadcrumbsUrls = generateBreadcrumbs(nextDir);
+                        render(rendered);
+                    } /*else {
+                        currentPath = nextDir;
+                        breadcrumbsUrls = generateBreadcrumbs(nextDir);
+                        render(rendered);
+                    }*/
+                    //console.log($(filemanager).find('#fileupload').attr('action'));
+                    $(filemanager).find('#fileupload').attr('action', '/index.php?eID=lth_feedit_simple&cmd=fileupload&path=' + getPath(breadcrumbs) + '&sid=' + Math.random());
+                } else {
+                    // if there is no nextDir
+                    //console.log(filemanager.find('#fileupload').children().attr());
+                    filemanager.find('.upload-icon').hide();
+                    fileList.html('');
+                    breadcrumbsUrls = generateBreadcrumbs('/fileadmin');
+                    rendered = searchByPath(data.path,'');
+                    for(var i=0;i<rendered.length;i++){
+                        render([rendered[i]]);
+                    }
+                    //currentPath = convertFileadmin(data.path);
+                    //breadcrumbsUrls.push(currentPath);
+                }
             }
 
             // Splits a file path and turns it into clickable breadcrumbs
@@ -652,6 +689,7 @@ function cute()
             // Locates a file by path
             function searchByPath(dir, type)
             {
+                //console.log(dir + ';' + type);
                 var path = dir.split('/'),
                     demo = [data],
                     flag = 0;
@@ -673,7 +711,6 @@ function cute()
                 demo = flag ? demo : [];
                 return demo;
             }
-           
 
             // Recursively search through the file tree
             function searchData(data, searchTerms)
@@ -699,7 +736,6 @@ function cute()
             // Render the HTML for the file manager
             function render(data)
             {
-                
                 var scannedFolders = [],
                     scannedFiles = [],
                     fPath = '';
@@ -770,11 +806,7 @@ function cute()
                         var file = $('<li class="files"><a href="#" title="'+ convertFileadmin(f.path) + '" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
                         file.appendTo(fileList);
 
-                        $(file).find('a').click(function(event) {
-                            ////console.log($(this).attr('title'));
-                            window.parent.$(".bootstrap-wysihtml5-insert-link-url").val(convertFileadmin($(this).attr('title')));
-                            $.fancybox.close();
-                        });
+                        addClickToFile(file);
                     });
 
                 }
@@ -799,21 +831,11 @@ function cute()
                 $(breadcrumbs).find('a').click(function() {
                     goto($(this).attr('title'));
                 });
-                
+                //console.log('802');
                 // Show the generated elements
                 fileList.animate({'display':'inline-block'});
             }
-            
-            function convertFileadmin(fPath)
-            {
-                ////console.log(fPath);
-                if(fPath) {
-                    var fPathArray = fPath.split('/fileadmin');
-                    fPath = '/fileadmin' + fPathArray[1];
-                    return fPath.replace('//','/');
-                }
-                
-            }
+
 
             // This function escapes special html characters in names
             function escapeHTML(text)
@@ -830,6 +852,15 @@ function cute()
                     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
             }
         },
+    });
+}
+
+function addClickToFile(file)
+{
+    $(file).find('a').click(function(event) {
+        ////console.log($(this).attr('title'));
+        window.parent.$(".bootstrap-wysihtml5-insert-link-url").val(convertFileadmin($(this).attr('title')));
+        $.fancybox.close();
     });
 }
 
@@ -1190,6 +1221,10 @@ function makeEditable(selector, type, okMessage, disabled)
                         ]);
                     });
                     
+                    $('.editable-delete-image').click(function() {
+                        confirm('Are you sure?');
+                    });
+                    
                     $('.editable-pagebrowser').click(function() {
                         $.fancybox.open([
                             {
@@ -1242,10 +1277,10 @@ function makeEditable(selector, type, okMessage, disabled)
                 //console.log($(this).find('img').attr('src'));
                 imgSrc = $(this).find('img').attr('src').split('/').pop();
             },
-            /*success: function(response, newValue) {
-                ////console.log('Tjo!!!');
+            success: function(response, newValue) {
+                //console.log($(this).find('img').attr('src'));
                 //update image frontend
-                $(this).attr('src',$('.bootstrap-wysihtml5-insert-link-url').val());
+                $(this).find('img').attr('src',$('.bootstrap-wysihtml5-insert-link-url').val());
                 //Show message to user
                 showMessage(okMessage);
             },
@@ -1255,7 +1290,7 @@ function makeEditable(selector, type, okMessage, disabled)
                 } else {
                     return response.responseText;
                 }
-            },*/
+            },
             //onblur: 'ignore',
             title: 'Enter src, title and target',
             /*toggle: 'dblclick',*/
@@ -1284,7 +1319,7 @@ function makeEditable(selector, type, okMessage, disabled)
                     sid : Math.random()
                 },
                 success: function(data) {
-                    console.log(data.content);
+                    //console.log(data.content);
                     var absolutePath = data.content;
                     $('input[name="absolutePath"]').val(absolutePath);
                     //var otherImages = '';
@@ -1629,6 +1664,22 @@ function changeImageOrientation(cmd, uid, okMessage)
     catch(err) {
         //console.log(err);
         showMessage({'header' : '500', 'message': err});
+    }
+}
+
+function getPath(breadcrumbs)
+{
+    //console.log($(breadcrumbs).children('a').last().attr('title'));
+    if($(breadcrumbs).length > 0) {
+        var path = '';
+        if($(breadcrumbs).length === 0) {
+            path = '/uploads/';
+        } else {
+            path = $(breadcrumbs).children('a').last().attr('title') + '/';
+        }
+        return(path);
+    } else { 
+        return '/uploads/';
     }
 }
 //<div class="csc-textpicHeader csc-textpicHeader-###UID###"><h2>###HEADER###</h2></div>

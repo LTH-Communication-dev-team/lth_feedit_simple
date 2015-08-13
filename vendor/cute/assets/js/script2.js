@@ -253,14 +253,12 @@ $(function(){
 		// Render the HTML for the file manager
 
 		function render(data) {
-console.log(data);
 			var scannedFolders = [],
 				scannedFiles = [];
 
                     if(Array.isArray(data)) {
 
 				data.forEach(function (d) {
-console.log('262');
 					if (d.type === 'folder') {
 						scannedFolders.push(d);
 					}
@@ -271,17 +269,13 @@ console.log('262');
 				});
 
 			} else if(typeof data === 'object') {
-console.log('272');
 				scannedFolders = data.folders;
 				scannedFiles = data.files;
 
 			}
 
-console.log(fileList);
 			// Empty the old result and make the new one
 			fileList.empty().hide();
-                        console.log(fileList);
-console.log(scannedFolders.length);
 			if(!scannedFolders.length && !scannedFiles.length) {
 				filemanager.find('.nothingfound').show();
 			}
@@ -292,7 +286,6 @@ console.log(scannedFolders.length);
 			if(scannedFolders.length) {
 
 				scannedFolders.forEach(function(f) {
-console.log('293');
 					var itemsLength = f.items.length,
 						name = escapeHTML(f.name),
 						icon = '<span class="icon folder"></span>';
@@ -311,15 +304,11 @@ console.log('293');
 						itemsLength = 'Empty';
 					}
 					var folder = $('<li class="folders"><a href="'+ f.path +'" title="'+ f.path +'" class="folders">'+icon+'<span class="name">' + name + '</span> <span class="details">' + itemsLength + '</span></a></li>');
-	console.log(folder);
                                     folder.appendTo(fileList);
                                     
 				});
 
 			}
-console.log(fileList);
-$('.filemanager').after('sucker');
-console.log($('.filemanager'));
 			if(scannedFiles.length) {
 
 				scannedFiles.forEach(function(f) {

@@ -14,6 +14,7 @@ $pid = t3lib_div::_GP('pid');
 $pageUid = t3lib_div::_GP('pageUid');
 $formToken = t3lib_div::_GP('formtoken');
 $contentToPaste = t3lib_div::_GP('contentToPaste');
+$path = t3lib_div::_GP('path');
 $sid = t3lib_div::_GP('sid');
 $content = array();
 switch($cmd) {
@@ -39,7 +40,7 @@ switch($cmd) {
 	$content = getAbsolutePath();
 	break;
     case "fileupload":
-	$content = fileupload();
+	$content = fileupload($path);
 	break;
     case "deleteContent":
 	$content = deleteContent($uid);
@@ -117,11 +118,11 @@ function getFiles()
                 $fPath = $row['path'];
                 $dir = $_SERVER['DOCUMENT_ROOT'] . "/fileadmin/$fPath";
                 $response[] = array(
-            "name" => str_replace('/','',$fPath),
-            "type" => "folder",
-            "path" => $dir,
-            "items" => scanFiles($dir)
-        );
+                    "name" => str_replace('/','',$fPath),
+                    "type" => "folder",
+                    "path" => $dir,
+                    "items" => scanFiles($dir)
+                );
             }
         }
         $GLOBALS['TYPO3_DB']->sql_free_result($res);
@@ -131,9 +132,10 @@ function getFiles()
         // Run the recursive function 
         
         $content = array(
+            "root" => $_SERVER['DOCUMENT_ROOT'],
             "name" => "fileadmin",
             "type" => "folder",
-            "path" => "fileadmin/",
+            "path" => $_SERVER['DOCUMENT_ROOT'] . "/fileadmin/",
             "items" => $response
         );
         ///
@@ -456,8 +458,9 @@ function showContent($cmd, $table, $uid)
     }
 }
 
-function fileupload()
+function fileupload($path)
 {
+    //$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => '461', 'crdate' => time()));
     /*
     * jQuery File Upload Plugin PHP Example 5.14
     * https://github.com/blueimp/jQuery-File-Upload
@@ -470,11 +473,13 @@ function fileupload()
     */
 
     //error_reporting(E_ALL | E_STRICT);
+    $options = array('upload_dir' => '/var/www/html/typo3' . $path, 'upload_url' => $path, 'script_url' => 'index.php?eID=lth_feedit_simple&cmd=fileupload');
+
     require('/var/www/html/typo3/typo3conf/ext/lth_feedit_simple/vendor/jqueryfileupload/server/UploadHandler.php');
     $returnArray = array();
-    $result = new UploadHandler();
+    $result = new UploadHandler($options);
     //$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => print_r($result,true), 'crdate' => time()));
-    return $result;
+    //return $result;
 }
 
 function tmpContent($tmpContent)
