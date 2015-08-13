@@ -25,6 +25,14 @@ body {
 
 }
 
+.bootstrap-wysihtml5-insert-link-modal {
+    height: 200px;
+}
+
+.bootstrap-wysihtml5-insert-link-modal a {
+    text-decoration: none;
+}
+
 .csc-default {
     border-bottom: 1px #08C dashed;
     margin-bottom: 10px;

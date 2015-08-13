@@ -1071,6 +1071,7 @@ function makeEditable(selector, type, okMessage, disabled)
                 "customTemplates": myCustomTemplates,
                 "font-styles": false,
                 "format-code": true,
+                "link": true,
                 //"html": true, //Button which allows you to edit the generated HTML. Default false
                 "image": true, //Button to insert an image. Default true,    
             },
@@ -1226,6 +1227,7 @@ function makeEditable(selector, type, okMessage, disabled)
                     });
                     
                     $('.editable-pagebrowser').click(function() {
+                        console.log('??????????????????');
                         $.fancybox.open([
                             {
                                 maxWidth: 800,
