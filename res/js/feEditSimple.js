@@ -218,21 +218,9 @@ $(document).ready(function()
     });
 
     
-    //bootstrap-contextmenu
-    $('.csc-default').contextmenu({
-        target:'#context-menu', 
-        before: function(e,context) {
-          // execute code before context menu if shown
-            //console.log($(e.target));
-        },
-        onItem: function(context,e) {
-            feeditSimpleContentCommand(context, e);// execute on menu item selection
-            e.stopPropagation();
-            this.closemenu(e);
-        }
-    });
-    
-    
+    //enable bootstrap-contextmenu
+    bootstrapContextMenu();
+        
     $('.feeditSimple-mainMenu a').click( function (e) {
         var cmd = $(this).attr('id');
         var pageUid = $('body').attr('id');
@@ -284,6 +272,23 @@ $(document).ready(function()
 ************************************************************HELP FUNCTIONS**************************************************
 ****************************************************************************************************************************/
 
+function bootstrapContextMenu()
+{
+    $('.csc-default').contextmenu({
+        target:'#context-menu', 
+        before: function(e,context) {
+          // execute code before context menu if shown
+            //console.log($(e.target));
+        },
+        onItem: function(context,e) {
+            feeditSimpleContentCommand(context, e);// execute on menu item selection
+            e.stopPropagation();
+            this.closemenu(e);
+        }
+    });
+}
+    
+    
 // append row to the HTML table
 function appendRow(tableId)
 {
@@ -415,10 +420,10 @@ function feeditSimpleContentCommand(context, e)
         case 'Beside Text, Right':
         case 'Beside Text, Left':
             var imageOrientationId = e.target.className.split('-').pop();
-            console.log(imageOrientationId);
+            //console.log(imageOrientationId);
             //console.log(cmd.toLowerCase().replace(',','').replace(' ', '-'));
             var okMessage = {'header' : 'Image', 'message': 'Image orientation successfully updated'};
-            changeImageOrientation(cmd.toLowerCase().replace(', ','-').replace(' ', '-'), uid, okMessage);
+            changeImageOrientation(cmd.toLowerCase().replace(', ','-').replace(' ', '-'), uid, imageOrientationId, okMessage);
             break;
         case 'Insert image':
             var okMessage = {'header' : 'Image', 'message': 'Image successfully inserted'};
@@ -984,6 +989,9 @@ function makeEditable(selector, type, okMessage)
                 return false;
             }
             
+            //Disable rightclick
+            $('.csc-default').off();
+            
             //remove empty
             $('body',$('.wysihtml5-sandbox').contents()).find('.feeditSimple-empty').remove();
             
@@ -1187,6 +1195,9 @@ function makeEditable(selector, type, okMessage)
             if(!editable) {
                 return false;
             }
+            
+            //Disable rightclick
+            $('.csc-default').off();
             
             var id = $(this).closest('.csc-default').attr('id');
             var imgId = $(this).find('img').attr('id');
@@ -1405,14 +1416,20 @@ function makeEditable(selector, type, okMessage)
         });
         
         
-        $('.feeditSimple-table').on('hidden', function(e, editable) {
-
+        $(selector).on('shown', function(e, editable) {
+            //Disable rightclick
+            $('.csc-default').off();
         });
-        $('.feeditSimple-table').on('shown', function(e, editable) {
-            //console.log($(this));
-        });
-        /////////////////////////
     }
+    
+    $(selector).on('hidden', function(e, editable) {
+        if(!editable) {
+            return false;
+        }
+        console.log('???');
+       //enable bootstrap-contextmenu
+        bootstrapContextMenu();
+    });
 }
 
 
@@ -1753,7 +1770,7 @@ function toggleHiddenObject(inputClass, myType)
 }
 
 
-function changeImageOrientation(cmd, uid, okMessage)
+function changeImageOrientation(cmd, uid, imageOrientationId, okMessage)
 {
     //console.log(cmd + uid);
     
@@ -1802,12 +1819,28 @@ function changeImageOrientation(cmd, uid, okMessage)
                 //remove template header
                 $(responseContent).find('.csc-textpicHeader').remove();
             }
-            //replace the content
-            $(innerContainer).html(responseContent);
-            //restore editable
-            //makeEditable('#lth_feeditsimple_'+ uid, 'textpic', '');
-            //('#lth_feeditsimple_'+ uid, 'image', '');
-            showMessage(okMessage);
+            
+            $.ajax({
+                url: 'index.php',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    eID : 'lth_feedit_simple',
+                    cmd : 'updateImageOrientation',
+                    uid : imageOrientationId,
+                    pid : uid,
+                    sid : Math.random(),
+                },
+                success: function(data) {
+                    //replace the content
+                    $(innerContainer).html(responseContent);
+                    showMessage(okMessage);
+                },
+                error: function(data) {
+                    alert('Something went wrong');
+                }
+            });
+            
         });
     } catch(err) {
         //console.log(err);

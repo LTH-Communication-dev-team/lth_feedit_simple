@@ -87,6 +87,9 @@ switch($cmd) {
     case 'updateSysFileReference':
         $content = updateSysFileReference($uid, $pid, $pageUid);
         break;
+    case 'updateImageOrientation':
+        $content = updateImageOrientation($uid, $pid);
+        break;    
 }
 
 if($cmd != 'fileupload') {
@@ -1041,13 +1044,29 @@ function updateSysFileReference($uid, $pid, $pageUid)
 	'tablenames' => 'tt_content',
 	'fieldname' => 'image',
 	'pid' => $pageUid, // parent id of the parent page
-	'table_local' => 'sys_file'
+	'table_local' => 'sys_file',
+        'crdate' => time(),
+        'tstamp' => time()
     );
     $GLOBALS['TYPO3_DB']->exec_INSERTquery('sys_file_reference', $insertArray);
     $newUid = $GLOBALS['TYPO3_DB']->sql_insert_id();
     
     $returnArray = array();
     $returnArray['content'] = $newUid;
+    return $returnArray;
+}
+
+
+function updateImageOrientation($imageOrientationId, $cUid)
+{
+    $updateArray = array(
+        'imageorient' => $imageOrientationId,
+        'tstamp' => time()
+    );
+    $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid='.intval($cUid), $updateArray);
+    
+    $returnArray = array();
+    $returnArray['content'] = 'ok';
     return $returnArray;
 }
 
