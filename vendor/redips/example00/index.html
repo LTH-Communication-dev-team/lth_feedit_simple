@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<head>
+		<meta name="author" content="Darko Bunic"/>
+		<meta name="description" content="Merge and split table cells with JavaScript"/>
+		<meta name="viewport" content="width=device-width, user-scalable=no"/><!-- "position: fixed" fix for Android 2.2+ -->
+		<link rel="stylesheet" href="style.css" type="text/css" media="screen" />
+		<script type="text/javascript" src="../header.js"></script>
+		<script type="text/javascript" src="../redips-table-min.js"></script>
+		<script type="text/javascript" src="script.js"></script>
+		<title>Example 0: Table demo</title>
+	</head>
+	<body>
+		<!-- container -->
+		<div id="myContainer">
+			<!-- toolbox -->
+			<table id="toolbox">
+				<tbody>
+					<tr>
+						<td>
+							<input type="button" value="Merge" class="button" onclick="redips.merge()" title="Merge marked table cells horizontally and verically"/>
+						</td>
+						<td>
+							<input type="button" value="Split H" class="button" onclick="redips.split('h')" title="Split marked table cell horizontally"/>
+							<input type="button" value="Split V" class="button" onclick="redips.split('v')" title="Split marked table cell vertically"/>
+						</td>
+						<td>
+							<input type="button" value="Row +" class="button" onclick="redips.row('insert')" title="Add table row"/>
+							<input type="button" value="Row -" class="button" onclick="redips.row('delete')" title="Delete table row"/>
+						</td>
+						<td>
+							<input type="button" value="Col +" class="button" onclick="redips.column('insert')" title="Add table column"/>
+							<input type="button" value="Col -" class="button" onclick="redips.column('delete')" title="Delete table column"/>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<!-- main table -->
+			<table id="mainTable">
+				<tbody>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>

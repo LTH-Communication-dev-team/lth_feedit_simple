@@ -208,14 +208,14 @@ class user_feeditsimple_adminpanel {
                 'bootstrap-editable.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-editable.js'),
                 
                 //wysihtml5
-                'bootstrap-wysihtml5.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-wysihtml5.css'),
-		'wysihtml5-0.3.0.min.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/wysihtml5-0.3.0.js'),               
-                'bootstrap-wysihtml5-0.0.2.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-wysihtml5-0.0.2.js'),
+                'bootstrap-wysihtml5-0.0.2.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-wysihtml5-0.0.2.css'),
+		'wysihtml5-0.3.0.min.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/wysihtml5-0.3.0.min.js'),               
+                'bootstrap-wysihtml5-0.0.2.min.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-wysihtml5-0.0.2.min.js'),
 		'wysihtml5.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/wysihtml5.js'),
 
-                /* load files needed for jquery file upload
+                /*load files needed for jquery file upload
                 'jquery.ui.widget.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/vendor/jquery.ui.widget.js'),
-                'jquery.iframe-transport.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.iframe-transport.js'),
+                 'jquery.iframe-transport.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.iframe-transport.js'),
                 'jquery.fileupload.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.fileupload.js'),*/
                  
                 //load files for bootstrap-treeview
@@ -224,6 +224,23 @@ class user_feeditsimple_adminpanel {
                 
                 //load files needed for bootstrap-contextmenu
                 'bootstrap-contextmenu.js' => $this->getScriptTag($extPath . 'vendor/bootstrapcontextmenu/bootstrap-contextmenu.js'),
+                
+                //load files needed for datatables
+                'jquery.dataTables.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/jquery.dataTables.min.css'),
+                'buttons.bootstrap.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/buttons.bootstrap.min.css'),
+                'buttons.dataTables.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/buttons.dataTables.min.css'),
+                'jquery.dataTables.min.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/jquery.dataTables.min.js'),
+                'dataTables.buttons.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/dataTables.buttons.min.js'),
+                'jszip.min.js' => $this->getScriptTag('//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js'),
+                'pdfmake.min.js' => $this->getScriptTag('//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js'),
+                'vfs_fonts.js' => $this->getScriptTag('//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js'),
+                'buttons.html5.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/buttons.html5.min.js'),
+                
+                //load files needed for jquery panelslider
+                'jquery.panelslider.min.js' => $this->getScriptTag($extPath . 'vendor/jquery-panelslider/jquery.panelslider.min.js'),
+                
+                //load files needed for redips
+                'redips-table-min.js' => $this->getScriptTag($extPath . 'vendor/redips/redips-table-min.js'),
                 
                 // load files needed for extension itself
                 'lth_feedit_simple.css' => $this->getLinkTag($extPath . 'res/css/lth_feedit_simple.css'), 		

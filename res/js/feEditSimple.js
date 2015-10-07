@@ -4,37 +4,60 @@
  * and open the template in the editor.
  */
 
-//defaults
-//$.fn.editable.defaults.mode = 'inline';
-/*$.fn.editableform.buttons  = ''+
-    '<button type="submit" class="btn btn-primary editable-submit"><i class="icon-ok icon-white"></i></button><br />'+
-    '<button type="button" class="btn editable-cancel" style="margin-left:0px;"><i class="icon-remove"></i></button><br />'+
-    '<button type="button" class="btn editable-remove"><i class="icon-trash"></i></button>';+
-    '<button type="button" class="btn editable-picture"><i class="icon-picture"></i></button><br />';
-
-//Add actions to new buttons
-$(document).delegate(".editable-remove",'click',function(e){ 
-    //$("#lista .editable-open[data-original-title]").remove();
-    //console.log('remove');
-});*/
-
-//$(document).delegate(".editable-picture",'click',function(e){
-    
-        /*find('figure').map(function(){
-                                //return $(this).attr('src')
-                                if($(this).attr('src').split('/').pop() != imgSrc) {
-                                    otherImages += $(this).attr('src').split('/').pop() + ',';
-                                }
-                            }).get();*/
-    ////console.log('picture');
-//});
 var saveBeforeStopUid = function(input) {
     beforeStopUid = input;
 };
 
+var redips = {};
+
 $(document).ready(function()
 {
-    $('.csc-textpic-image').attr('data-type', 'address');
+    $('#feeditSimple-helpButton').panelslider({
+        side: 'right',
+        duration: 200,
+        clickClose: true,
+        onOpen: function() {
+            //console.log($('.panel-body').html());
+            $('.panel-body').load( "/typo3conf/ext/lth_feedit_simple/res/template/help.html #tjo" );
+        },
+        easingOpen:null,
+        easingClose: null 
+    });
+    
+    $('#feeditSimple-editPageButton').panelslider({
+        side: 'right',
+        duration: 200,
+        clickClose: true,
+        onOpen: function() {
+            var url = '';
+            var id = $('body').attr('id');
+            if(id==='new') {
+                url = '/typo3/alt_doc.php?edit[pages]['+id+']=new';
+            } else {
+                url = '/typo3/alt_doc.php?edit[pages]['+id+']=edit';
+            }
+            var formToken = '';
+
+            $.ajax({
+                url: url,
+                type: 'post',
+                dataType: 'json',
+                complete: function(data) {
+                    formToken = $(data.responseText).find('input[name="formToken"]').val();
+                    $('.panel-header').append('<input type="hidden" name="formToken" value="' + formToken + '" />');
+                    $('.panel-body').load( "/typo3conf/ext/lth_feedit_simple/res/template/formelement.html #editPage" );
+                }
+            });
+        },
+        easingOpen:null,
+        easingClose: null 
+    });
+    
+    $('#close-panel-bt').click(function() {
+        $.panelslider.close();
+    });
+    
+
     //Hide new content elements row on blur
     $("html").mouseup(function(e)
     {
@@ -44,11 +67,14 @@ $(document).ready(function()
             subject.fadeOut();
         }
     });
-    ////console.log($('#feEditSimple-normalColWrapper').is(':empty'));
+    //console.log($('#feEditSimple-normalColWrapper').is(':empty'));
+    //
+    //
     //add empty div if no content
     if($('#feEditSimple-normalColWrapper').is(':empty')) {
         $('#feEditSimple-normalColWrapper').html('<div class="feEditSimple-empty">Empty</div>');
     }
+    
     
     //make it possible to make content-elements change place
     $('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper').sortable({
@@ -74,7 +100,6 @@ $(document).ready(function()
                 var uid = ui.item.context.id;
                 var okMessage = {'header' : 'Move', 'message': 'Content element successfully moved'};
                 ajaxCall('moveContent', table, uid, pid, pageUid, okMessage);
-                //function getSortNumber($table,$uid,$pid)
             };
         }
     }).disableSelection();
@@ -82,7 +107,6 @@ $(document).ready(function()
     //make it possible to drop new content element
     $('#feEditSimple-contentTypeToolbar > a').draggable({
         helper:'clone',
-        //revert: 'invalid',
         connectToSortable:'#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper',
        
         stop: function( e, ui ) {
@@ -99,224 +123,100 @@ $(document).ready(function()
             if(okMessage) {
                 showMessage(okMessage);
             }
-           //$(ui.helper).remove();
-            /*var templateArray = getContentTemplate(ui.item.context.rel);
-            var newUid = templateArray[0];
-            var template = templateArray[1];
-            
-            saveBeforeStopUid(newUid);
-            
-            	    
-            
-            //$(this).sortable('cancel');
-            makeEditable('#'+beforeStopUid+' .lth_feeditsimple_content', cType, okMessage);
-            $('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper').sortable('refresh');*/
        }
-   });
-     
-    
-    /*$('#feEditSimple-contentTypeToolbar').sortable({
-        connectWith: '#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper',
-        placeholder: 'ui-state-highlight',
-        cursor: 'move',
-        forcePlaceholderSize: false,
-        appendTo: '#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper',
-        beforeStop : function(event, ui) {
-            //console.log(ui);
-            
-            var templateArray = getContentTemplate(ui.item.context.rel);
-            var newUid = templateArray[0];
-            var template = templateArray[1];
-            
-            saveBeforeStopUid(newUid);
-            
-            if(template) {
-                if($(ui.placeholder).next().attr('id')) {                          
-                    $(ui.placeholder).next().before(template);
-                } else {
-                    //sist
-                    $(ui.placeholder).parent().append(template);
-                }
-            } else {
-                alert('fel!');
-            }		                                                   
-	},
-        stop : function(event, ui) {
-            var cType = getCtype(ui.item.context.rel);
-            var okMessage = {'header' : 'Move', 'message': 'Content element successfully created'};
-            $(this).sortable('cancel');
-            makeEditable('#'+beforeStopUid+' .lth_feeditsimple_content', cType, okMessage);
-            $('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper').sortable('refresh');
-            //<div id="c59" class="csc-default">
-    //<div id="lth_feeditsimple_img_59" data-type="address" data-pk="img_59" class="lth_feeditsimple_img">
-    //<div class="csc-textpic-text">
-    //<div id="lth_feeditsimple_59" data-type="wysihtml5" data-pk="59" class="lth_feeditsimple_content">
-    //<p>yada</p>
-    //</div>
-    //</div>
-    //</div>
-    //</div>
-            //$('#feEditSimple-contentTypeToolbar').sortable('refresh');
-            //$('#feeditSimple-newElement').editable('toggle');
-	}
-    }).disableSelection();
-    
-    $('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper, #feEditSimple-contentTypeToolbar').bind('sortstart', function(event, ui) {
-        $('.ui-state-highlight').append('<span>Drop content here!</span>');
-    });*/
-    
-    //Create new fields for updating image
-    var Address = function (options) {
-        this.init('address', options, Address.defaults);
-    };
-
-    //inherit from Abstract input
-    $.fn.editableutils.inherit(Address, $.fn.editabletypes.abstractinput);
-
-    $.extend(Address.prototype, {
-        /** Renders input from tpl
-        @method render() **/        
-        render: function() {
-           this.$input = this.$tpl.find('input');
-        },
-        
-        /**    Default method to show value in element. Can be overwritten by display option.
-        @method value2html(value, element)  **/
-        value2html: function(value, element) {
-            if(!value) {
-                $(element).empty();
-                return; 
-            }
-            var html = $('<div>').text(value.src).html() + ', ' + 
-                    $('<div>').text(value.title).html() + ', ' + 
-                    $('<div>').text(value.target).html() + ', ' + 
-                    $('<div>').text(value.width).html() + ', ' +
-                    $('<div>').text(value.height).html() + ', ' +
-                    $('<div>').text(value.process).html();
-            $(element).html(html); 
-        },
-        
-        /**        Gets value from element's html
-                @method html2value(html) **/        
-        html2value: function(html) {        
-          /*
-            you may write parsing method to get value by element's html
-            e.g. "Moscow, st. Lenina, bld. 15" => {src: "Moscow", title: "Lenina", target: "15"}
-            but for complex structures it's not recommended.
-            Better set value directly via javascript, e.g. 
-            editable({
-                value: {
-                    src: "Moscow", 
-                    title: "Lenina", 
-                    target: "15"
-                }
-            });
-          */ 
-          return null;  
-        },
-      
-       /**        Converts value to string.         It is used in internal comparing (not for sending to server).
-                @method value2str(value)         **/
-       value2str: function(value) {
-           var str = '';
-           if(value) {
-               for(var k in value) {
-                   str = str + k + ':' + value[k] + ';';  
-               }
-           }
-           return str;
-       }, 
-       
-       /*        Converts string to value. Used for reading value from 'data-value' attribute.
-                @method str2value(str)         */
-       str2value: function(str) {
-           /*
-           this is mainly for parsing value defined in data-value attribute. 
-           If you will always set value by javascript, no need to overwrite it
-           */
-           return str;
-       },                
-       
-       /**        Sets value of input.
-                @method value2input(value) 
-        @param {mixed} value       **/         
-       value2input: function(value) {
-           if(!value) {
-             return;
-           }
-           this.$input.filter('[name="src"]').val(value.src);
-           this.$input.filter('[name="title"]').val(value.title);
-           this.$input.filter('[name="target"]').val(value.target);
-           this.$input.filter('[name="width"]').val(value.width);
-           this.$input.filter('[name="height"]').val(value.height);
-           this.$input.filter('[name="process"]').val(value.process);
-       },       
-       
-       /**        Returns value of input.
-                @method input2value()        **/          
-       input2value: function() { 
-           return {
-              src: this.$input.filter('[name="src"]').val(), 
-              title: this.$input.filter('[name="title"]').val(), 
-              target: this.$input.filter('[name="target"]').val(),
-              width: this.$input.filter('[name="width"]').val(),
-              height: this.$input.filter('[name="height"]').val(),
-              process: this.$input.filter('[name="process"]').val()
-           };
-       },        
-       
-        /**        Activates input: sets focus on the first field.
-                @method activate()        **/        
-        activate: function() {
-            this.$input.filter('[name="src"]').focus();
-        },  
-       
-       /**        Attaches handler to submit form in case of 'showbuttons=false' mode
-                @method autosubmit()        **/       
-       /*autosubmit: function() {
-           this.$input.keydown(function (e) {
-                if (e.which === 13) {
-                    $(this).closest('form').submit();
-                }
-           });
-       }     */  
     });
-/*
- * $('.bootstrap-wysihtml5-insert-link-url').after('<button title="File or image" type="button" class="btn editable-filemanager">' +
-                            '<i class="icon-folder-open"></i></button>');
- */
-    Address.defaults = $.extend({}, $.fn.editabletypes.abstractinput.defaults, {
-        tpl: '<div class="control-group">' + 
-            '<div class="controls">' +
-            '<input type="text" id="src" placeholder="Src" name="src" class="input bootstrap-wysihtml5-insert-link-url">' +
-            '<button title="File or image" type="button" class="btn editable-filemanager"><i class="icon-folder-open"></i></button>' +
-            '<button title="Delete image" type="button" class="btn editable-delete-image"><i class="icon-trash"></i></button>' +
-            '</div>'+
-            '<div class="controls"><input type="text" id="title" placeholder="Title" name="title" class="input"></div>' +
-            '<div class="controls"><input type="text" id="target" placeholder="Target" name="target" class="input"></div>' +
-            '<div class="controls"><input type="text" id="width" placeholder="Width" name="width" class="input"></div>' +
-            '<div class="controls"><input type="text" id="height" placeholder="Height" name="height" class="input"></div>' +
-            '<div class="controls"><input type="text" id="process" placeholder="Process" name="process" class="input"></div>' +
-            '</div>'
-        ,
-        inputclass: ''
-    });
-
-    $.fn.editabletypes.address = Address;
     
-    var okMessage = {'header' : 'Move', 'message': 'Content element successfully updated'};
+    var okMessage = {'header' : 'Save', 'message': 'Content element successfully updated'};
     
-    //make text elements editable
+    /*make text elements editable
     $('.csc-default').dblclick(function(e, ui){
         //console.log('dblclick');
         e.stopPropagation();
         $(this).find('.lth_feeditsimple_content').editable('toggle');
-    });
+    });*/
     
     makeEditable('.lth_feeditsimple_content', 'text', okMessage);
         
     //make image elements editable
     makeEditable('.csc-textpic-image', 'image', okMessage);
+    
+
+    $('.feeditSimple-tableWrapper').dblclick(function(e,ui){
+        //e.stopPropagation();
+        $(this).prepend('<div></div>');
+        var tbl = $(this).find('table');
+        $(tbl).before('<table id="toolbox"><tbody>' +
+                '<tr>' +
+                    '<td>' +
+                            '<input type="button" value="Merge" class="button" onclick="redips.merge()" title="Merge marked table cells horizontally and verically"/>' +
+                    '</td>' +
+                    '<td>' +
+                            '<input type="button" value="Split H" class="button" onclick="redips.split(\'h\')" title="Split marked table cell horizontally"/>' +
+                            '<input type="button" value="Split V" class="button" onclick="redips.split(\'v\')" title="Split marked table cell vertically"/>' +
+                    '</td>' +
+                    '<td>' +
+                            '<input type="button" value="Row +" class="button" onclick="redips.row(\'insert\')" title="Add table row"/>' +
+                            '<input type="button" value="Row -" class="button" onclick="redips.row(\'delete\')" title="Delete table row"/>' +
+                    '</td>' +
+                    '<td>' +
+                            '<input type="button" value="Col +" class="button" onclick="redips.column(\'insert\')" title="Add table column"/>' +
+                            '<input type="button" value="Col -" class="button" onclick="redips.column(\'delete\')" title="Delete table column"/>' +
+                    '</td>' +
+                '</tr>' +
+            '</tbody>' +
+        '</table>');
+                
+               // REDIPS.table initialization
+        //redips.init = function () {
+            //console.log('init');
+                // define reference to the REDIPS.table object
+                var rt = REDIPS.table;
+                // activate onmousedown event listener on cells within table with id="feeditSimple-table"
+                rt.onmousedown('feeditSimple-table', true);
+                // show cellIndex (it is nice for debugging)
+                //rt.cell_index(true);
+                // define background color for marked cell
+                rt.color.cell = '#9BB3DA';
+        //};
+        appendColumn('feeditSimple-table');
+        appendRow('feeditSimple-table');
+
+
+        // function merges table cells
+        redips.merge = function () {
+            // first merge cells horizontally and leave cells marked
+            REDIPS.table.merge('h', false);
+            // and then merge cells vertically and clear cells (second parameter is true by default)
+            REDIPS.table.merge('v');
+        };
+
+
+        // function splits table cells if colspan/rowspan is greater then 1
+        // mode is 'h' or 'v' (cells should be marked before)
+        redips.split = function (mode) {
+            REDIPS.table.split(mode);
+        };
+
+
+        // insert/delete table row
+        redips.row = function (type) {
+            REDIPS.table.row('feeditSimple-table', type);
+        };
+
+
+        // insert/delete table column
+        redips.column = function (type) {
+                REDIPS.table.column('feeditSimple-table', type);
+        };
+
+        $(this).unbind( "dblclick" );
+        //makte tables editable
+    
+
+        makeEditable('.feeditSimple-table td', 'table', okMessage);
+    
+    });
+
     
     //bootstrap-contextmenu
     $('.csc-default').contextmenu({
@@ -329,6 +229,18 @@ $(document).ready(function()
             feeditSimpleContentCommand(context, e);// execute on menu item selection
             e.stopPropagation();
             this.closemenu(e);
+        }
+    });
+    
+    
+    $('.feeditSimple-mainMenu a').click( function (e) {
+        var cmd = $(this).attr('id');
+        var pageUid = $('body').attr('id');
+        //console.log($(this).attr('id'));
+        switch(cmd) {
+            case 'feeditSimple-formHandler':
+                ajaxCall('getFormHandler', '', '', '', pageUid);
+                break;
         }
     });
     /*
@@ -372,9 +284,60 @@ $(document).ready(function()
 ************************************************************HELP FUNCTIONS**************************************************
 ****************************************************************************************************************************/
 
+// append row to the HTML table
+function appendRow(tableId)
+{
+    var tbl = document.getElementById(tableId), // table reference
+        row = tbl.insertRow(0),      // append table row
+        i;
+    // insert table cells to the new row
+    for (i = 0; i < tbl.rows[1].cells.length; i++) {
+        //createCell(row.insertCell(i), i, 'row');
+        cell = row.insertCell(i);
+        cell.innerHTML = '<a href="javascript:" class="feeditSimple-markColumn"><span class="icon-arrow-down"></span></a>';
+    }
+    var rt = REDIPS.table;
+    $('.feeditSimple-markColumn').click(function() {
+        $('#'+tableId+' td, th').each(function(){
+            rt.mark(false,this);
+        });
+        var index = $(this).parent().index();
+        for (i = 2; i < tbl.rows.length; i++) {
+            rt.mark(true, tbl, i, index);
+        }
+    });
+}
+
+
+// append column to the HTML table
+function appendColumn(tableId)
+{
+    var tbl = document.getElementById(tableId), // table reference
+        i;
+    // open loop for each row and append cell
+    for (i = 0; i < tbl.rows.length; i++) {
+        //createCell(tbl.rows[i].insertCell(tbl.rows[i].cells.length), i, 'col');
+        cell = tbl.rows[i].insertCell(0);
+        cell.innerHTML = '<a href="javascript:" class="feeditSimple-markRow"><span class="icon-arrow-right"></span></a>';
+    }
+    var rt = REDIPS.table;
+    $('.feeditSimple-markRow').click(function() {
+        $('#'+tableId+' td, th').each(function(){
+            rt.mark(false,this);
+        });
+        //console.log($(this).parent().parent().index());
+        var index = $(this).parent().parent().index() + 2;
+
+        for (i = 0; i < tbl.rows[0].cells.length; i++) {
+            rt.mark(true, tbl, index, i);
+        }
+    });
+}
+
+
 function convertFileadmin(fPath)
 {
-    ////console.log(fPath);
+    //console.log(fPath);
     if(fPath) {
         var fPathArray = fPath.split('/fileadmin');
         fPath = '/fileadmin' + fPathArray[1];
@@ -391,11 +354,14 @@ function feeditSimpleContentCommand(context, e)
     var pageUid = $('body').attr('id');
     
     switch(cmd) {
+        case 'Edit':
+            //console.log
+            $(context).find('.lth_feeditsimple_content').editable('toggle');
+            break;
         case 'Delete':
             //console.log(context);
             if(confirm('Are you sure?')) {
                 var okMessage = {'header' : 'Delete', 'message': 'Content element successfully deleted'};
-                
                 $(context).remove();
                 ajaxCall('deleteContent', 'tt_content', uid, '', '', okMessage);
             } else {
@@ -448,16 +414,23 @@ function feeditSimpleContentCommand(context, e)
         case 'In text, left':
         case 'Beside Text, Right':
         case 'Beside Text, Left':
+            var imageOrientationId = e.target.className.split('-').pop();
+            console.log(imageOrientationId);
             //console.log(cmd.toLowerCase().replace(',','').replace(' ', '-'));
             var okMessage = {'header' : 'Image', 'message': 'Image orientation successfully updated'};
             changeImageOrientation(cmd.toLowerCase().replace(', ','-').replace(' ', '-'), uid, okMessage);
             break;
+        case 'Insert image':
+            var okMessage = {'header' : 'Image', 'message': 'Image successfully inserted'};
+            insertImage(uid, okMessage);
+            break;
         default:
             //default code block
     }
+    $('#context-menu').hide();
 }
-    
-function cute()
+
+function cute(imgId)
 {
     $.ajax({
         type : "POST",
@@ -468,11 +441,20 @@ function cute()
             sid : Math.random(),
         },
         dataType: "json",
+        error: function() {
+            console.log('error');
+        },
         success: function(data) {
+            //console.log(data);
             var filemanager = $('body',$('.fancybox-iframe').contents()).find('.filemanager');
             var breadcrumbs = $('body',$('.fancybox-iframe').contents()).find('.breadcrumbs');
             var fileList = filemanager.find('.data');
             var breadcrumbsUrls = [];
+            
+            //Add close fancybox
+            $(filemanager).find('.close').click(function() {
+                $.fancybox.close();
+            });
 
             // Hiding and showing the search box
             filemanager.find('.search').click(function(){
@@ -518,7 +500,7 @@ function cute()
             }).always(function () {
                 $(this).removeClass('fileupload-processing');
             }).done(function (result) {
-                console.log(result);
+                //console.log(result);
                 $(this).fileupload('option', 'done')
                     .call(this, $.Event('done'), {result: result});
             });*/
@@ -553,7 +535,7 @@ function cute()
             // Listening for keyboard input on the search field.
 		// We are using the "input" event which detects cut and paste
 		// in addition to keyboard input.
-            filemanager.find('input[type=search]').on('input', function(e){
+            filemanager.find('input[type=search]').on('input', function(e) {
                 folders = [];
                 files = [];
                 var value = this.value.trim();
@@ -593,8 +575,7 @@ function cute()
                     filemanager.removeClass('searching');
                     filemanager.find('input[type=search]').val('').hide();
                     filemanager.find('span').show();
-                }
-                else {
+                } else {
                     breadcrumbsUrls.push(nextDir);
                 }
 
@@ -663,11 +644,11 @@ function cute()
                     $(filemanager).find('#fileupload').attr('action', '/index.php?eID=lth_feedit_simple&cmd=fileupload&path=' + getPath(breadcrumbs) + '&sid=' + Math.random());
                 } else {
                     // if there is no nextDir
-                    //console.log(filemanager.find('#fileupload').children().attr());
+                    //console.log(data.path);
                     filemanager.find('.upload-icon').hide();
                     fileList.html('');
                     breadcrumbsUrls = generateBreadcrumbs('/fileadmin');
-                    rendered = searchByPath(data.path,'');
+                    rendered = searchByPath(data.path, '');
                     for(var i=0;i<rendered.length;i++){
                         render([rendered[i]]);
                     }
@@ -693,17 +674,20 @@ function cute()
                 var path = dir.split('/'),
                     demo = [data],
                     flag = 0;
-            
-                if(type=='next') {
+
+                if(type === 'next') {
                     demo = demo[0].items;
                 }
-            
-                for(var i=0;i<path.length;i++){
-                    for(var j=0;j<demo.length;j++) {
-                        if(demo[j].name === path[i]) {
-                            flag = 1;
-                            demo = demo[j].items;
-                            break;
+                
+                
+                for(var i=0;i<path.length;i++) {
+                    if(demo) {
+                        for(var j=0;j<demo.length;j++) {
+                            if(demo[j].name === path[i]) {
+                                flag = 1;
+                                demo = demo[j].items;
+                                break;
+                            }
                         }
                     }
                 }
@@ -744,10 +728,10 @@ function cute()
                     
                     data.forEach(function (d) {
                         if (d.type === 'folder') {
-                                scannedFolders.push(d);
+                            scannedFolders.push(d);
                         }
                         else if (d.type === 'file') {
-                                scannedFiles.push(d);
+                            scannedFiles.push(d);
                         }
                     });
                 } else if(typeof data === 'object') {
@@ -806,7 +790,7 @@ function cute()
                         var file = $('<li class="files"><a href="#" title="'+ convertFileadmin(f.path) + '" class="files">'+icon+'<span class="name">'+ name +'</span> <span class="details">'+fileSize+'</span></a></li>');
                         file.appendTo(fileList);
 
-                        addClickToFile(file);
+                        addClickToFile(file, imgId);
                     });
 
                 }
@@ -855,29 +839,33 @@ function cute()
     });
 }
 
-function addClickToFile(file)
+
+function addClickToFile(file, imgId)
 {
     $(file).find('a').click(function(event) {
-        ////console.log($(this).attr('title'));
-        window.parent.$(".bootstrap-wysihtml5-insert-link-url").val(convertFileadmin($(this).attr('title')));
-        $.fancybox.close();
+        //console.log($("#"+imgId).attr('src'));
+        ajaxCall('getImgId', '', imgId, '', '', '', $(this).attr('title').replace('/fileadmin', '').replace('//', '/'));
     });
 }
+
 
 function getPageTree()
 {
     ajaxCall('getPageTree');
 }
 
+
 function toggleItem(selector,eType)
 {
     $(selector).toggle();
 }
 
+
 function newContent()
 {
     $('.feEditSimple-secondRow').fadeIn();
 }
+
 
 //extract cType
 function getCtype(rel)
@@ -903,16 +891,6 @@ function getContentTemplate(rel)
         '<input type="hidden" name="CType" value="textpic" />' +
         '</div>'
     };
-    //console.log($('#feeditSimple-new').length);
-    //<div id="c59" class="csc-default">
-    //<div id="lth_feeditsimple_img_59" data-type="address" data-pk="img_59" class="lth_feeditsimple_img">
-    //<div class="csc-textpic-text">
-    //<div id="lth_feeditsimple_59" data-type="wysihtml5" data-pk="59" class="lth_feeditsimple_content">
-    //<p>yada</p>
-    //</div>
-    //</div>
-    //</div>
-    //</div>
     /*
      * 
      * @type {@exp;rel@call;split@call;shift@call;toString@call;split@call;pop@call;toString}
@@ -926,86 +904,13 @@ function getContentTemplate(rel)
     }
 }
 
+
 var imgSrc = '';
 //params for editable
-function makeEditable(selector, type, okMessage, disabled)
+function makeEditable(selector, type, okMessage)
 {
-    //console.log(disabled);
-    if(disabled===false) {
-        disabled = false;
-    } else {
-        disabled = true;
-    }
     var myCustomTemplates = {
         emphasis : function(locale) {
-            /*return "<li>" +
-            "<div class=\"dropdown\"><button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"feeditSimple-contentMenu\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">" +
-            "<i class=\"icon-cog\"></i></button>" +
-            "<ul class=\"dropdown-menu feeditSimple-content-command\" aria-labelledby=\"feeditSimple-contentMenu\">" +
-                "<li><a class=\"feeditSimple-content-command-delete\" href=\"#\">Delete</a></li>" +
-                "<li><a class=\"feeditSimple-content-command-cut\" href=\"#\">Cut</a></li>" +
-                "<li><a class=\"feeditSimple-content-command-copy\" href=\"#\">Copy</a></li>" +
-                "<li><a class=\"feeditSimple-content-command-paste\" href=\"#\">Paste</a></li>" +
-                "<li><a class=\"feeditSimple-content-command-hide\" href=\"#\">Hide</a></li>" +
-                "<li><a class=\"feeditSimple-content-command-show\" href=\"#\">Show</a></li>" +
-                "<li class=\"dropdown-submenu\"><a href=\"#\">Image orientation</a>" +
-                    "<ul class=\"dropdown-menu feeditSimple-imageorient\">" +
-                    //data[tt_content][1][imageorient]
-                        "<li><a class=\"feeditSimple-imageorient-0\" href=\"#\">Above, center</a></li>" +
-                        "<li><a class=\"feeditSimple-imageorient-1\" href=\"#\">Above, right</a></li>" +
-                        "<li><a class=\"feeditSimple-imageorient-2\" href=\"#\">Above, left</a></li>" +
-                        "<li><a class=\"feeditSimple-imageorient-8\" href=\"#\">Below, center</a></li>" +
-                        "<li><a class=\"feeditSimple-imageorient-9\" href=\"#\">Below, right</a></li>" +
-                        "<li><a class=\"feeditSimple-imageorient-10\" href=\"#\">Below, left</a></li>" +
-                        "<li><a class=\"feeditSimple-imageorient-17\" href=\"#\">In text, right</a></li>" +
-                        "<li><a class=\"feeditSimple-imageorient-18\" href=\"#\">In text, left</a></li>" +
-                        "<li>__No wrap:__</a></li>" +
-                        "<li><a class=\"feeditSimple-imageorient-25\" href=\"#\">Beside Text, Right</a></li>" +
-                        "<li><a class=\"feeditSimple-imageorient-26\" href=\"#\">Beside Text, Left</a></li>" +
-                    "</ul>" +
-                "</li>" +
-                "<li class=\"dropdown-submenu\"><a href=\"#\">Image quality and type</a>" +
-                    "<ul class=\"dropdown-menu feeditSimple-image_compression\">" +
-                    //<select id="tceforms-select-55b9d47044475" name="data[tt_content][1][image_compression]" class="select" onchange="if (this.options[this.selectedIndex].value=='--div--') {this.selectedIndex=0;} TBE_EDITOR.fieldChanged('tt_content','1','image_compression','data[tt_content][1][image_compression]');"><option value="0" selected="selected">Default</option>
-                        "<li><a class=\"feeditSimple-image_compression-1\" href=\"#\">None (ignores all other options)</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-10\" href=\"#\">GIF/256</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-11\" href=\"#\">GIF/128</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-12\" href=\"#\">GIF/64</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-13\" href=\"#\">GIF/32</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-14\" href=\"#\">GIF/16</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-15\" href=\"#\">GIF/8</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-39\" href=\"#\">PNG</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-30\" href=\"#\">PNG/256</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-31\" href=\"#\">PNG/128</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-32\" href=\"#\">PNG/64</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-33\" href=\"#\">PNG/32</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-34\" href=\"#\">PNG/16</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-35\" href=\"#\">PNG/8</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-21\" href=\"#\">JPG/Very High</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-22\" href=\"#\">JPG/High</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-24\" href=\"#\">JPG/Medium</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-26\" href=\"#\">JPG/Low</a></li>" +
-                        "<li><a class=\"feeditSimple-image_compression-28\" href=\"#\">JPG/Very Low</a></li>" +
-                    "</ul>" +
-                "</li>" +
-                "<li class=\"dropdown-submenu\"><a href=\"#\">Image effect</a>" +
-                    "<ul class=\"dropdown-menu feeditSimple-image_effects\">" +
-                    //<select id="tceforms-select-55b9d47044c14" name="data[tt_content][1][image_effects]" class="select" onchange="if (this.options[this.selectedIndex].value=='--div--') {this.selectedIndex=0;} TBE_EDITOR.fieldChanged('tt_content','1','image_effects','data[tt_content][1][image_effects]');"><option value="0" selected="selected">None</option>
-                        "<li><a class=\"feeditSimple-image_effects-1\" href=\"#\">Rotate 90 CW</a></li>" +
-                        "<li><a class=\"feeditSimple-image_effects-2\" href=\"#\">Rotate -90 CCW</a></li>" +
-                        "<li><a class=\"feeditSimple-image_effects-3\" href=\"#\">Rotate 180</a></li>" +
-                        "<li><a class=\"feeditSimple-image_effects-10\" href=\"#\">Grayscale</a></li>" +
-                        "<li><a class=\"feeditSimple-image_effects-11\" href=\"#\">Sharpen</a></li>" +
-                        "<li><a class=\"feeditSimple-image_effects-20\" href=\"#\">Normalize</a></li>" +
-                        "<li><a class=\"feeditSimple-image_effects-23\" href=\"#\">Contrast</a></li>" +
-                        "<li><a class=\"feeditSimple-image_effects-25\" href=\"#\">Brighter</a></li>" +
-                        "<li><a class=\"feeditSimple-image_effects-26\" href=\"#\">Darker</a></li>" +
-                    "</ul>" +
-                "</li>" +
-            "</ul>" +
-            "</div>" + 
-            "</li>" +
-            "<li>" +*/
             return "<li><div class=\"btn-group\">" +
             "<a class=\"btn feeditSimple-h2\" data-wysihtml5-command=\"formatBlock\" data-wysihtml5-command-value=\"h2\" title=\"H2\" tabindex=\"-1\" unselectable=\"on\">H2</a>" +
             "<a class=\"btn feeditSimple-formatCode\" data-wysihtml5-command=\"formatCode\" data-wysihtml5-command-value=\"code\" title=\"Code\" tabindex=\"-1\" unselectable=\"on\">C</a>" +
@@ -1013,39 +918,456 @@ function makeEditable(selector, type, okMessage, disabled)
             "<a class=\"btn\" data-wysihtml5-command=\"italic\" title=\"CTRL+I\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\">I</a>" +
             "</div>" +
             "</li>";
-        },
-        //<a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h2" tabindex="-1" href="javascript:;" unselectable="on">Heading 2</a>
+        }/*,
         image : function(locale) {
             return "<li>" +
             "<a class=\"btn feeditSimple-insertImage\" data-wysihtml5-command=\"insertImage\" title=\"Insert image\" tabindex=\"-1\" href=\"javascript:;\" unselectable=\"on\"><i class=\"icon-picture\"></i></a>" +
             "</li>";
-        }
+        }*/
         
     };
 
     if(type==='text' || type==='textpic') {
         //console.log(type+selector);
         $(selector).editable({
-            mode: 'inline',
+            //mode: 'inline',
             //disabled: true,
             defaultValue: '<p class="feeditSimple-empty">Empty</p>',
             url: 'typo3/alt_doc.php?doSave=1',
             params: function(params) {
-                var theImages = '';
-                var absolutePath = $('input[name="absolutePath"]').val();
-                //console.log($(this).find('img'));
-                $(this).closest('.lth_feeditsimple_img').find('img').map(function(){
-                    //console.log($(this).attr('src'));
-                    //return $(this).attr('src')
-                    if(theImages != '') {
-                        theImages += ',';
+                var colId = $(this).closest('.connectedSortable').attr('id');
+                var colPos = getColpos(colId);
+                
+                var uid = $(this).attr('id');
+                uid = uid.split('_').pop();
+                //console.log(uid);
+                params['_saveandclosedok_x'] = 1;
+                //_savedoc_x
+                params['cmd'] = "edit";
+                params["record"] = $('input[name="record"]',this).val();
+                params["data[tt_content]["+uid+"][colPos]"] = colPos;
+                params["data[tt_content]["+uid+"][pid]"] = $('input[name="pid"]').val();
+                params["data[tt_content]["+uid+"][header]"] = $('#feeditsimple-elHeader').val();
+                params["data[tt_content]["+uid+"][CType]"] = $('input[name="CType"]').val();
+                params["data[tt_content]["+uid+"][bodytext]"] = params.value;
+                params["formToken"] = $('input[name="formToken"]',this).val();
+                return params;
+            },
+            wysihtml5: {
+                "emphasis": true,
+                "customTemplates": myCustomTemplates,
+                "font-styles": false,
+                "format-code": true,
+                //"html": true, //Button which allows you to edit the generated HTML. Default false
+                "image": true, //Button to insert an image. Default true,    
+            },
+            success: function(response, newValue) {
+                //console.log(response);
+                //console.log(newValue);
+                //To do remove placeholder class
+                showMessage(okMessage);
+            },
+            error: function(response, newValue) {
+                if(response.status === 500) {
+                    return 'Service unavailable. Please try later.';
+                } else {
+                    return response.responseText;
+                }
+            },
+            //onblur: 'ignore',
+            toggle: 'dblclick',
+            inputclass: 'feeditSimple-textarea'
+        });
+
+        $(selector).on('shown', function(e, editable) {
+            if(!editable) {
+                return false;
+            }
+            
+            //remove empty
+            $('body',$('.wysihtml5-sandbox').contents()).find('.feeditSimple-empty').remove();
+            
+            var id = $(this).closest('.lth_feeditsimple_content').attr('id');
+            var ui = $(this).closest('.csc-default');
+            
+            id = id.split('_').pop();
+            var url = '';
+            var pid = '';
+            //var pageUid = 0;
+            if(!ui.prev().attr('id')) {
+                // Sorting number is in the top
+                pid = $('body').attr('id').toString(); //pid=6
+                //pageUid = pid;
+            } else {
+                // Sorting number is inside the list
+                pid = '-' + ui.prev().attr('id').replace('c',''); //pid = -63
+                //pageUid = $('body').attr('id');
+            }
+            if(id==='new') {
+                url = '/typo3/alt_doc.php?edit[tt_content]['+pid+']=new';
+            } else {
+                url = '/typo3/alt_doc.php?edit[tt_content]['+id+']=edit';
+            }
+            var that = this;
+            var formToken = '';
+
+            $.ajax({
+                url: url,
+                type: 'post',
+                dataType: 'json',
+                complete: function(data) {
+                    formToken = $(data.responseText).find('input[name="formToken"]').val();
+                    $(that).append('<input type="hidden" name="formToken" value="' + formToken + '" />' +
+                        '<input type="hidden" name="pid" id="pid" value="' + pid + '" />');
+                    if($('.editable-filemanager').length < 0) {
+                        $('.bootstrap-wysihtml5-insert-link-url').after('<button title="Files and images" type="button" class="btn editable-filemanager">' +
+                            '<i class="icon-folder-open"></i></button>' +
+                            '<button title="Typo3 page-tree" type="button" class="btn editable-pagebrowser">' +
+                            '<i class="icon-list-alt"></i></button>');
                     }
-                    if($(this).find('.feeditSimple-placeHolder')) {
-                        theImages += absolutePath + $(this).attr('src');
-                    } else {
+                    $('.editable-filemanager').click(function() {
+                        $.fancybox.open([
+                            {
+                                maxWidth: 800,
+                                maxHeight: 600,
+                                fitToView: false,
+                                width: '70%',
+                                height: '70%',
+                                autoSize: false,
+                                closeClick: false,
+                                openEffect: 'none',
+                                closeEffect: 'none',
+                                type: 'iframe',
+                                modal: false,
+                                closeBtn: false,
+                                href: 'typo3conf/ext/lth_feedit_simple/vendor/cute/index.html',
+                                afterLoad:function() {
+                                    cute();
+                                }
+                            }
+                        ]);
+                    });
+
+                    
+                    $('.editable-pagebrowser').click(function() {
+                        $.fancybox.open([
+                            {
+                                maxWidth: 500,
+                                maxHeight: 900,
+                                fitToView: false,
+                                width: '40%',
+                                height: '70%',
+                                autoSize: false,
+                                closeClick: false,
+                                openEffect: 'none',
+                                closeEffect: 'none',
+                                type: 'iframe',
+                                modal: false,
+                                closeBtn: false,
+                                href: 'typo3conf/ext/lth_feedit_simple/vendor/bootstraptreeview/index.html',
+                                afterLoad:function() {
+                                    getPageTree();
+                                }
+                            }
+                        ]);
+                    });
+                }
+            });
+            e.stopPropagation();
+        });
+    } else if(type=='image') {
+        createAddress();
+        $(selector).editable({
+            //selector: 'img',
+            /*url: function() {
+                var selectedImage = $('#feeditSimple-imageSrc').val();
+                var title = $('#feeditSimple-imageTitle').val();
+                var target = $('#feeditSimple-imageTarget').val();
+                var width = $('#feeditSimple-imageWidth').val();
+                var height = $('#feeditSimple-imageHeight').val();
+                
+                $(this).closest('.feeditSimple-placeHolder').attr('src',selectedImage);
+                //console.log('1345');
+                return 'typo3/alt_doc.php?doSave=1';
+            },*/
+            send: 'always',
+            url: 'typo3/alt_doc.php?doSave=1',
+            params: function(params) {
+                var theImages = new Array();
+                var theTitles = new Array();
+                var imagewidth = '';
+                var imageheight = '';
+
+                $(this).closest('.csc-textpic').find('img').map(function(){
+                    //if($(this).find('.feeditSimple-placeHolder')) {
+                    theImages.push($(this).attr('id'));
+                    theTitles.push($(this).attr('title'));
+                    imagewidth = $(this).width();
+                    imageheight = $(this).height();
+                    /*} else {
                         theImages += $(this).attr('src').split('/').pop();
-                    }
+                    }*/
                 }).get();
+                
+                var colId = $(this).closest('.connectedSortable').attr('id');
+                var colPos = getColpos(colId);
+                
+                var uid = $(this).closest('.csc-default').attr('id').replace('c','');
+                //uid = uid.split('_').pop();
+                //console.log(uid);
+                params['_saveandclosedok_x'] = 1;
+                //_savedoc_x
+                params['cmd'] = "edit";
+                params["record"] = $('input[name="record"]',this).val();
+                params["data[tt_content]["+uid+"][colPos]"] = colPos;
+                params["data[tt_content]["+uid+"][pid]"] = $('input[name="pid"]').val();
+                params["data[tt_content]["+uid+"][CType]"] = $('input[name="CType"]').val();
+                params["data[tt_content]["+uid+"][image]"] = glueTogether(',', theImages);;
+                params["data[tt_content]["+uid+"][title]"] = glueTogether(',', theTitles);
+                params["data[tt_content]["+uid+"][imagewidth]"] = imagewidth;
+                params["data[tt_content]["+uid+"][imageheight]"] = imageheight;
+                params["data[tt_content]["+uid+"][imageorient]"] = $('input[name="imageorient"]',this).val();
+                params["data[tt_content]["+uid+"][image_compression]"] = $('input[name="image_compression"]',this).val();
+                params["formToken"] = $('input[name="formToken"]',this).val();
+                params["edit[tt_content]["+uid+"]"] = "edit";
+                $.ajax({
+                    url: 'index.php',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        eID : 'lth_feedit_simple',
+                        cmd : 'updateSysFileReference',
+                        uid : $(this).find('img').attr('id'),
+                        pid : uid,
+                        pageUid : $('body').attr('id'),
+                        sid : Math.random()
+                    },
+                    success: function(data) {
+                        //console.log($(this).find('img').attr('id'));
+                        if(data.content) {
+                            return params;
+                        } else {
+                            alert('Something went wrong');
+                        }
+                    }
+                    
+                });
+            },
+            display: function(value, sourceData) {
+                //console.log($(this));
+                //imgSrc = $(this).find('img').attr('src').split('/').pop();
+            },
+            container: 'body',
+            success: function(response, newValue) {
+                //console.log(response);
+                //update image frontend
+                //$(this).find('img').attr('src',$('#feeditSimple-imageSrc').val());
+                //Show message to user
+                showMessage(okMessage);
+            },
+            error: function(response, newValue) {
+                //console.log('no');
+                if(response.status === 500) {
+                    return 'Service unavailable. Please try later.';
+                } else {
+                    return response.responseText;
+                }
+            },
+            //onblur: 'ignore',
+            title: 'Enter src, title and target',
+            toggle: 'dblclick'
+            /*value: {
+                src: imgSrc, 
+                title: "Lenina", 
+                target: "15"
+            }*/
+        });
+
+        $(selector).on('shown', function(e, editable) {
+            if(!editable) {
+                return false;
+            }
+            
+            var id = $(this).closest('.csc-default').attr('id');
+            var imgId = $(this).find('img').attr('id');
+            var ui = $(this).closest('.csc-default');
+            //console.log($(this).closest('.csc-default').prev().attr('id'));
+            id = id.replace('c', '');
+            var url = '';
+            var pid = '';
+            //var pageUid = 0;
+            if(!ui.prev().attr('id')) {
+                // Sorting number is in the top
+                pid = $('body').attr('id').toString(); //pid=6
+                //pageUid = pid;
+            } else {
+                // Sorting number is inside the list
+                pid = '-' + ui.prev().attr('id').replace('c',''); //pid = -63
+                //pageUid = $('body').attr('id');
+            }
+            
+            var src = $(this).find('img').attr('src');
+            var title = $(this).find('img').attr('title');
+            var target = $(this).find('img').attr('target');
+            var height = $(this).find('img').height();
+            var width = $(this).find('img').width();
+  
+            if(id==='new') {
+                url = '/typo3/alt_doc.php?edit[tt_content]['+pid+']=new';
+            } else {
+                url = '/typo3/alt_doc.php?edit[tt_content]['+id+']=edit';
+            }
+            var that = this;
+            var formToken, imageorient, image_compression = '';
+            
+            //prevent close editable on dblclick
+            $('.editable-popup').dblclick(function() {
+                return false;
+            });
+            
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: 'json',
+                complete: function(data) {
+                    formToken = $(data.responseText).find('input[name="formToken"]').val();
+                    imageorient = $(data.responseText).find('select[name="data[tt_content]['+id+'][imageorient]"]').val();
+                    image_compression = $(data.responseText).find('select[name="data[tt_content]['+id+'][image_compression]"]').val();
+                    //console.log(imageorient + ';' + image_compression);
+                    $(that).append('<input type="hidden" name="formToken" value="' + formToken + '" />' +
+                        '<input type="hidden" name="pid" id="pid" value="' + pid + '" />' +
+                        '<input type="hidden" name="imageorient" id="imageorient" value="' + imageorient + '" />' +
+                        '<input type="hidden" name="image_compression" id="image_compression" value="' + image_compression + '" />' +
+                        '<input type="hidden" name="absolutePath" id="absolutePath" />');
+                    if($('.editable-filemanager').length < 0) {
+                        $('.bootstrap-wysihtml5-insert-link-url').after('<button title="Files and images" type="button" class="btn editable-filemanager">' +
+                            '<i class="icon-folder-open"></i></button>' +
+                            '<button title="Typo3 page-tree" type="button" class="btn editable-pagebrowser">' +
+                            '<i class="icon-list-alt"></i></button>');
+                    }
+                    
+                    $('#feeditSimple-imageSrc').val(src);
+                    $('#feeditSimple-imageTitle').val(title);
+                    $('#feeditSimple-imageTarget').val(target);
+                    $('#feeditSimple-imageHeight').val(height);
+                    $('#feeditSimple-imageWidth').val(width);
+                    
+                    $('.editable-filemanager').click(function(that) {
+                        $.fancybox.open([
+                            {
+                                maxWidth: 800,
+                                maxHeight: 600,
+                                fitToView: false,
+                                width: '70%',
+                                height: '70%',
+                                autoSize: false,
+                                closeClick: false,
+                                openEffect: 'none',
+                                closeEffect: 'none',
+                                type: 'iframe',
+                                modal: false,
+                                closeBtn: false,
+                                href: 'typo3conf/ext/lth_feedit_simple/vendor/cute/index.html',
+                                afterLoad:function() {
+                                    cute(imgId);
+                                }
+                            }
+                        ]);
+                    });
+                                        
+                    $('.editable-delete-image').click(function(e) {
+                        if(confirm('Are you sure?')) {
+                            //var cscDefault = $(imgOrg).closest('.csc-default');
+                            //var noOfRows = $(cscDefault).find('.csc-textpic-imagerow').length;
+
+                            if($(this).closest('.csc-textpic-imagerow').length === 0) {
+                                //There is one image only
+                                $(this).closest('.csc-textpic-imagewrap').remove();
+                            } else {
+                                //There are more than one image
+                                $(this).closest('.csc-textpic-imagerow').remove();
+                            }
+                            $.fancybox.close();
+                        }
+                        //e.stopPropagation();
+                    });
+                    
+                    $('.feeditSimple-plus').click(function(e) {
+                        var currentVal = parseInt($(this).prev().val());
+                        if (!isNaN(currentVal)) {
+                            if($('#feeditSimple-keepRatio').prop('checked')) {
+                                $('#feeditSimple-imageWidth').val( function(i, oldval) {
+                                    return parseInt( oldval, 10) + 1;
+                                });
+                                $(that).closest('.csc-default').find('img').width($('#feeditSimple-imageWidth').val());
+                                $('#feeditSimple-imageHeight').val( function(i, oldval) {
+                                    return parseInt( oldval, 10) + 1;
+                                });
+                                $(that).closest('.csc-default').find('img').height($('#feeditSimple-imageHeight').val());
+                            } else {
+                                $(this).prev().val(currentVal + 1);
+                                if($(this).attr('id').indexOf('width') > 0) {
+                                    $(that).closest('.csc-default').find('img').width(currentVal + 1);
+                                } else {
+                                    $(that).closest('.csc-default').find('img').height(currentVal + 1);
+                                }
+                            }
+                        }
+                        //e.stopPropagation();
+                    });
+                    
+                    $('.feeditSimple-minus').click(function(e) {
+                        var currentVal = parseInt($(this).prev().prev().val());
+                        //console.log(currentVal);
+                        if (!isNaN(currentVal)) {
+                            if($('#feeditSimple-keepRatio').prop('checked')) {
+                                $('#feeditSimple-imageWidth').val( function(i, oldval) {
+                                    return parseInt( oldval, 10)- 1;
+                                });
+                                $(that).closest('.csc-default').find('img').width($('#feeditSimple-imageWidth').val());
+                                $('#feeditSimple-imageHeight').val( function(i, oldval) {
+                                    return parseInt( oldval, 10) - 1;
+                                });
+                                $(that).closest('.csc-default').find('img').height($('#feeditSimple-imageHeight').val());
+                            } else {
+                                $(this).prev().prev().val(currentVal - 1);
+                                if($(this).attr('id').indexOf('width') > 0) {
+                                    $(that).closest('.csc-default').find('img').width(currentVal - 1);
+                                } else {
+                                    $(that).closest('.csc-default').find('img').height(currentVal - 1);
+                                }
+                            }
+                        }
+                        //e.stopPropagation();
+                    });
+                }/*,
+                error: function(xhr, status, error) {
+                    //var err = xhr.responseText + ")");
+                    console.log(xhr.responseText);
+                    showMessage({message : 'no', header : '1590'});
+                }*/
+            }); 
+            //e.stopPropagation();
+        });
+    } else if(type === 'table') {
+        ////////////////////////
+        //console.log(type+selector);
+        $(selector).editable({
+            //mode: 'inline',
+            //disabled: true,
+            //defaultValue: '<p class="feeditSimple-empty">Empty</p>',
+            url: 'typo3/alt_doc.php?doSave=1',
+            //onblur: 'ignore',
+            toggle: 'dblclick',
+            wysihtml5: {
+                "emphasis": true,
+                "customTemplates": myCustomTemplates,
+                "font-styles": false,
+                "format-code": true,
+                //"html": true, //Button which allows you to edit the generated HTML. Default false
+                "image": true, //Button to insert an image. Default true,    
+            },
+            params: function(params) {
                 
                 var colId = $(this).closest('.connectedSortable').attr('id');
                 var colPos = getColpos(colId);
@@ -1066,18 +1388,9 @@ function makeEditable(selector, type, okMessage, disabled)
                 params["formToken"] = $('input[name="formToken"]',this).val();
                 return params;
             },
-            wysihtml5: {
-                "emphasis": true,
-                "customTemplates": myCustomTemplates,
-                "font-styles": false,
-                "format-code": true,
-                "link": true,
-                //"html": true, //Button which allows you to edit the generated HTML. Default false
-                "image": true, //Button to insert an image. Default true,    
-            },
             success: function(response, newValue) {
-                console.log(response);
-                console.log(newValue);
+                //console.log(response);
+                //console.log(newValue);
                 //To do remove placeholder class
                 showMessage(okMessage);
             },
@@ -1088,304 +1401,68 @@ function makeEditable(selector, type, okMessage, disabled)
                     return response.responseText;
                 }
             },
-            onblur: 'ignore',
-            toggle: 'manual'
+            //inputclass: 'feeditSimple-textarea'
         });
-        $('.lth_feeditsimple_content').on('hidden', function(e, editable) {
-            /*$(".csc-default").hover(function(e) { 
-                $(this).css("background-color",e.type === "mouseenter"?"yellow":"transparent");
-            });*/
-            $(this).closest('.csc-default').find('.csc-textpic-image').editable('option', 'disabled', true);
+        
+        
+        $('.feeditSimple-table').on('hidden', function(e, editable) {
+
         });
-        $('.lth_feeditsimple_content').on('shown', function(e, editable) {
-            //console.log($(this).closest('.csc-default').find('.csc-textpic-image'));
-            $(this).closest('.csc-default').find('.csc-textpic-image').editable('option', 'disabled', false);
-            /*$(".csc-default").hover(function() {
-                $(this).css("background-color","transparent");
-                $(this).css("background-color",e.type === "mouseenter"?"transparent":"transparent");
-            });*/
-            
-            var el = this;
-            //console.log(editable);
-            //console.log(e);
-            /*$('.feeditSimple-content-command').find('> li:not(.dropdown-submenu)').each(function() {
-                $(this).find('a').click(function() {
-                    feeditSimpleContentCommand($(this).attr('class').split('-').pop(), el);
-                });
-            });*/
-            
-            //remove empty
-            $('body',$('.wysihtml5-sandbox').contents()).find('.feeditSimple-empty').remove();
-
-            
-            $('.feeditSimple-insertImage').click(function() {
-                if($(this).closest('.csc-default').find('.csc-textpic-imagewrap').length > 0) {
-                    //There is an image
-                    
-                    //<div class="csc-textpic-center-outer"><<div class="csc-textpic-center-inner">
-                    //
-                    var newIndex = $(this).closest('.csc-default').find('.feeditSimple-placeHolder').length;
-                    var afterContent = '<div class="csc-textpic-imagerow csc-textpic-imagerow-last">' +
-                        '<div class="csc-textpic-imagecolumn csc-textpic-firstcol csc-textpic-lastcol">' +
-                        '<figure class="csc-textpic-image csc-textpic-last csc-textpic-new-' + newIndex + '">' +
-                        '<img class="feeditSimple-placeHolder" src="typo3conf/ext/lth_feedit_simple/res/icons/placeholder.png" alt="">' +
-                        '</figure>' +
-                        '</div>' +
-                        '</div>';
-                    if($(this).closest('.csc-default').find('.csc-textpic-imagerow').length > 0) {
-                        //There is more than one image
-                        $(this).closest('.csc-default').last('.csc-textpic-imagerow').removeClass('csc-textpic-imagerow-last');
-                        $(this).closest('.csc-default').last('.csc-textpic-imagerow').after(afterContent);
-                    } else {
-                        //There is only one image
-                        $(this).closest('.csc-default').find('.csc-textpic-imagewrap').wrap('<div class="csc-textpic-imagerow">' +
-                            '<div class="csc-textpic-imagecolumn csc-textpic-firstcol csc-textpic-lastcol">' +
-                            '<figure class="csc-textpic-image csc-textpic-last csc-textpic-new-' + newIndex + '">' +
-                            '</figure>' +
-                            '</div>' +
-                            '</div>');
-                        $(this).closest('.csc-default').find('.csc-textpic-imagerow').after(afterContent);
-                        if($(this).closest('.csc-textpic-above').length > 0) {
-                            $(this).closest('.csc-default').find('.csc-textpic-imagerow').wrapAll('<div class="csc-textpic-center-outer"><div class="csc-textpic-center-inner"></div></div>');
-                        }
-                    }
-                } else {
-                    //console.log('There is no image');
-                    //There is no image
-                    var prependContent = '<div class="csc-textpic-imagewrap">' +
-                        '<figure class="csc-textpic-image csc-textpic-last csc-textpic-new-' + newIndex + '">' +
-                        '<img class="feeditSimple-placeHolder" src="typo3conf/ext/lth_feedit_simple/res/icons/placeholder.png" alt="">' +
-                        '</figure>' +
-                        '</div>';
-                    $(this).closest('.csc-textpic-text').toggleClass('csc-textpic csc-textpic-intext-right').prepend(prependContent);
-                }
-                //make editable
-                makeEditable('.csc-textpic-new-' + newIndex, 'image', okMessage, false);
-            });           
-            
-            var id = $(this).closest('.lth_feeditsimple_content').attr('id');
-            var ui = $(this).closest('.csc-default');
-            //console.log($(this).closest('.csc-default').prev().attr('id'));
-            id = id.split('_').pop();
-            var url = '';
-            var pid = '';
-            var pageUid = 0;
-            if(!ui.prev().attr('id')) {
-                // Sorting number is in the top
-                pid = $('body').attr('id').toString(); //pid=6
-                pageUid = pid;
-            } else {
-                // Sorting number is inside the list
-                pid = '-' + ui.prev().attr('id').replace('c',''); //pid = -63
-                pageUid = $('body').attr('id');
-            }
-            if(id==='new') {
-                url = '/typo3/alt_doc.php?edit[tt_content]['+pid+']=new';
-            } else {
-                url = '/typo3/alt_doc.php?edit[tt_content]['+id+']=edit';
-            }
-            var that = this;
-            var formToken = '';
-
-            $.ajax({
-                url: url,
-                type: 'post',
-                dataType: 'json',
-                complete: function(data) {
-                    formToken = $(data.responseText).find('input[name="formToken"]').val();
-                    $(that).append('<input type="hidden" name="formToken" value="' + formToken + '" />' +
-                            '<input type="hidden" name="pid" value="' + pid + '" />' +
-                            '<input type="hidden" name="absolutePath" />');
-                    var urlInput = $('.bootstrap-wysihtml5-insert-link-url').after('<button title="Files and images" type="button" class="btn editable-filemanager">' +
-                            '<i class="icon-folder-open"></i></button>' +
-                            '<button title="Typo3 page-tree" type="button" class="btn editable-pagebrowser">' +
-                            '<i class="icon-list-alt"></i></button>');
-                    $('.editable-filemanager').click(function() {
-                        $.fancybox.open([
-                            {
-                                maxWidth: 800,
-                                maxHeight: 600,
-                                fitToView: false,
-                                width: '70%',
-                                height: '70%',
-                                autoSize: false,
-                                closeClick: false,
-                                openEffect: 'none',
-                                closeEffect: 'none',
-                                type: 'iframe',
-                                modal: false,
-                                href: 'typo3conf/ext/lth_feedit_simple/vendor/cute/index.html',
-                                afterLoad:function() {
-                                    cute();
-                                }
-                            }
-                        ]);
-                    });
-                    
-                    $('.editable-delete-image').click(function() {
-                        confirm('Are you sure?');
-                    });
-                    
-                    $('.editable-pagebrowser').click(function() {
-                        console.log('??????????????????');
-                        $.fancybox.open([
-                            {
-                                maxWidth: 800,
-                                maxHeight: 600,
-                                fitToView: false,
-                                width: '70%',
-                                height: '70%',
-                                autoSize: false,
-                                closeClick: false,
-                                openEffect: 'none',
-                                closeEffect: 'none',
-                                type: 'iframe',
-                                modal: false,
-                                href: 'typo3conf/ext/lth_feedit_simple/vendor/bootstraptreeview/index.html',
-                                afterLoad:function() {
-                                    getPageTree();
-                                }
-                            }
-                        ]);
-                    });
-                }
-            });
+        $('.feeditSimple-table').on('shown', function(e, editable) {
+            //console.log($(this));
         });
-    } else if(type=='image') {
-        $(selector).editable({
-            //selector: 'img',
-            //url: 'typo3/alt_doc.php?doSave=1',
-            url: function() {
-                var selectedImage = $('.bootstrap-wysihtml5-insert-link-url').val();
-                $(this).closest('.feeditSimple-placeHolder').attr('src',selectedImage);
-            },
-            /*params: function(params) {   
-                var uid = $(this).closest('.lth_feeditsimple_img').attr('id');
-                uid = uid.split('_').pop();
-                params['_savedoc_x'] = 1;
-                params['cmd'] = "edit";
-                params["data[tt_content]["+uid+"][image]"] = $('input[name="otherImages"]',$(this).closest('.lth_feeditsimple_img')).val() +
-                    $('input[name="absolutePath"]',$(this).closest('.lth_feeditsimple_img')).val() + 
-                    $('.bootstrap-wysihtml5-insert-link-url').val();
-                //params["data[tt_content]["+uid+"][imagewidth]"] =;
-                //params["data[tt_content]["+uid+"][imageheight]"] =;
-                params['formToken'] = $('input[name="formToken"]',$(this).closest('.lth_feeditsimple_img')).val();
-                //params['data[tt_content]['+uid+'][cType]'] = 'textpic';
-                //params['data[tt_content]['+uid+'][colPos]'] = 0;
-                return params;
-            },*/
-            disabled: disabled,
-            display: function(value, sourceData) {
-                //console.log($(this).find('img').attr('src'));
-                imgSrc = $(this).find('img').attr('src').split('/').pop();
-            },
-            success: function(response, newValue) {
-                //console.log($(this).find('img').attr('src'));
-                //update image frontend
-                $(this).find('img').attr('src',$('.bootstrap-wysihtml5-insert-link-url').val());
-                //Show message to user
-                showMessage(okMessage);
-            },
-            error: function(response, newValue) {
-                if(response.status === 500) {
-                    return 'Service unavailable. Please try later.';
-                } else {
-                    return response.responseText;
-                }
-            },
-            //onblur: 'ignore',
-            title: 'Enter src, title and target',
-            /*toggle: 'dblclick',*/
-            /*value: {
-                src: imgSrc, 
-                title: "Lenina", 
-                target: "15"
-            }*/
-        });
-
-        $('.csc-textpic-image').on('shown', function(e, editable) {
-            
-            //input-small bootstrap-wysihtml5-insert-link-url
-            var id = $(this).closest('.csc-default').attr('id').substring(1);
-            //id = id.split('_').pop();
-            var that = this;
-            var formToken = '';
-            
-            $.ajax({
-                type: 'POST',
-                url: 'index.php',
-                dataType: 'json',
-                data : {
-                    eID : 'lth_feedit_simple',
-                    cmd : 'getAbsolutePath',
-                    sid : Math.random()
-                },
-                success: function(data) {
-                    //console.log(data.content);
-                    var absolutePath = data.content;
-                    $('input[name="absolutePath"]').val(absolutePath);
-                    //var otherImages = '';
-                    $('.bootstrap-wysihtml5-insert-link-url').val(imgSrc);
-                    //console.log($('.editable-filemanager').length);
-                    //if($('.editable-filemanager').length==1) {
-                    //if($('.editable-filemanager').length === 1) {
-                        //$('.bootstrap-wysihtml5-insert-link-url').after('<button title="File or image" type="button" class="btn editable-filemanager">' +
-                        //    '<i class="icon-folder-open"></i></button>');
-                    //}
-                    $('.editable-filemanager').click(function() {
-                        $.fancybox.open([
-                            {
-                                maxWidth: 800,
-                                maxHeight: 600,
-                                fitToView: false,
-                                width: '70%',
-                                height: '70%',
-                                autoSize: false,
-                                closeClick: false,
-                                openEffect: 'none',
-                                closeEffect: 'none',
-                                type: 'iframe',
-                                modal: false,
-                                href: 'typo3conf/ext/lth_feedit_simple/vendor/cute/index.html',
-                                afterLoad:function() {
-                                    cute();
-                                }
-                            }
-                        ]);
-                    });
-                    //}
-                    /*$.ajax({
-                        url: '/typo3/alt_doc.php?edit[tt_content]['+id+']=edit',
-                        url : function() {
-                            
-                        },
-                        //type: 'post',
-                        dataType: 'json',
-                        complete: function(data){
-                            formToken = $(data.responseText).find('input[name="formToken"]').val();
-                            var images = $(that).find('img').map(function(){
-                                //return $(this).attr('src')
-                                if($(this).attr('src').split('/').pop() != imgSrc) {
-                                    otherImages += $(this).attr('src').split('/').pop() + ',';
-                                }
-                            }).get();
-
-                            $(that).closest('.lth_feeditsimple_img').append('<input type="hidden" name="formToken" value="' + formToken + '" />' +
-                                    '<input type="hidden" name="absolutePath" value="' + absolutePath + '" />' +
-                                    '<input type="hidden" name="otherImages" value="' + otherImages + '" />');
-                                           
-                        }
-                    });*/
-                },
-                error: function(data){
-                    //console.log(data);
-                    showMessage({message : 'no', header : '1276'});
-                }
-            });
-
-            
-        });
+        /////////////////////////
     }
+}
+
+
+function insertImage(uid, okMessage)
+{
+    //console.log(uid);
+    if($('#c'+uid).find('.csc-textpic-imagewrap').length > 0) {
+        //
+        //There is an image
+        //<div class="csc-textpic-center-outer"><<div class="csc-textpic-center-inner">
+        //
+        var newIndex = $('#c'+uid).find('.feeditSimple-placeHolder').length;
+        var afterContent = '<div class="csc-textpic-imagerow csc-textpic-imagerow-last">' +
+            '<div class="csc-textpic-imagecolumn csc-textpic-firstcol csc-textpic-lastcol">' +
+            '<figure class="csc-textpic-image csc-textpic-last csc-textpic-new-' + newIndex + '">' +
+            '<img id="csc-textpic-new-' + newIndex + '" class="feeditSimple-placeHolder" src="typo3conf/ext/lth_feedit_simple/res/icons/placeholder.png" alt="">' +
+            '</figure>' +
+            '</div>' +
+            '</div>';
+        if($('#c'+uid).find('.csc-textpic-imagerow').length > 0) {
+            //There is more than one image
+            //console.log('There are more than image');
+            $('#c'+uid).find('.csc-textpic-imagerow').removeClass('csc-textpic-imagerow-last');
+            $('#c'+uid).find('.csc-textpic-imagerow').last().after(afterContent);
+        } else {
+            //There is only one image
+            //console.log('There is only one image');
+            $('#c'+uid).find('.csc-textpic-imagewrap').wrap('<div class="csc-textpic-imagerow">' +
+                '<div class="csc-textpic-imagecolumn csc-textpic-firstcol csc-textpic-lastcol">' +
+                '<figure class="csc-textpic-image csc-textpic-last csc-textpic-new-' + newIndex + '">' +
+                '</figure>' +
+                '</div>' +
+                '</div>');
+            $('#c'+uid).find('.csc-textpic-imagerow').after(afterContent);
+            if($('#c'+uid).find('.csc-textpic-above').length > 0) {
+                $('#c'+uid).find('.csc-textpic-imagerow').wrapAll('<div class="csc-textpic-center-outer"><div class="csc-textpic-center-inner"></div></div>');
+            }
+        }
+    } else {
+        //console.log('There is no image');
+        //There is no image
+        var prependContent = '<div class="csc-textpic-imagewrap">' +
+            '<figure class="csc-textpic-image csc-textpic-last csc-textpic-new-' + newIndex + '">' +
+            '<img class="feeditSimple-placeHolder" src="typo3conf/ext/lth_feedit_simple/res/icons/placeholder.png" alt="">' +
+            '</figure>' +
+            '</div>';
+        $('#c'+uid).find('.csc-textpic-text').toggleClass('csc-textpic csc-textpic-intext-right').prepend(prependContent);
+    }
+    //make editable
+    makeEditable('.csc-textpic-new-' + newIndex, 'image', okMessage);
 }
 
  function getColpos(columnId)
@@ -1426,7 +1503,7 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
             if(cmd == 'pasteContent' && data.content && data.result == 200) {
                 //$('#c'+pid).toggle();
                 $('#c'+pid).after(data.content);
-                makeEditable('#lth_feeditsimple_'+ uid + ' .lth_feeditsimple_content', '', '');
+                makeEditable('#lth_feeditsimple_'+ uid + ' .lth_feeditsimple_content', '');
                 $('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper').sortable('refresh');
                 if(data.oldUid) {
                     feeditSimpleSetCookie('feeditSimple-copycutitem', 'copy:'+table+':'+data.oldUid,1);
@@ -1439,26 +1516,91 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                 $('#c'+uid).css('-ms-filter', '');
             } else if(cmd === 'getPageTree' && data.content && data.result == 200) {
                 var arr1 = [];
-                //console.log(data.content);
+                
                 $.each(data.content, function (index, d) {
                     var tmp = d[0];
-                    arr1.push({'href': tmp.href, 'text':tmp.text, 'tags': tmp.tags, 'nodes': tmp.nodes});
+                    arr1.push({'href': tmp.href, 'text':tmp.text, 'uid': tmp.uid, 'tags': tmp.tags, 'nodes': tmp.nodes});
                 });
 
                 var pageTreeContainer = $('body',$('.fancybox-iframe').contents()).find('.pageTreeContainer');
                 var pageTree = pageTreeContainer.find('#pageTree');
+                
+                //Add close fancybox
+                $(pageTreeContainer).find('.close').click(function() {
+                    $.fancybox.close();
+                });
+                
                 pageTree.treeview({
                     color: "#428bca",
                     enableLinks: true,
                     data: arr1,
                     onNodeSelected: function(event, data) {
-                        //console.log(data.nodeId);
-                        window.parent.$(".bootstrap-wysihtml5-insert-link-url").val(data.nodeId);
+                        //console.log(data);
+                        window.parent.$(".bootstrap-wysihtml5-insert-link-url").val('/?id=' + data.uid);
                         $.fancybox.close();
                     }
                 });
                 pageTree.treeview('collapseAll', { silent: true });
                 pageTreeContainer.show();
+            } else if(cmd === 'getFormHandler') {
+                var resultColumns = [];
+                var tableContent = '<thead><tr>';
+                $.each(data.columns, function(i, value){
+
+                    var obj = { sTitle: value };
+
+                    resultColumns.push(obj);
+                    tableContent += '<th>'+value+'</th>';
+                });
+                //console.log(data.data);
+                tableContent += '</tr></thead>';
+                tableContent += '<tbody></tbody>';
+                $('.modal-body').html('<table id="feeditSimple-formhandlerTable" class="display" width="100%"></table>');
+
+                $('#feeditSimple-formhandlerTable').DataTable({
+                    /*"aaData": data.data,
+                    "aoColumns": [ resultColumns ],
+                    "sPaginationType": "full_numbers",
+                    "aaSorting": [[0, "asc"]],
+                    "bJQueryUI": true,
+                    "bDestroy": true,*/
+                    "aaData": data.data,
+                    "aoColumns": resultColumns,
+                    dom: 'Bfrtip',
+                    buttons: [
+                        'copyHtml5',
+                        'excelHtml5',
+                        'csvHtml5',
+                        'pdfHtml5'
+                    ]
+                });
+                
+                $("#feeditSimple-modalBox").modal({
+                    persist: true,
+                    onClose: function (dialog) {
+                        dialog.container.fadeOut('slow', function () {
+                            $.modal.close();
+                        });
+                    }
+                });
+        
+                $("#feeditSimple-modalBox").on('shown', function() {
+                    var tableWidth = $('#feeditSimple-formhandlerTable').width() + 50;
+                    //var tableHeight = $('#feeditSimple-formhandlerTable').height()+200;
+                    if(!tableWidth) {
+                        tableWidth = '800';
+                        //tableHeight = '800';
+                    }
+                    $(this).css('width', tableWidth + 'px');
+                    //console.log($(this).find('.modal-body'));
+                    //$(this).find('.dataTables_wrapper').css('height', tableHeight + 'px');
+                });
+            } else if(cmd === 'getImgId') {
+                //console.log(contentToPaste);
+                $("#"+uid).attr('src', '/fileadmin' + contentToPaste);
+                $("#"+uid).attr('id', data.content);
+                $(".bootstrap-wysihtml5-insert-link-url").val('/fileadmin' + contentToPaste);
+                $.fancybox.close();
             }
             
             if(data.result == 200 && okMessage) {
@@ -1468,7 +1610,7 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
             }
         },
         error: function(data){
-            showMessage({message : '500', header : '1365'});
+            showMessage({message : '500', header : '1590'});
         }
     });
 }
@@ -1613,13 +1755,14 @@ function toggleHiddenObject(inputClass, myType)
 
 function changeImageOrientation(cmd, uid, okMessage)
 {
-    console.log(cmd + uid);
+    //console.log(cmd + uid);
     
     try {
-        var outerContainer = $('#c'+uid);
-        var innerContainer = $(outerContainer).find('.lth_feeditsimple_img');
+        var innerContainer = $('#c'+uid);
+        //var innerContainer = $(outerContainer).find('.lth_feeditsimple_img');
+        //console.log(innerContainer);
         $.get('/typo3conf/ext/lth_feedit_simple/res/template/contentelement.html', function( response ) {
-            //console.log($(parentElement).find('.csc-textpicHeader'));
+            //console.log($(innerContainer).find('.csc-textpicHeader'));
             if(innerContainer.find('.csc-textpicHeader').length > 0) {
                 var header = $(innerContainer).find('.csc-textpicHeader').text();
             } else if(innerContainer.prev('h2').length > 0) {
@@ -1627,14 +1770,18 @@ function changeImageOrientation(cmd, uid, okMessage)
             }
             
             //Replace content in template
-            var image = $(innerContainer).find('.csc-textpic-image').html();
             var content = $(innerContainer).find('.lth_feeditsimple_content').html();
+            //console.log($(innerContainer).find('.csc-textpic-image').html());
             var responseContent = $(response).filter("#"+cmd).html();
-            responseContent = responseContent.replace('###IMAGE###', image);
+            //$(innerContainer).find('.csc-textpic-imagewrap').each(function(){
+                //console.log('???2117');
+                responseContent = responseContent.replace('###IMAGE###', $(innerContainer).find('.csc-textpic-imagewrap').html());
+            //});
+            //responseContent = responseContent.replace('###IMAGE###', image);
             responseContent = responseContent.replace('###CONTENT###', content);
-            console.log(responseContent);
+            //console.log(responseContent);
             responseContent = responseContent.replace('lth_feeditsimple_###UID###', 'lth_feeditsimple_' + uid);
-            console.log(responseContent);
+            //console.log(responseContent);
  
             if(header) {
                 //there is a header :( and we have to deal with it
@@ -1658,12 +1805,11 @@ function changeImageOrientation(cmd, uid, okMessage)
             //replace the content
             $(innerContainer).html(responseContent);
             //restore editable
-            makeEditable('#lth_feeditsimple_'+ uid, 'textpic', '');
-            makeEditable('#lth_feeditsimple_'+ uid, 'image', '');
+            //makeEditable('#lth_feeditsimple_'+ uid, 'textpic', '');
+            //('#lth_feeditsimple_'+ uid, 'image', '');
             showMessage(okMessage);
         });
-    }
-    catch(err) {
+    } catch(err) {
         //console.log(err);
         showMessage({'header' : '500', 'message': err});
     }
@@ -1683,6 +1829,194 @@ function getPath(breadcrumbs)
     } else { 
         return '/uploads/';
     }
+}
+
+function glueTogether(glue, theArray)
+{
+    if(theArray.length > 0) {
+        return theArray.join(glue);
+    } else {
+        return '';
+    }
+}
+
+
+function createAddress()
+{
+    $('.csc-textpic-image').attr('data-type', 'address');
+    
+    //Create new fields for updating image
+    var Address = function (options) {
+        this.init('address', options, Address.defaults);
+    };
+
+    //inherit from Abstract input
+    $.fn.editableutils.inherit(Address, $.fn.editabletypes.abstractinput);
+
+    $.extend(Address.prototype, {
+        /** Renders input from tpl @method render() **/        
+        render: function() {
+           this.$input = this.$tpl.find('input');
+        },
+        
+        /**    Default method to show value in element. Can be overwritten by display option.
+        @method value2html(value, element)  **/
+        value2html: function(value, element) {
+            if(!value) {
+                $(element).empty();
+                return; 
+            }
+            var html = $('<div>').text(value.src).html() + ', ' + 
+                    $('<div>').text(value.title).html() + ', ' + 
+                    $('<div>').text(value.target).html() + ', ' + 
+                    $('<div>').text(value.width).html() + ', ' +
+                    $('<div>').text(value.height).html() + ', ' +
+                    $('<div>').text(value.process).html();
+            $(element).html(html); 
+        },
+        
+        /**        Gets value from element's html
+                @method html2value(html) **/        
+        html2value: function(html) {        
+          
+          return null;  
+        },
+      
+       /**        Converts value to string.         It is used in internal comparing (not for sending to server).
+                @method value2str(value)         **/
+       value2str: function(value) {
+           var str = '';
+           if(value) {
+               for(var k in value) {
+                   str = str + k + ':' + value[k] + ';';  
+               }
+           }
+           return str;
+       }, 
+       
+       /*        Converts string to value. Used for reading value from 'data-value' attribute.
+                @method str2value(str)         */
+       str2value: function(str) {
+           /*
+           this is mainly for parsing value defined in data-value attribute. 
+           If you will always set value by javascript, no need to overwrite it
+           */
+           return str;
+       },                
+       
+       /**        Sets value of input.
+                @method value2input(value) 
+        @param {mixed} value       **/         
+       value2input: function(value) {
+           if(!value) {
+             return;
+           }
+           this.$input.filter('[name="src"]').val(value.src);
+           this.$input.filter('[name="title"]').val(value.title);
+           this.$input.filter('[name="target"]').val(value.target);
+           this.$input.filter('[name="width"]').val(value.width);
+           this.$input.filter('[name="height"]').val(value.height);
+           this.$input.filter('[name="process"]').val(value.process);
+       },       
+       
+       /**        Returns value of input.
+                @method input2value()        **/          
+       input2value: function() { 
+           return {
+              src: this.$input.filter('[name="src"]').val(), 
+              title: this.$input.filter('[name="title"]').val(), 
+              target: this.$input.filter('[name="target"]').val(),
+              width: this.$input.filter('[name="width"]').val(),
+              height: this.$input.filter('[name="height"]').val(),
+              process: this.$input.filter('[name="process"]').val()
+           };
+       },        
+       
+        /**        Activates input: sets focus on the first field.
+                @method activate()        **/        
+        activate: function() {
+            this.$input.filter('[name="src"]').focus();
+        },  
+       
+       /**        Attaches handler to submit form in case of 'showbuttons=false' mode
+                @method autosubmit()        **/       
+       /*autosubmit: function() {
+          /* this.$input.keydown(function (e) {
+                if (e.which === 13) {
+                    $(this).closest('form').submit();
+                }
+           });
+       }     */  
+    });
+
+    Address.defaults = $.extend({}, $.fn.editabletypes.abstractinput.defaults, {
+        tpl: '<div class="form-horizontal">' +
+                
+            '<div class="control-group">' +
+            
+            '<label class="control-label" for="src">Src</label>' +
+            '<div class="controls">' +
+            '<input type="text" id="feeditSimple-imageSrc" placeholder="Src" name="src" class="input bootstrap-wysihtml5-insert-link-url" />' +
+            '<button title="File or image" type="button" class="btn editable-filemanager"><i class="icon-folder-open"></i></button>' +
+            '<button title="Delete image" type="button" class="btn editable-delete-image"><i class="icon-trash"></i></button>' +
+            '</div>'+            
+            
+            '<label class="control-label ">Title</label>' +
+            '<div class="controls"><input type="text" id="feeditSimple-imageTitle" placeholder="Title" name="title" class="input feeditSimple-imgTitle" /></div>' +
+
+            '<label class="control-label ">Width</label>' +
+            '<div class="controls">' + 
+            '<input type="text" readonly="readonly" id="feeditSimple-imageWidth" name="width" class="input-mini" />' +
+            '<a id="plus-width" href="javascript:" class="feeditSimple-plus"><i class="icon-plus"></i></a>' +
+            '<a id="minus-width" href="javascript:" class="feeditSimple-minus"><i class="icon-minus"></i></a>' +
+            '</div>' +
+            
+            '<label class="control-label ">Height</label>' +
+            '<div class="controls">' +
+            '<input type="text" readonly="readonly" id="feeditSimple-imageHeight" name="height" class="input-mini" />' +
+            '<a id="plus-height" href="javascript:" class="feeditSimple-plus"><i class="icon-plus"></i></a>' +
+            '<a id="minus-height" href="javascript:" class="feeditSimple-minus"><i class="icon-minus"></i></a>' +
+            '</div>' +
+            
+            '<label class="control-label ">Keep ratio</label>' +
+            '<div class="controls">' +
+                '<input type="checkbox" name="feeditSimple-keepRatio" id="feeditSimple-keepRatio" checked="checked" />' +
+            '</div>' +
+            
+            
+            '<label class="control-label ">Quality and type</label>' +
+            '<div class="controls">' +
+                '<select id="image_compression" name="image_compression">' +
+                    '<option value="0" selected="selected">Default</option>' +
+                    '<option value="1">None (ignores all other options)</option>' +
+                    '<option value="10">GIF/256</option>' +
+                    '<option value="11">GIF/128</option>' +
+                    '<option value="12">GIF/64</option>' +
+                    '<option value="13">GIF/32</option>' +
+                    '<option value="14">GIF/16</option>' +
+                    '<option value="15">GIF/8</option>' +
+                    '<option value="39">PNG</option>' +
+                    '<option value="30">PNG/256</option>' +
+                    '<option value="31">PNG/128</option>' +
+                    '<option value="32">PNG/64</option>' +
+                    '<option value="33">PNG/32</option>' +
+                    '<option value="34">PNG/16</option>' +
+                    '<option value="35">PNG/8</option>' +
+                    '<option value="21">JPG/Very High</option>' +
+                    '<option value="22">JPG/High</option>' +
+                    '<option value="24">JPG/Medium</option>' +
+                    '<option value="26">JPG/Low</option>' +
+                    '<option value="28">JPG/Very Low</option>' +
+                "</select>" +
+            '</div>' +
+            
+            '</div>' +
+            
+            '</div>',
+        inputclass: ''
+    });
+
+    $.fn.editabletypes.address = Address;
 }
 //<div class="csc-textpicHeader csc-textpicHeader-###UID###"><h2>###HEADER###</h2></div>
 
@@ -1791,3 +2125,36 @@ wysihtml5.commands.formatCode = {
         formEl.html('');
         container.hide();
     });*/
+/*
+* var aaData = [
+            [ "Trident", "Internet Explorer 4.0", "Win 95+", 4, "X" ],
+            [ "Trident", "Internet Explorer 5.0", "Win 95+", 5, "C" ],
+            [ "Trident", "Internet Explorer 5.5", "Win 95+", 5.5, "A" ],
+            [ "Trident", "Internet Explorer 6.0", "Win 98+", 6, "A" ],
+            [ "Trident", "Internet Explorer 7.0", "Win XP SP2+", 7, "A" ],
+            [ "Gecko", "Firefox 1.5", "Win 98+ / OSX.2+", 1.8, "A" ],
+            [ "Gecko", "Firefox 2", "Win 98+ / OSX.2+", 1.8, "A" ],
+            [ "Gecko", "Firefox 3", "Win 2k+ / OSX.3+", 1.9, "A" ],
+            [ "Webkit", "Safari 1.2", "OSX.3", 125.5, "A" ],
+            [ "Webkit", "Safari 1.3", "OSX.3", 312.8, "A" ],
+            [ "Webkit", "Safari 2.0", "OSX.4+", 419.3, "A" ],
+            [ "Webkit", "Safari 3.0", "OSX.4+", 522.1, "A" ]
+        ];
+        var aoColumns = [
+            { "sTitle": "Engine" },
+            { "sTitle": "Browser" },
+            { "sTitle": "Platform" },
+            { "sTitle": "Version", "sClass": "center" },
+            {
+                "sTitle": "Grade",
+                "sClass": "center",
+                "fnRender": function(obj) {
+                    var sReturn = obj.aData[ obj.iDataColumn ];
+                    if ( sReturn == "A" ) {
+                        sReturn = "<b>A</b>";
+                    }
+                    return sReturn;
+                }
+            }
+        ];
+ */

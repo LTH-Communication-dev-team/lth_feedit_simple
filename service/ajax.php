@@ -66,8 +66,8 @@ switch($cmd) {
     case "showPageInMenu":
 	$content = hideShowPage($cmd,$table,$pageId,0);
 	break;    
-    case "getPidForNewArticles":
-        $content = getPidForNewArticles($pageId);
+    case "getFormHandler":
+        $content = getFormHandler($pageUid);
         break;
     case "loadCategorySelector":
         $content = loadCategorySelector($uid);
@@ -81,6 +81,12 @@ switch($cmd) {
     case "tmpContent":
         $content = tmpContent($tmpContent);
 	break;
+    case 'getImgId':
+        $content = getImgId($uid, $contentToPaste);
+        break;
+    case 'updateSysFileReference':
+        $content = updateSysFileReference($uid, $pid, $pageUid);
+        break;
 }
 
 if($cmd != 'fileupload') {
@@ -91,14 +97,93 @@ global $arrs;
 global $globalContent;
 
 
+function getFormHandler($pageUid)
+{
+    $arraySize = 0;
+    $tempArray = array();
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid, params', 'tx_formhandler_log', 'pid='.intval($pageUid), '', '', '');
+    $recordsTotal = $GLOBALS["TYPO3_DB"]->sql_num_rows($res);
+    while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
+        /*$uid = $row['uid'];
+        $pid = $row['pid'];
+        $params = $row['params'];
+        $tempArray = unserialize($params);
+        $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => print_r($tempArray, true), 'crdate' => time()));
+         * $GLOBALS['TYPO3_DB']->exec_SELECTquery($select_fields,$from_table,$where_clause,$groupBy,$orderBy,$limit);
+        if($arraySize < count($tempArray)) {
+            $arraySize = count($tempArray);
+        }
+         * [11] => Array
+        (
+            [epost] => ko@tlth.se
+            [institution] => TLTH
+            [kost] => 
+            [medfoljare] => 
+            [mobilnr] => 0709653025
+            [namn] => Axel Andersson
+            [program] => 
+            [randomID] => a7b32f01e3eda2de637f4b767b9f8ca8
+            [removeFile] => 
+            [removeFileField] => 
+            [step-2-next] => Skicka
+            [submitField] => 
+            [submitted] => 1
+        )
+        $dataArray[] = array_values($tempArray);*/
+        $tempArray = unserialize($row['params']);
+        unset($tempArray['randomID']);
+        unset($tempArray['removeFile']);
+        unset($tempArray['removeFileField']);
+        unset($tempArray['step-2-next']);
+        unset($tempArray['submitField']);
+        unset($tempArray['submitted']);
+        $columnsArray[] = array_keys($tempArray);
+        $dataArray[] = $tempArray;
+        
+    }
+
+    $tempArray = array();
+    $columnsArray = array_unique($columnsArray);
+    $columnsArray = array_filter($columnsArray);
+    $dataArray = array_filter($dataArray);
+    foreach($columnsArray as $cKey => $cValue) {
+        $columnsArray = $cValue;
+    }    
+
+    $dataTempArray = array();
+    foreach($dataArray as $aKey => $aValue) {
+        $i = 0;
+        //$tempArray['DT_RowId'] = "row_" . $aKey;
+        foreach ($columnsArray as $pKey => $pValue) {
+            if (isset($aValue[$pValue])) {
+                $tempArray[$i] = $aValue[$pValue];
+            } else {
+                $tempArray[$i] = '';
+            }
+            $i++;
+        }
+        array_push($dataTempArray, array_values($tempArray));
+    }
+    $GLOBALS['TYPO3_DB']->sql_free_result($res);
+    
+    //"DT_RowId":"row_5","0":"Airi","1":"Satou","2":"Accountant","3":"Tokyo","4":"28th Nov 08","5":"$162,700"},
+    //$dataOutArray = array("draw" => 1,"recordsTotal" => $recordsTotal, "recordsFiltered" => $recordsTotal, "data" => $dataTempArray);
+
+    $returnArray['columns'] = $columnsArray;
+    $returnArray['data'] = $dataTempArray;
+    
+    return $returnArray;
+}
+
+
 function getFiles()
 {
     if ($_COOKIE['be_typo_user']) {
-        
-        require_once (PATH_t3lib.'class.t3lib_befunc.php');
-        require_once (PATH_t3lib.'class.t3lib_userauthgroup.php');
-        require_once (PATH_t3lib.'class.t3lib_beuserauth.php');
-        require_once (PATH_t3lib.'class.t3lib_tsfebeuserauth.php');
+//        $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => PATH_t3lib, 'crdate' => time()));
+        require_once ('/var/www/html/typo3/typo3/sysext/backend/Classes/Utility/BackendUtility.php');
+        /*require_once ('Backend/Utility/BackendUtility\class.t3lib_userauthgroup.php');
+        require_once ('Backend\Utility\BackendUtility\class.t3lib_beuserauth.php');
+        require_once ('Backend\Utility\BackendUtility\class.t3lib_tsfebeuserauth.php');*/
 
         // the value this->formfield_status is set to empty in order to disable login-attempts to the backend account through this script
         // @todo 	Comment says its set to empty, but where does that happen?
@@ -150,10 +235,7 @@ function getFiles()
 function getPageTree()
 {
     if ($_COOKIE['be_typo_user']) {
-        require_once (PATH_t3lib.'class.t3lib_befunc.php');
-        require_once (PATH_t3lib.'class.t3lib_userauthgroup.php');
-        require_once (PATH_t3lib.'class.t3lib_beuserauth.php');
-        require_once (PATH_t3lib.'class.t3lib_tsfebeuserauth.php');
+        require_once ('/var/www/html/typo3/typo3/sysext/backend/Classes/Utility/BackendUtility.php');
 
         $db_mountpointsArray = array();
         $returnArray = array();
@@ -933,6 +1015,42 @@ function hideShowPage($cmd,$table,$pageId,$type)
     
     return $returnArray;
 }
+
+
+function getImgId($uid, $contentToPaste)
+{
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+        uid,
+        "sys_file",
+        "identifier = '$contentToPaste'");
+    $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+    $uid = $row['uid'];
+    $GLOBALS['TYPO3_DB']->sql_free_result($res);
+    
+    $returnArray = array();
+    $returnArray['content'] = $uid;
+    return $returnArray;
+}
+
+
+function updateSysFileReference($uid, $pid, $pageUid)
+{
+    $insertArray = array(
+        'uid_local' => $uid,
+	'uid_foreign' => $pid, // uid of your content record
+	'tablenames' => 'tt_content',
+	'fieldname' => 'image',
+	'pid' => $pageUid, // parent id of the parent page
+	'table_local' => 'sys_file'
+    );
+    $GLOBALS['TYPO3_DB']->exec_INSERTquery('sys_file_reference', $insertArray);
+    $newUid = $GLOBALS['TYPO3_DB']->sql_insert_id();
+    
+    $returnArray = array();
+    $returnArray['content'] = $newUid;
+    return $returnArray;
+}
+
 
 function logout($url)
 {

@@ -166,6 +166,7 @@ class lth_feeditsimple_menu {
         
         function insertMenu()
         {
+            $pageUid = $GLOBALS['TSFE']->id;
             $userSettingsArray = array();
             if(isset($_COOKIE['feeditSimple-usersettings'])) {
                 $feeditsimpleUsersettings = $_COOKIE['feeditSimple-usersettings'];
@@ -208,7 +209,7 @@ class lth_feeditsimple_menu {
              * <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
              */
             $content .= '
-            <ul class="nav">
+            <ul class="nav feeditSimple-mainMenu">
                 
                 <li id="" class="dropdown" title="">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageTooltip').'">
@@ -216,7 +217,7 @@ class lth_feeditsimple_menu {
                         '.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:page').'
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageEditPageTooltip').'" href="#" onclick="editPage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageEditPage').'</a></li>
+                        <li><a id="feeditSimple-editPageButton" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageEditPageTooltip').'" href="#feeditSimple-sidePanel">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageEditPage').'</a></li>
                         <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageMovePageTooltip').'" href="#" onclick="movePage(\'\');return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageMovePage').'</a></li>
                         <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageCopyPageTooltip').'" href="#" onclick="movePage(\'copy\');return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageCopyPage').'</a></li>
                         <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageDeletePageTooltip').'" href="#" onclick="deletePage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageDeletePage').'</a></li>';
@@ -252,8 +253,8 @@ class lth_feeditsimple_menu {
                         <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:tool').'</span>
                     </a>
                         <ul class="dropdown-menu">
-                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolFileManagerTooltip').'" href="#" onclick="fileManager();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolFileManager').'</a></li>
-                            <li id="formHandlerManagerMenu"><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolMailFormManagerTooltip').'" href="#" onclick="mailFormAdmin();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolMailFormManager').'</a></li>
+                            <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolFileManagerTooltip').'" href="javascript:;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolFileManager').'</a></li>
+                            <li><a id="feeditSimple-formHandler" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolMailFormManagerTooltip').'" href="javascript:;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:toolMailFormManager').'</a></li>
                         </ul>
                 </li>                
 
@@ -270,7 +271,7 @@ class lth_feeditsimple_menu {
                 </li>
              
                 <li id="" class="">
-                    <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:helpTooltip').'" onclick="loadHelp(\''.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:langsel') . '\');return false;" href="#">
+                    <a id="feeditSimple-helpButton" href="#feeditSimple-sidePanel" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:helpTooltip').'");return false;" href="#">
                         <span class="icon-question-sign"></span>
                         <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:help').'</span>
                     </a>

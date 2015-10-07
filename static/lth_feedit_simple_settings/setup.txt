@@ -1,0 +1,5 @@
+# bodyTag
+page.bodyTag >
+page.bodyTagCObject = TEXT
+page.bodyTagCObject.field = uid
+page.bodyTagCObject.wrap = <body id="|">

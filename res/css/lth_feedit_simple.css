@@ -22,15 +22,54 @@ and open the template in the editor.
  * fe_formsOnPage.css)
  */
 body {
-
+    padding-top: 8px;
 }
 
-.bootstrap-wysihtml5-insert-link-modal {
+.panel {
+      display: none;
+      width: 220px;
+      padding: 20px;
+      background-color: #333;
+      color: #fff;
+      box-shadow: inset 0 0 5px 5px #222;
+}
+
+.dropdown-header {
+    font-weight: bold;
+}
+
+.feeditSimple-textarea {
+  width: 550px;
+}
+
+.radio {
+    margin-top: 0px !important;
+}
+
+.feeditSimple-minus {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+/*.bootstrap-wysihtml5-insert-link-modal {
     height: 200px;
-}
+}*/
 
 .bootstrap-wysihtml5-insert-link-modal a {
     text-decoration: none;
+}
+
+.bootstrap-wysihtml5-insert-link-modal a.btn, .modal a.btn {
+    color: #000;
+}
+
+.bootstrap-wysihtml5-insert-link-modal a.btn.btn-primary, .modal a.btn.btn-primary {
+    color: #fff;
+}
+
+.modal th {
+    background-color: #fff;
+    color: #000;
 }
 
 .csc-default {

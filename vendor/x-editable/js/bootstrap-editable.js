@@ -312,6 +312,7 @@ Editableform is linked with one of input types, e.g. 'text', 'select' etc.
             */
             send = !!(typeof this.options.url === 'function' || (this.options.url && ((this.options.send === 'always') || (this.options.send === 'auto' && pk !== null && pk !== undefined)))),
             params;
+
             if (send) { //send to server
                 this.showLoading();
 
@@ -322,18 +323,15 @@ Editableform is linked with one of input types, e.g. 'text', 'select' etc.
                     pk: pk 
                 };
 
-
                 //additional params
-                
                 if(typeof this.options.params === 'function') {
-                    params = this.options.params.call(this.options.scope, params);
+                    params = this.options.params.call(this.options.scope, params);  
                 } else {
                     //try parse json in single quotes (from data-params attribute)
                     this.options.params = $.fn.editableutils.tryParseJson(this.options.params, true);   
                     $.extend(params, this.options.params);
                 }
-                //console.log(this.options.url);
-                //console.log(params);
+
                 if(typeof this.options.url === 'function') { //user's function
                     return this.options.url.call(this.options.scope, params);
                 } else {  
