@@ -84,12 +84,12 @@ switch($cmd) {
     case 'getImgId':
         $content = getImgId($uid, $contentToPaste);
         break;
-    case 'updateSysFileReference':
-        $content = updateSysFileReference($uid, $pid, $pageUid);
-        break;
     case 'updateImageOrientation':
         $content = updateImageOrientation($uid, $pid);
-        break;    
+        break;
+    case 'moveImage':
+        $content = moveImage($uid, $pageUid);
+        break;
 }
 
 if($cmd != 'fileupload') {
@@ -1022,37 +1022,16 @@ function hideShowPage($cmd,$table,$pageId,$type)
 
 function getImgId($uid, $contentToPaste)
 {
-    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+    /*$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
         uid,
         "sys_file",
         "identifier = '$contentToPaste'");
     $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
     $uid = $row['uid'];
-    $GLOBALS['TYPO3_DB']->sql_free_result($res);
+    $GLOBALS['TYPO3_DB']->sql_free_result($res);*/
     
     $returnArray = array();
-    $returnArray['content'] = $uid;
-    return $returnArray;
-}
-
-
-function updateSysFileReference($uid, $pid, $pageUid)
-{
-    $insertArray = array(
-        'uid_local' => $uid,
-	'uid_foreign' => $pid, // uid of your content record
-	'tablenames' => 'tt_content',
-	'fieldname' => 'image',
-	'pid' => $pageUid, // parent id of the parent page
-	'table_local' => 'sys_file',
-        'crdate' => time(),
-        'tstamp' => time()
-    );
-    $GLOBALS['TYPO3_DB']->exec_INSERTquery('sys_file_reference', $insertArray);
-    $newUid = $GLOBALS['TYPO3_DB']->sql_insert_id();
-    
-    $returnArray = array();
-    $returnArray['content'] = $newUid;
+    $returnArray['content'] = uniqid('NEW', true);
     return $returnArray;
 }
 
@@ -1067,6 +1046,29 @@ function updateImageOrientation($imageOrientationId, $cUid)
     
     $returnArray = array();
     $returnArray['content'] = 'ok';
+    return $returnArray;
+}
+
+
+function moveImage($uid, $pageUid)
+{
+    $uidArray = explode('_', $uid);
+    $i=1;
+    foreach($uidArray as $key => $value) {
+        //$GLOBALS['TYPO3_DB']->store_lastBuiltQuery = 1;
+        //echo $value;
+        $updateArray = array(
+            'sorting_foreign' => $i,
+            'tstamp' => time()
+        );
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery('sys_file_reference', 'uid = '.intval($value), $updateArray);
+        //echo $GLOBALS['TYPO3_DB']->debug_lastBuiltQuery;
+        $i++;
+    }
+    
+    
+    $returnArray = array();
+    $returnArray['result'] = 200;
     return $returnArray;
 }
 

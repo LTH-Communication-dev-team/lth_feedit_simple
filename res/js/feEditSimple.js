@@ -45,16 +45,19 @@ $(document).ready(function()
                 complete: function(data) {
                     formToken = $(data.responseText).find('input[name="formToken"]').val();
                     $('.panel-header').append('<input type="hidden" name="formToken" value="' + formToken + '" />');
-                    $('.panel-body').load( "/typo3conf/ext/lth_feedit_simple/res/template/formelement.html #editPage" );
+                    $('.panel-body').load( "/typo3conf/ext/lth_feedit_simple/res/template/formelement.html?sid=" + Math.random() + " #editPage", function(){
+                        $('#close-panel-bt').click(function() {
+                            $.panelslider.close();
+                        });
+                        $('#save-panel-bt').click(function() {
+                            savePageProperties();
+                        });
+                    });
                 }
             });
         },
         easingOpen:null,
         easingClose: null 
-    });
-    
-    $('#close-panel-bt').click(function() {
-        $.panelslider.close();
     });
     
 
@@ -125,6 +128,42 @@ $(document).ready(function()
             }
        }
     });
+    
+    //make it possible to change place of images
+    $('.csc-textpic-imagewrap').sortable({
+        connectWith: '.csc-textpic-imagerow',
+        placeholder: 'ui-state-highlight',
+        cursor: 'move',
+        update: function( event, ui ) {
+            var okMessage = {'header' : 'Move', 'message': 'Image successfully moved'};
+            var idList= new Array();
+            $(ui.item.closest('.csc-default')).find('.csc-textpic-image img').each(function(){
+                idList.push($(this).attr('id'));
+            });
+            ajaxCall('moveImage', '', idList.join('_'), '', $('body').attr('id'), okMessage);
+        },
+        stop: function( event, ui ) {
+            /*if(ui.item.attr('class').indexOf('feEditSimple-contentTypeItem') < 0) {
+
+                var pid = '';
+                var pageUid = 0;
+                if(!ui.item.context.previousSibling) {
+                    // Sorting number is in the top
+                    pid = $('body').attr('id').toString(); //pid=6
+                    pageUid = pid;
+                } else {
+                    // Sorting number is inside the list
+                    pid = '-'+ui.item.context.previousSibling.id.toString(); //pid = -63
+                    pageUid = $('body').attr('id');
+                }
+
+                var table = 'tt_content';
+                var uid = ui.item.context.id;
+                var okMessage = {'header' : 'Move', 'message': 'Content element successfully moved'};
+                ajaxCall('moveContent', table, uid, pid, pageUid, okMessage);
+            };*/
+        }
+    }).disableSelection();
     
     var okMessage = {'header' : 'Save', 'message': 'Content element successfully updated'};
     
@@ -219,7 +258,7 @@ $(document).ready(function()
 
     
     //enable bootstrap-contextmenu
-    bootstrapContextMenu();
+    enableBootstrapContextMenu(true);
         
     $('.feeditSimple-mainMenu a').click( function (e) {
         var cmd = $(this).attr('id');
@@ -272,13 +311,12 @@ $(document).ready(function()
 ************************************************************HELP FUNCTIONS**************************************************
 ****************************************************************************************************************************/
 
-function bootstrapContextMenu()
+function enableBootstrapContextMenu()
 {
     $('.csc-default').contextmenu({
         target:'#context-menu', 
         before: function(e,context) {
-          // execute code before context menu if shown
-            //console.log($(e.target));
+            return true;
         },
         onItem: function(context,e) {
             feeditSimpleContentCommand(context, e);// execute on menu item selection
@@ -286,6 +324,12 @@ function bootstrapContextMenu()
             this.closemenu(e);
         }
     });
+}
+
+
+function disableBootstrapContextMenu()
+{
+    $('.csc-default').attr("disabled", true);
 }
     
     
@@ -990,7 +1034,7 @@ function makeEditable(selector, type, okMessage)
             }
             
             //Disable rightclick
-            $('.csc-default').off();
+            disableBootstrapContextMenu();
             
             //remove empty
             $('body',$('.wysihtml5-sandbox').contents()).find('.feeditSimple-empty').remove();
@@ -1103,18 +1147,21 @@ function makeEditable(selector, type, okMessage)
             params: function(params) {
                 var theImages = new Array();
                 var theTitles = new Array();
+                var theRemoves = new Array();
                 var imagewidth = '';
                 var imageheight = '';
-
+                var idToRemove = 0;
+                
                 $(this).closest('.csc-textpic').find('img').map(function(){
-                    //if($(this).find('.feeditSimple-placeHolder')) {
-                    theImages.push($(this).attr('id'));
-                    theTitles.push($(this).attr('title'));
-                    imagewidth = $(this).width();
-                    imageheight = $(this).height();
-                    /*} else {
-                        theImages += $(this).attr('src').split('/').pop();
-                    }*/
+                    if($(this).hasClass('feeditSimple-remove')) {
+                        theRemoves.push($(this).attr('id'));
+                    } else {
+                        theImages.push($(this).attr('id'));
+                        theTitles.push($(this).attr('title'));
+                        //theSysRefs.push($(this).attr(''));
+                        imagewidth = $(this).width();
+                        imageheight = $(this).height();
+                    }
                 }).get();
                 
                 var colId = $(this).closest('.connectedSortable').attr('id');
@@ -1130,36 +1177,17 @@ function makeEditable(selector, type, okMessage)
                 params["data[tt_content]["+uid+"][colPos]"] = colPos;
                 params["data[tt_content]["+uid+"][pid]"] = $('input[name="pid"]').val();
                 params["data[tt_content]["+uid+"][CType]"] = $('input[name="CType"]').val();
-                params["data[tt_content]["+uid+"][image]"] = glueTogether(',', theImages);;
+                params["data[tt_content]["+uid+"][image]"] = glueTogether(',', theImages);
+                theRemoves.forEach(function(d) {
+                    params["cmd[sys_file_reference]["+d+"][delete]"] = 1;
+                });
                 params["data[tt_content]["+uid+"][title]"] = glueTogether(',', theTitles);
                 params["data[tt_content]["+uid+"][imagewidth]"] = imagewidth;
                 params["data[tt_content]["+uid+"][imageheight]"] = imageheight;
                 params["data[tt_content]["+uid+"][imageorient]"] = $('input[name="imageorient"]',this).val();
                 params["data[tt_content]["+uid+"][image_compression]"] = $('input[name="image_compression"]',this).val();
                 params["formToken"] = $('input[name="formToken"]',this).val();
-                params["edit[tt_content]["+uid+"]"] = "edit";
-                $.ajax({
-                    url: 'index.php',
-                    type: 'post',
-                    dataType: 'json',
-                    data: {
-                        eID : 'lth_feedit_simple',
-                        cmd : 'updateSysFileReference',
-                        uid : $(this).find('img').attr('id'),
-                        pid : uid,
-                        pageUid : $('body').attr('id'),
-                        sid : Math.random()
-                    },
-                    success: function(data) {
-                        //console.log($(this).find('img').attr('id'));
-                        if(data.content) {
-                            return params;
-                        } else {
-                            alert('Something went wrong');
-                        }
-                    }
-                    
-                });
+                return params;
             },
             display: function(value, sourceData) {
                 //console.log($(this));
@@ -1197,7 +1225,7 @@ function makeEditable(selector, type, okMessage)
             }
             
             //Disable rightclick
-            $('.csc-default').off();
+            disableBootstrapContextMenu();
             
             var id = $(this).closest('.csc-default').attr('id');
             var imgId = $(this).find('img').attr('id');
@@ -1290,15 +1318,18 @@ function makeEditable(selector, type, okMessage)
                         if(confirm('Are you sure?')) {
                             //var cscDefault = $(imgOrg).closest('.csc-default');
                             //var noOfRows = $(cscDefault).find('.csc-textpic-imagerow').length;
-
-                            if($(this).closest('.csc-textpic-imagerow').length === 0) {
+                            $('#'+imgId).addClass('feeditSimple-remove');
+                            $('.editableform').editable().submit();
+                            if($('#'+imgId).closest('.csc-textpic-imagerow').length === 0) {
                                 //There is one image only
-                                $(this).closest('.csc-textpic-imagewrap').remove();
+                                //console.log('one');
+                                $('#'+imgId).closest('.csc-textpic-imagewrap').remove();
                             } else {
+                                //console.log('more');
                                 //There are more than one image
-                                $(this).closest('.csc-textpic-imagerow').remove();
+                                $('#'+imgId).closest('.csc-textpic-imagerow').remove();
                             }
-                            $.fancybox.close();
+                            //$.fancybox.close();
                         }
                         //e.stopPropagation();
                     });
@@ -1417,8 +1448,9 @@ function makeEditable(selector, type, okMessage)
         
         
         $(selector).on('shown', function(e, editable) {
+            //console.log(selector);
             //Disable rightclick
-            $('.csc-default').off();
+            disableBootstrapContextMenu();
         });
     }
     
@@ -1426,11 +1458,27 @@ function makeEditable(selector, type, okMessage)
         if(!editable) {
             return false;
         }
-        console.log('???');
-       //enable bootstrap-contextmenu
-        bootstrapContextMenu();
+        $('.csc-default').attr("disabled", false);
     });
 }
+
+
+(function () {
+	this.uniqid = function (pr, en) {
+		var pr = pr || '', en = en || false, result;
+  
+		this.seed = function (s, w) {
+			s = parseInt(s, 10).toString(16);
+			return w < s.length ? s.slice(s.length - w) : (w > s.length) ? new Array(1 + (w - s.length)).join('0') + s : s;
+		};
+
+		result = pr + this.seed(parseInt(new Date().getTime() / 1000, 10), 8) + this.seed(Math.floor(Math.random() * 0x75bcd15) + 1, 5);
+  
+		if (en) result += (Math.random() * 10).toFixed(8).toString();
+
+		return result;
+	};
+})();
 
 
 function insertImage(uid, okMessage)
@@ -1623,11 +1671,12 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
             if(data.result == 200 && okMessage) {
                 showMessage(okMessage);
             } else if(okMessage) {
-                showMessage({message : '500'+cmd, header : '1361'});
+                showMessage({message : '500'+cmd+data.result, header : '1671'});
             }
         },
-        error: function(data){
-            showMessage({message : '500', header : '1590'});
+        error: function(err) {
+            console.log(err);
+            showMessage({message : '500', header : '1676'});
         }
     });
 }
@@ -1654,6 +1703,11 @@ function showMessage(message)
     }
     $('.feEditSimple-fourthRow').html(content);
     $('.feEditSimple-fourthRow').slideDown('slow').delay(1500).slideUp('slow');
+}
+
+function hideMessage(input)
+{
+    
 }
 
 /*function feeditSimpleContentCommand_old(cmd, el)
@@ -1846,6 +1900,35 @@ function changeImageOrientation(cmd, uid, imageOrientationId, okMessage)
         //console.log(err);
         showMessage({'header' : '500', 'message': err});
     }
+}
+
+
+function savePageProperties()
+{
+    var pid = $('body').attr('id');
+    params = new Array();
+    //params["data[tt_content]["+uid+"][colPos]"] = colPos;
+    params["data['pages'][pid]['subtitle']"] = $('#inputSubTitle');
+    params["data['pages'][pid]['nav_title']"] = $('#inputNavTitle');
+    params["data['pages'][pid]['title']"] = $('#inputTitle');
+    params["data['formtoken']"] = $('input[name="formToken"]',this).val();
+    
+    $.ajax({
+        url: '/typo3/alt_doc.php?edit[pages][' + pid + ']=edit',
+        data: params,
+        type: 'post',
+        dataType: 'json',
+        success: function(data) {
+            if(confirm('??')) {
+                location.reload(true);
+            } else {
+                $.panelslider.close();
+            }
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    });
 }
 
 function getPath(breadcrumbs)
