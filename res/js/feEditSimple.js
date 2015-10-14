@@ -30,13 +30,13 @@ $(document).ready(function()
         clickClose: true,
         onOpen: function() {
             var url = '';
-            var id = $('body').attr('id');
-            if(id==='new') {
-                url = '/typo3/alt_doc.php?edit[pages]['+id+']=new';
+            var pid = $('body').attr('id');
+            if(pid==='new') {
+                url = '/typo3/alt_doc.php?edit[pages]['+pid+']=new';
             } else {
-                url = '/typo3/alt_doc.php?edit[pages]['+id+']=edit';
+                url = '/typo3/alt_doc.php?edit[pages]['+pid+']=edit';
             }
-            var formToken = '';
+            var formToken, title, subtitle, nav_title = '';
 
             $.ajax({
                 url: url,
@@ -44,8 +44,14 @@ $(document).ready(function()
                 dataType: 'json',
                 complete: function(data) {
                     formToken = $(data.responseText).find('input[name="formToken"]').val();
+                    title = $(data.responseText).find('input[name="data[pages]['+pid+'][title]"]').val();
+                    subtitle = $(data.responseText).find('input[name="data[pages]['+pid+'][subtitle]"]').val();
+                    nav_title = $(data.responseText).find('input[name="data[pages]['+pid+'][nav_title]"]').val();
                     $('.panel-header').append('<input type="hidden" name="formToken" value="' + formToken + '" />');
-                    $('.panel-body').load( "/typo3conf/ext/lth_feedit_simple/res/template/formelement.html?sid=" + Math.random() + " #editPage", function(){
+                    $('.panel-body').load( "/typo3conf/ext/lth_feedit_simple/res/template/formelement.html?sid=" + Math.random() + " #editPage", function() {
+                        $('#inputTitle').val(title);
+                        $('#inputSubTitle').val(subtitle);
+                        $('#inputNavTitle').val(nav_title);
                         $('#close-panel-bt').click(function() {
                             $.panelslider.close();
                         });
@@ -60,6 +66,84 @@ $(document).ready(function()
         easingClose: null 
     });
     
+    
+    $('#feeditSimple-cutPageButton').click(function() {
+        var uid = $('body').attr('id');
+        if(feeditSimpleSetCookie('feeditSimple-copycutpage', 'cut:pages:'+uid,1)) {
+            var okMessage = {'header' : 'Cut', 'message': 'Page successfully cut'};
+            showMessage(okMessage);
+        } else {
+            showMessage({'header' : '500', 'message': 'no'});
+        }
+    });
+    
+    
+    $('#feeditSimple-copyPageButton').click(function() {
+        var uid = $('body').attr('id');
+        if(feeditSimpleSetCookie('feeditSimple-copycutpage', 'copy:pages:'+uid,1)) {
+            var okMessage = {'header' : 'Copy', 'message': 'Page successfully copied'};
+            showMessage(okMessage);
+        } else {
+            showMessage({'header' : '500', 'message': 'no'});
+        }
+    });
+    
+    
+    $('#feeditSimple-pastePageButton').click(function() {
+        if(confirm('Are you sure?')) {
+            var cookieContent = feeditSimpleGetCookie('feeditSimple-copycutpage');
+            if(cookieContent) {
+                var okMessage = {'header' : 'Paste', 'message': 'Page successfully pasted'};
+                ajaxCall('pastePage', '', cookieContent, '', $('body').attr('id'), okMessage);
+            }
+        }
+    });
+    
+    
+    $('#feeditSimple-deletePageButton').click(function() {
+        if(confirm('Are you sure?')) {
+            var okMessage = {'header' : 'Paste', 'message': 'Page successfully pasted'};
+            ajaxCall('deletePage', '', '', '', $('body').attr('id'), okMessage);
+        }
+    });
+    
+     
+    $('#feeditSimple-showPageButton').click(function() {
+        var okMessage = {'header' : 'Show', 'message': 'Page successfully show'};
+        ajaxCall('showPage', '', '', '', $('body').attr('id'), okMessage);
+    });
+    
+    $('#feeditSimple-hidePageButton').click(function() {
+        var okMessage = {'header' : 'Paste', 'message': 'Page successfully hidden'};
+        ajaxCall('hidePage', '', '', '', $('body').attr('id'), okMessage);
+    });
+    
+    $('#feeditSimple-showPageInMenuButton').click(function() {
+        var okMessage = {'header' : 'Paste', 'message': 'Page successfully show in menu'};
+        ajaxCall('showPageInMenu', '', '', '', $('body').attr('id'), okMessage);
+    });
+    
+    $('#feeditSimple-hidePageInMenuButton').click(function() {
+        var okMessage = {'header' : 'Paste', 'message': 'Page successfully hide in menu'};
+        ajaxCall('hidePageInMenu', '', '', '', $('body').attr('id'), okMessage);
+    });
+    
+        ///////////////
+    $('#feeditSimple-toggleHiddenElement').click(function() {
+        var okMessage = {'header' : 'Show/Hide', 'message': 'Display hidden elements successfully changed'};
+        toggleHiddenObject('.hidden-1', 'hiddenElement', okMessage);
+    });
+    
+    $('#feeditSimple-toggleHiddenInMenu').click(function() {
+        var okMessage = {'header' : 'Show/Hide', 'message': 'Display hidden in menu successfully changed'};
+        toggleHiddenObject('.feeditSimple-hiddenInMenu-1', 'hiddenInMenu', okMessage)
+    });
+    
+    $('#feeditSimple-toggleHiddenPage').click(function() {
+        var okMessage = {'header' : 'Show/Hide', 'message': 'Display hidden pages successfully Changed'};
+        toggleHiddenObject('.feeditSimple-hiddenPage-1', 'hiddenPage', okMessage);
+    });
+    ////////////////////////
 
     //Hide new content elements row on blur
     $("html").mouseup(function(e)
@@ -295,8 +379,17 @@ $(document).ready(function()
             $('.lth_feeditsimple_content.hidden-1').closest('.csc-default').css('opacity', '0.5');
             $('.lth_feeditsimple_content.hidden-1').closest('.csc-default').css('-ms-filter', 'alpha(opacity=50)');
         }
-    } else {
-        $('.lth_feeditsimple_content.hidden-1').closest('.csc-default').css('display', 'none');
+        if(displayObject['hiddenInMenu'] === 'none') {
+            $('.feeditSimple-hiddenInMenu-1').hide();
+        } else {
+            $('.feeditSimple-hiddenInMenu-1 a').append('<span class="icon-white-eye-close"></span>');
+        }
+        if(displayObject['hiddenPage'] === 'none') {
+            $('.feeditSimple-hiddenPage-1').hide();
+        } else {
+            $('.feeditSimple-hiddenPage-1 a').append('<span class="icon-white-ban-circle"></span>');
+        }
+        
     }
     
     /*$(".csc-default").hover(function(e) { 
@@ -898,12 +991,6 @@ function addClickToFile(file, imgId)
 }
 
 
-function getPageTree()
-{
-    ajaxCall('getPageTree');
-}
-
-
 function toggleItem(selector,eType)
 {
     $(selector).toggle();
@@ -1118,7 +1205,7 @@ function makeEditable(selector, type, okMessage)
                                 closeBtn: false,
                                 href: 'typo3conf/ext/lth_feedit_simple/vendor/bootstraptreeview/index.html',
                                 afterLoad:function() {
-                                    getPageTree();
+                                    ajaxCall('getPageTree', 'tt_content', id, '', $('body').attr('id'));
                                 }
                             }
                         ]);
@@ -1579,12 +1666,26 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
             } else if(cmd === 'showContent' && data.result == 200) {
                 $('#c'+uid).css('opacity', '');
                 $('#c'+uid).css('-ms-filter', '');
-            } else if(cmd === 'getPageTree' && data.content && data.result == 200) {
+            } else if(cmd === 'pastePage') {
+                if(data.oldUid) {
+                    feeditSimpleSetCookie('feeditSimple-copycutpage', 'copy:pages:'+data.oldUid,1);
+                }
+                if(confirm('Page successfully pasted. You have to reload the page to see the changes. Do you want to do this?')) {
+                    location.reload(true);
+                }
+            } else if(cmd === 'deletePage') {
+                location.replace('index.php?id='+data.pid);
+            }  else if(cmd === 'hidePage' || cmd === 'hidePageInMenu') {
+                location.replace('index.php?id='+data.pid);
+            } else if((cmd === 'getPageTree') && data.content && data.result == 200) {
                 var arr1 = [];
                 
                 $.each(data.content, function (index, d) {
+                    
+                    //console.log(d);
                     var tmp = d[0];
-                    arr1.push({'href': tmp.href, 'text':tmp.text, 'uid': tmp.uid, 'tags': tmp.tags, 'nodes': tmp.nodes});
+                    //console.log(tmp.uid);
+                    arr1.push({'href': tmp.href, 'text':tmp.text, 'uid': tmp.uid, 'nodes': tmp.nodes});
                 });
 
                 var pageTreeContainer = $('body',$('.fancybox-iframe').contents()).find('.pageTreeContainer');
@@ -1605,6 +1706,7 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                         $.fancybox.close();
                     }
                 });
+                
                 pageTree.treeview('collapseAll', { silent: true });
                 pageTreeContainer.show();
             } else if(cmd === 'getFormHandler') {
@@ -1679,6 +1781,12 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
             showMessage({message : '500', header : '1676'});
         }
     });
+}
+
+
+function movePage(pageUid, that)
+{
+    console.log(pageUid + $(that).text());
 }
 
 
@@ -1799,27 +1907,39 @@ function feeditSimpleSetCookie(name, value, expires, domain, secure)
 }
 
 
-function toggleHiddenObject(inputClass, myType)
+function toggleHiddenObject(inputClass, myType, okMessage)
 {
-    //$('.'+inputClass).toggle();
-    var displayString = feeditSimpleGetCookie('feeditSimple-usersettings');  
+    var displayString = feeditSimpleGetCookie('feeditSimple-usersettings');
     if(displayString) {
         var displayObject = JSON.parse(unescape(displayString));
         //console.log(inputClass+','+myType + ',' + displayObject[myType]);
 
-        if(displayObject[myType]=='none') {
+        if(displayObject[myType]=='none' && inputClass === 'hiddenElement') {
             displayObject[myType] = 'block';
             $(inputClass).closest('.csc-default').css('opacity', '0.5');
             $(inputClass).closest('.csc-default').css('-ms-filter', 'alpha(opacity=50)');
 
             $(inputClass).closest('.csc-default').css('display','block');
             $('#'+myType).css('display','inline-block');
-        } else {
+        } else if(inputClass === 'hiddenElement') {
             displayObject[myType] = 'none';
             $(inputClass).closest('.csc-default').css('display','none');
             $('#'+myType).css('display','none');
+        } else {
+            if(displayObject[myType] === 'block') {
+                displayObject[myType] = 'none';
+                $(inputClass).hide();
+                $('#'+myType).css('display','none');
+            } else {
+                displayObject[myType] = 'block';
+                $(inputClass).show();
+                $('#'+myType).css('display','inline-block');
+            }
         }
         feeditSimpleSetCookie('feeditSimple-usersettings', JSON.stringify(displayObject),0);
+        //showMessage(okMessage);
+    } else {
+        
     }
 }
 
@@ -1906,19 +2026,22 @@ function changeImageOrientation(cmd, uid, imageOrientationId, okMessage)
 function savePageProperties()
 {
     var pid = $('body').attr('id');
-    params = new Array();
+    var params = {};
+    params['_saveandclosedok_x'] = 1;
+                //_savedoc_x
+    params['cmd'] = "edit";
     //params["data[tt_content]["+uid+"][colPos]"] = colPos;
-    params["data['pages'][pid]['subtitle']"] = $('#inputSubTitle');
-    params["data['pages'][pid]['nav_title']"] = $('#inputNavTitle');
-    params["data['pages'][pid]['title']"] = $('#inputTitle');
-    params["data['formtoken']"] = $('input[name="formToken"]',this).val();
-    
+    params["data[pages]["+pid+"][subtitle]"] = $('#inputSubTitle').val();
+    params["data[pages]["+pid+"][nav_title]"] = $('#inputNavTitle').val();
+    params["data[pages]["+pid+"][title]"] = $('#inputTitle').val();
+    params["formToken"] = $('input[name="formToken"]').val();
+    //console.log(params);
     $.ajax({
-        url: '/typo3/alt_doc.php?edit[pages][' + pid + ']=edit',
+        url: 'typo3/alt_doc.php?doSave=1',
         data: params,
         type: 'post',
         dataType: 'json',
-        success: function(data) {
+        complete: function(data) {
             if(confirm('??')) {
                 location.reload(true);
             } else {

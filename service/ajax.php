@@ -52,20 +52,19 @@ switch($cmd) {
 	$content = setClipboard($uid, $table, $contentToPaste);
 	break;    
     case "deletePage":
-	$content = deletePage($cmd,$table,$uid);
+	$content = deletePage($cmd, $pageUid);
 	break;
+    case "pastePage":
+	$content = pastePage($cmd, $uid, $pageUid);
+	break;   
     case "hidePage":
-	$content = hideShowPage($cmd,$table,$pageId,1);
+    case "hidePageInMenu":
+	$content = hideShowPage($cmd, $pageUid, 1);
 	break;
     case "showPage":
-	$content = hideShowPage($cmd,$table,$pageId,0);
-	break;
-    case "hidePageInMenu":
-	$content = hideShowPage($cmd,$table,$pageId,1);
-	break;
     case "showPageInMenu":
-	$content = hideShowPage($cmd,$table,$pageId,0);
-	break;    
+	$content = hideShowPage($cmd, $pageUid, 0);
+	break;   
     case "getFormHandler":
         $content = getFormHandler($pageUid);
         break;
@@ -73,7 +72,7 @@ switch($cmd) {
         $content = loadCategorySelector($uid);
         break;
     case "changeCategory":
-        $content = changeCategory($uid,$parentUid);
+        $content = changeCategory($uid, $parentUid);
         break;
     case "logout":
         $content = logout($table);
@@ -342,14 +341,11 @@ function getAbsolutePath()
 function setClipboard($uid, $table, $contentToPaste)
 {
     if ($_COOKIE['be_typo_user']) {
-        require_once (PATH_t3lib.'class.t3lib_befunc.php');
-        require_once (PATH_t3lib.'class.t3lib_userauthgroup.php');
-        require_once (PATH_t3lib.'class.t3lib_beuserauth.php');
-        require_once (PATH_t3lib.'class.t3lib_tsfebeuserauth.php');
-        
         $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
+        $beuserid = $GLOBALS['BE_USER']->user['uid'];
+        
         if($GLOBALS['BE_USER']->user['uid']) {
             $beuserId = intval($GLOBALS['BE_USER']->user['uid']);
             $time = time();
@@ -923,17 +919,10 @@ function getPidForNewArticles($pageId)
     
 }
 
-function deletePage($cmd,$table,$uid)
+
+function deletePage($cmd, $pageUid)
 {
     if ($_COOKIE['be_typo_user']) {
-        require_once (PATH_t3lib.'class.t3lib_befunc.php');
-        require_once (PATH_t3lib.'class.t3lib_userauthgroup.php');
-        require_once (PATH_t3lib.'class.t3lib_beuserauth.php');
-        require_once (PATH_t3lib.'class.t3lib_tsfebeuserauth.php');
-
-        // the value this->formfield_status is set to empty in order to disable login-attempts to the backend account through this script
-        // @todo 	Comment says its set to empty, but where does that happen?
-
         $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
@@ -942,50 +931,35 @@ function deletePage($cmd,$table,$uid)
         $returnArray = array();
         
         if($beuserid) {
-            //if($GLOBALS['BE_USER']->isInWebMount($uid) or $GLOBALS['BE_USER']->user['admin']) {
-                // get the pid of the current page   
-                $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("pid", $table, "uid=".intval($uid). " AND pid != 0") or die('355; '.mysql_error());
-                $row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res);
-                $pid = $row['pid'];
-                
-                $GLOBALS['TYPO3_DB']->sql_free_result($res);
+            // get the pid of the current page   
+            $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('pid', 'pages', 'uid='.intval($pageUid). ' AND pid != 0');
+            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+            $pid = $row['pid'];
+            $GLOBALS['TYPO3_DB']->sql_free_result($res);
 
-                if($pid) {
-                            //Set deleted to 1
-                    $values = array ('deleted' => 1, 'tstamp' => time());
-                    $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($uid), $values) or die("363; ".mysql_error());
-
-                    
-                    $returnArray['pid'] = $pid;
-                    $returnArray['msg'] = $pid.$table.intval($uid);
-                    
-                } else {
-                    $returnArray['msg'] = 'Root?'.$table.$uid.$pid;
-                }
-            /*} else {
-                $returnArray['msg'] = 'No access.';
-            }*/
+            if($pid) {
+                //Set deleted to 1
+                $updateArray = array ('deleted' => 1, 'tstamp' => time());
+                $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='.intval($pageUid), $updateArray);
+                $returnArray['pid'] = $pid;
+                $returnArray['result'] = 200;
+            } else {
+                $returnArray['result'] = 500;
+            }
         } else {
-            $returnArray['msg'] = 'No user logged in.';
+            $returnArray['result'] = 'No user logged in.';
         }
     } else {
-        $returnArray['msg'] = 'No user logged in.';
+        $returnArray['result'] = 'No user logged in.';
     }
     return $returnArray;
         
 }
 
-function hideShowPage($cmd,$table,$pageId,$type)
+
+function pastePage($cmd, $uid, $pageUid)
 {
     if ($_COOKIE['be_typo_user']) {
-        require_once (PATH_t3lib.'class.t3lib_befunc.php');
-        require_once (PATH_t3lib.'class.t3lib_userauthgroup.php');
-        require_once (PATH_t3lib.'class.t3lib_beuserauth.php');
-        require_once (PATH_t3lib.'class.t3lib_tsfebeuserauth.php');
-
-        // the value this->formfield_status is set to empty in order to disable login-attempts to the backend account through this script
-        // @todo 	Comment says its set to empty, but where does that happen?
-
         $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
@@ -994,26 +968,96 @@ function hideShowPage($cmd,$table,$pageId,$type)
         $returnArray = array();
         
         if($beuserid) {
-            if($GLOBALS['BE_USER']->isInWebMount($pageId)) {
-                            //Set hidden to 0 or 1
+            $uidArray = explode(':', $uid);
+            $pasteType = $uidArray[0];
+            $uidToPaste = $uidArray[2];
+            
+            $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('pid, root', 'pages', 'uid = '.intval($pageUid));
+            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+            $pid = $row['pid'];
+            $root = $row['root'];
+
+            if($pasteType === 'cut') {
+                if($pid && $root) {
+                    $updateArray = array ('pid' => $pid, 'root' => $root, 'tstamp' => time());
+                    $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='.intval($uidToPaste), $updateArray);
+                    $returnArray['result'] = 200;
+                    $returnArray['oldUid'] = $uidToPaste;
+                } else {
+                    $returnArray['result'] = 500;
+                }
+            } else if($pasteType === 'copy') {
+                // get original record
+                $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'pages', 'uid = '.intval($uidToPaste));
+                $original_record = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+                $GLOBALS['TYPO3_DB']->sql_free_result($res);
+            
+                // insert the new record and get the new auto_increment id
+                $insertArray = array ('uid' => null);
+                $res = $GLOBALS['TYPO3_DB']->exec_INSERTquery('pages', $insertArray);
+                $newId = mysql_insert_id();
+
+                // generate the query to update the new record with the previous values
+                foreach ($original_record as $key => $value) {
+                    if ($key != 'uid' && $key != 'pid' && $key != 'root') {
+                        $updateArray[$key] = $value;
+                    }
+                }
                 
-                if($cmd=='hidePageInMenu' or $cmd == 'showPageInMenu') {
-                    $values = array ('nav_hide' => $type, 'tstamp' => time());
-                } else if($cmd=='hidePage' or $cmd =='showPage') {
-                    $values = array ('hidden' => $type, 'tstamp' => time());
-                }   
-                $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($pageId), $values) or die("289; ".mysql_error());
-                    
-                $returnArray['pid'] = $pid;
-                $returnArray['msg'] = $pid.$table.intval($uid);
-            } else {
-                $returnArray['msg'] = 'No access.';
+                $updateArray['pid'] = $pid;
+                $updateArray['root'] = $root;
+
+                // update the new record
+                if(is_array($updateArray)) {
+                    $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='.intval($newId), $updateArray);
+                    $returnArray['result'] = 200;
+                } else {
+                    $returnArray['result'] = 500;
+                }            
             }
         } else {
-            $returnArray['msg'] = 'No user logged in.';
+            $returnArray['result'] = 'No user logged in.';
         }
     } else {
-        $returnArray['msg'] = 'No user logged in.';
+        $returnArray['result'] = 'No user logged in.';
+    }
+    return $returnArray;
+        
+}
+
+
+function hideShowPage($cmd, $pageUid, $type)
+{
+    if ($_COOKIE['be_typo_user']) {
+        $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $GLOBALS['BE_USER']->start();
+        $GLOBALS['BE_USER']->unpack_uc('');
+        $beuserid = $GLOBALS['BE_USER']->user['uid'];
+        
+        $returnArray = array();
+        
+        if($beuserid) {
+            // get the pid of the current page   
+            $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('pid', 'pages', 'uid='.intval($pageUid). ' AND pid != 0');
+            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+            $pid = $row['pid'];
+            $GLOBALS['TYPO3_DB']->sql_free_result($res);
+            
+            //Set hidden or nav_hide to 0 or 1
+            if($cmd === 'hidePageInMenu' or $cmd === 'showPageInMenu') {
+                $updateArray = array ('nav_hide' => $type, 'tstamp' => time());
+            } else if($cmd === 'hidePage' or $cmd === 'showPage') {
+                $updateArray = array ('hidden' => $type, 'tstamp' => time());
+            }   
+            $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='.intval($pageUid), $updateArray);
+
+            $returnArray['pid'] = $pid;
+            $returnArray['result'] = 200;
+        } else {
+            $returnArray['result'] = 'No user logged in.';
+        }
+    } else {
+        $returnArray['result'] = 'No user logged in.';
     }
     
     return $returnArray;
@@ -1140,7 +1184,11 @@ function scanPages($db_mountpoint)
         // Build array
     $treeArray = array();
     while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
-        $treeArray[] = array('href' => '#', 'text' => $row['title'], 'lft' => $row['lft'], 'rgt' => $row['rgt'], 'uid' => $row['uid'], 'pid' => $row['pid']);
+        $uid = $row['uid'];
+        $treeArray[] = array('href' => '#', 'text' => $row['title']
+            . '<span class="icon share-icon glyphicon glyphicon-share"><a href="javascript:" onclick="parent.movePage(' . $uid . ',this);";>before</a></span>'
+            . '<span class="icon unshare-icon glyphicon glyphicon-unshare"><a href="javascript:" onclick="parent.movePage(' . $uid . ',this);";>after</a></span>',
+            'lft' => $row['lft'], 'rgt' => $row['rgt'], 'uid' => $row['uid'], 'pid' => $row['pid']);
     }
     $GLOBALS['TYPO3_DB']->sql_free_result($res);
     
@@ -1181,7 +1229,7 @@ function nest($arrData)
         for($i=0; $i < $stackSize; $i++) {
             $link =& $link[$stack[$i]['index']]["nodes"]; //navigate to the proper children array
         }
-        $tmp = array_push($link,  array ('href'=>$arrValues['href'], 'text' => $arrValues['text'], 'uid' => $arrValues['uid'], 'nodes'=>array()));
+        $tmp = array_push($link,  array ('href'=>$arrValues['href'], 'text' => $arrValues['text'], 'nodeId' => $arrValues['uid'], 'nodes'=>array()));
         array_push($stack, array('index' => $tmp-1, 'rgt' => $arrValues['rgt'], 'tags' => count($tmp)));
 
     }
