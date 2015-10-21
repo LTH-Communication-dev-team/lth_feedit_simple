@@ -211,7 +211,14 @@ class lth_feeditsimple_menu {
              * <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
              */
             if($_COOKIE['feeditSimple-copycutpage']) {
-                $pastePage = '<li><a id="feeditSimple-pastePageButton" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pagePastePageTooltip').'" href="javascript:">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pagePastePage').'</a></li>';
+                $pastePage = '<li><a id="feeditSimple-pastePageAfterButton" title="' . 
+                    $GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pagePastePageAfterTooltip').'" href="javascript:">' .
+                    $GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pagePastePageAfter').
+                    '</a></li>';
+                $pastePage .= '<li><a id="feeditSimple-pastePageIntoButton" title="' . 
+                    $GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pagePastePageIntoTooltip').'" href="javascript:">' .
+                    $GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pagePastePageInto').
+                    '</a></li>';
             }
             $content .= '
             <ul class="nav feeditSimple-mainMenu">
@@ -306,11 +313,6 @@ class lth_feeditsimple_menu {
                     <div id="msg-div"></div>
                 </li>
                 
-                <li class="lth_feedit_simple_top_logo" id="">
-                    <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:topLogoTooltip').'" href="http://typo3.org">
-                    <span class="lth_feedit_simple_top_logo"></span></a>
-                </li>
-                
                 <li id="" class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userTooltip').'">
                         <span class="icon-user"></span>
@@ -321,6 +323,12 @@ class lth_feeditsimple_menu {
                         <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userBackendTooltip').'" href="/typo3/">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userBackend').'</a></li>
                         <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogoutTooltip').'" href="#" onclick="feeditsimple_logout(\'' . t3lib_div::getIndpEnv('TYPO3_REQUEST_URL') . '\');return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogout').'</a></li>
                     </ul>
+                </li>
+                
+                
+                <li id="feEditSimple-logo">
+                    <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:topLogoTooltip').'" href="http://typo3.org">
+                    <span class="feEditSimple-logo"></span></a>
                 </li>
                 
                 
@@ -618,5 +626,3 @@ class lth_feeditsimple_menu {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/lth_feedit_simple/view/class.lth_feeditsimple_menu.php']) {
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/lth_feedit_simple/view/class.lth_feeditsimple_menu.php']);
 }
-
-?>

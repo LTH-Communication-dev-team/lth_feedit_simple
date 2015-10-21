@@ -89,12 +89,22 @@ $(document).ready(function()
     });
     
     
-    $('#feeditSimple-pastePageButton').click(function() {
+    $('#feeditSimple-pastePageAfterButton').click(function() {
         if(confirm('Are you sure?')) {
             var cookieContent = feeditSimpleGetCookie('feeditSimple-copycutpage');
             if(cookieContent) {
                 var okMessage = {'header' : 'Paste', 'message': 'Page successfully pasted'};
-                ajaxCall('pastePage', '', cookieContent, '', $('body').attr('id'), okMessage);
+                ajaxCall('pastePageAfter', '', cookieContent, '', $('body').attr('id'), okMessage);
+            }
+        }
+    });
+    
+    $('#feeditSimple-pastePageIntoButton').click(function() {
+        if(confirm('Are you sure?')) {
+            var cookieContent = feeditSimpleGetCookie('feeditSimple-copycutpage');
+            if(cookieContent) {
+                var okMessage = {'header' : 'Paste', 'message': 'Page successfully pasted'};
+                ajaxCall('pastePageInto', '', cookieContent, '', $('body').attr('id'), okMessage);
             }
         }
     });
@@ -102,7 +112,7 @@ $(document).ready(function()
     
     $('#feeditSimple-deletePageButton').click(function() {
         if(confirm('Are you sure?')) {
-            var okMessage = {'header' : 'Paste', 'message': 'Page successfully pasted'};
+            var okMessage = {'header' : 'Delete', 'message': 'Page successfully deleted'};
             ajaxCall('deletePage', '', '', '', $('body').attr('id'), okMessage);
         }
     });
@@ -1666,12 +1676,31 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
             } else if(cmd === 'showContent' && data.result == 200) {
                 $('#c'+uid).css('opacity', '');
                 $('#c'+uid).css('-ms-filter', '');
-            } else if(cmd === 'pastePage') {
+            } else if(cmd === 'pastePageAfter' || cmd === 'pastePageInto') {
                 if(data.oldUid) {
                     feeditSimpleSetCookie('feeditSimple-copycutpage', 'copy:pages:'+data.oldUid,1);
-                }
-                if(confirm('Page successfully pasted. You have to reload the page to see the changes. Do you want to do this?')) {
-                    location.reload(true);
+                } else {
+                    $.ajax({
+                        url: 'index.php',
+                        type: 'post',
+                        dataType: 'json',
+                        data: {
+                            eID : 'lth_feedit_simple',
+                            contentToPaste: cmd,
+                            cmd : 'updateCopiedPage',
+                            uid : uid,
+                            pageUid : pageUid,
+                            sid : Math.random(),
+                        },
+                        success: function(data) {
+                            if(confirm('Page successfully pasted. You have to reload the page to see the changes. Do you want to do this?')) {
+                                location.reload(true);
+                            }
+                        },
+                        error: function(data) {
+                            alert('Something went wrong');
+                        }
+                    });
                 }
             } else if(cmd === 'deletePage') {
                 location.replace('index.php?id='+data.pid);

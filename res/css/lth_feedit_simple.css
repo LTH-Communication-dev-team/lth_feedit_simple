@@ -238,12 +238,19 @@ div#feEditSimple-menuBar div.feEditSimple-fourthRow {
         width: 1024px;
 }
 
-div#feEditSimple-logo {
-	float: right;
-	padding: 0 15px;
-	position: absolute;
-	right: 0;
-	top: 39px;
+#feEditSimple-logo {
+        background: url(../icons/typo3-black-200px-transparent.png) no-repeat;
+        float:right;
+    width: 105px;
+    height: 30px;
+}
+
+.feeditSimple-mainMenu {
+    width:100%;
+}
+.feEditSimple-logo {
+        width: 105px;
+    height: 30px;
 }
 
 div.feEditSimple-menuToolbar {
@@ -1032,21 +1039,6 @@ div.feEditSimple-contentWrapperSmall .start-grid-8 {
 #lth_feedit_simple_top_menu_user {
     float:right;
     margin-right:30px;
-}
-
-#lth_feedit_simple_top_logo {
-    background: url(../icons/typo3-white-200px-transparent.png) no-repeat;
-    float:right;
-    margin-right:30px;
-    /*background-position: 10px 30px;*/
-    width: 60px;
-    height: 17px;
-}
-
-.lth_feedit_simple_top_logo {
-    width: 60px;
-    height: 17px;
-    
 }
 
 .feEditSimple-secondRow {

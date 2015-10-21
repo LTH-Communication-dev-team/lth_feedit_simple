@@ -2,6 +2,12 @@
 if (!defined ('PATH_typo3conf')) die ('Could not access this script directly!');
 class Tx_Contentstage_Eid_ClearCache_FakeBEUSER {
        public function writelog() {}
+       public function isInWebMount() {
+           return true;
+       }
+        public function recordEditAccessInternals() {
+           return true;
+       }
 }
 tslib_eidtools::connectDB();
 //require_once(PATH_t3lib.'class.t3lib_div.php');
@@ -54,7 +60,8 @@ switch($cmd) {
     case "deletePage":
 	$content = deletePage($cmd, $pageUid);
 	break;
-    case "pastePage":
+    case "pastePageAfter":
+    case "pastePageInto":
 	$content = pastePage($cmd, $uid, $pageUid);
 	break;   
     case "hidePage":
@@ -89,6 +96,9 @@ switch($cmd) {
     case 'moveImage':
         $content = moveImage($uid, $pageUid);
         break;
+    case 'updateCopiedPage':
+        $content = updateCopiedPage($uid, $pageUid, $contentToPaste);
+        break; 
 }
 
 if($cmd != 'fileupload') {
@@ -401,7 +411,6 @@ function getClipboard()
 
 function moveContent($cmd, $table, $uid, $pid, $pageUid, $oldUid = null)
 {
-    //$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => "$cmd, $table, $uid, $pid, $pageUid", 'crdate' => time()));
     $newSorting = null;
     $returnArray = array();
     $uid = str_replace('c','',strtolower($uid));
@@ -426,7 +435,7 @@ function moveContent($cmd, $table, $uid, $pid, $pageUid, $oldUid = null)
         if($GLOBALS['TYPO3_DB']->sql_affected_rows() > 0) {
             $returnArray['result'] = 200;
         } else {
-        $returnArray['result'] = 500;
+            $returnArray['result'] = 500;
         }
         if($cmd == 'cut' || $cmd == 'copy') {
             $returnArray = getClipboard();
@@ -434,7 +443,7 @@ function moveContent($cmd, $table, $uid, $pid, $pageUid, $oldUid = null)
         }
     } catch(Exception $e) {
         $returnArray['result'] = 500;
-        $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => 'feeditSimple ajax row154: ' . $e->getMessage(), 'crdate' => time()));
+        echo $e->getMessage();
     }
     return $returnArray;
 }
@@ -473,7 +482,7 @@ function pasteContent($uid, $table, $pid, $pageUid)
         // insert the new record and get the new auto_increment id
         $insertArray = array ('uid' => null);
         $res = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertArray);
-        $newId = mysql_insert_id();
+        $newId = $GLOBALS['TYPO3_DB']->sql_insert_id();
 
         // generate the query to update the new record with the previous values
         foreach ($original_record as $key => $value) {
@@ -963,57 +972,102 @@ function pastePage($cmd, $uid, $pageUid)
         $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
-        $beuserid = $GLOBALS['BE_USER']->user['uid'];
+        $GLOBALS['BE_USER']->admin = true;
+        $GLOBALS['PAGES_TYPES']['default']['allowedTables'] = 'pages,tt_content';
+        $GLOBALS['TCA']['pages']['ctrl']['versioningWS_alwaysAllowLiveEdit'] = TRUE;
+
+        $beuserId = $GLOBALS['BE_USER']->user['uid'];
+        $beuserUsername = $GLOBALS['BE_USER']->user['username'];
         
         $returnArray = array();
         
-        if($beuserid) {
+        if($beuserId) {
             $uidArray = explode(':', $uid);
-            $pasteType = $uidArray[0];
+            $pasteType = str_replace('cut', 'move', $uidArray[0]);
             $uidToPaste = $uidArray[2];
+            if($cmd === 'pastePageAfter') {
+                $pageUid = -$pageUid;
+            } 
             
-            $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('pid, root', 'pages', 'uid = '.intval($pageUid));
-            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-            $pid = $row['pid'];
-            $root = $row['root'];
+            try {
+                // fake tcemain
+                $GLOBALS['TCA']['pages']['ctrl']['sortby'] = 'sorting';
+                //$GLOBALS['LANG'] = array();
+                if (!is_object($GLOBALS['LANG'])) {
+                    $GLOBALS['LANG'] = t3lib_div::makeInstance('language');
+                    $GLOBALS['LANG']->csConvObj = t3lib_div::makeInstance('t3lib_cs');
+                }
 
-            if($pasteType === 'cut') {
-                if($pid && $root) {
-                    $updateArray = array ('pid' => $pid, 'root' => $root, 'tstamp' => time());
-                    $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='.intval($uidToPaste), $updateArray);
-                    $returnArray['result'] = 200;
+                $GLOBALS['TCA']['pages']['columns']['tstamp'] = TRUE;
+                $GLOBALS['TCA']['pages']['columns']['crdate'] = TRUE;
+                $GLOBALS['TCA']['pages']['columns']['cruser_id'] = TRUE;
+                $GLOBALS['TCA']['pages']['columns']['editlock']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['hidden']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['title']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['doktype']['config'] = array('type' =>  'select');
+                $GLOBALS['TCA']['pages']['columns']['TSconfig']['config'] = array('type' =>  'text');
+                $GLOBALS['TCA']['pages']['columns']['storage_pid']['config'] = array('type' =>  'group');
+                $GLOBALS['TCA']['pages']['columns']['is_siteroot']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['php_tree_stop']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['tx_impexp_origuid']['config'] = array('type' =>  'passthrough');
+                $GLOBALS['TCA']['pages']['columns']['url']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['starttime']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['endtime']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['urltype']['config'] = array('type' =>  'select');
+                $GLOBALS['TCA']['pages']['columns']['shortcut']['config'] = array('type' =>  'group');
+                $GLOBALS['TCA']['pages']['columns']['shortcut_mode']['config'] = array('type' =>  'select');
+                $GLOBALS['TCA']['pages']['columns']['no_cache']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['fe_group']['config'] = array('type' =>  'select');
+                $GLOBALS['TCA']['pages']['columns']['subtitle']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['layout']['config'] = array('type' =>  'select');
+                $GLOBALS['TCA']['pages']['columns']['url_scheme']['config'] = array('type' =>  'select');
+                $GLOBALS['TCA']['pages']['columns']['target']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['media']['config'] = array('type' =>  'inline');
+                $GLOBALS['TCA']['pages']['columns']['lastUpdated']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['keywords']['config'] = array('type' =>  'text');
+                $GLOBALS['TCA']['pages']['columns']['cache_timeout']['config'] = array('type' =>  'select');
+                $GLOBALS['TCA']['pages']['columns']['newUntil']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['description']['config'] = array('type' =>  'text');
+                $GLOBALS['TCA']['pages']['columns']['no_search']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['abstract']['config'] = array('type' =>  'text');
+                $GLOBALS['TCA']['pages']['columns']['module']['config'] = array('type' =>  'select');
+                $GLOBALS['TCA']['pages']['columns']['extendToSubpages']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['author']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['author_email']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['nav_title']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['nav_hide']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['content_from_pid']['config'] = array('type' =>  'group');
+                $GLOBALS['TCA']['pages']['columns']['mount_pid']['config'] = array('type' =>  'group');
+                $GLOBALS['TCA']['pages']['columns']['mount_pid_ol']['config'] = array('type' =>  'radio');
+                $GLOBALS['TCA']['pages']['columns']['alias']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['l18n_cfg']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['fe_login_mode']['config'] = array('type' =>  'select');
+                $GLOBALS['TCA']['pages']['columns']['backend_layout']['config'] = array('type' =>  'select');
+                $GLOBALS['TCA']['pages']['columns']['backend_layout_next_level']['config'] = array('type' =>  'select');
+                $GLOBALS['TCA']['pages']['columns']['tx_realurl_pathsegment']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['tx_realurl_pathoverride']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['tx_realurl_exclude']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['tx_realurl_nocache']['config'] = array('type' =>  'check');
+                $GLOBALS['TCA']['pages']['columns']['lft']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['rgt']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['root']['config'] = array('type' =>  'input');
+
+                $GLOBALS['TCA']['pages']['columns']['cache_tags']['config'] = array('type' =>  'input');
+                $GLOBALS['TCA']['pages']['columns']['categories']['config'] = array('type' =>  'select');
+
+
+                            $localTCE = getLocalTCE();
+                $cmd = array();
+                $cmd['pages'][$uidToPaste][$pasteType] = $pageUid;
+                $localTCE->start(array(), $cmd, $GLOBALS['BE_USER']);
+                $localTCE->process_cmdmap();
+                if($pasteType === 'move') {
                     $returnArray['oldUid'] = $uidToPaste;
-                } else {
-                    $returnArray['result'] = 500;
                 }
-            } else if($pasteType === 'copy') {
-                // get original record
-                $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'pages', 'uid = '.intval($uidToPaste));
-                $original_record = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-                $GLOBALS['TYPO3_DB']->sql_free_result($res);
-            
-                // insert the new record and get the new auto_increment id
-                $insertArray = array ('uid' => null);
-                $res = $GLOBALS['TYPO3_DB']->exec_INSERTquery('pages', $insertArray);
-                $newId = mysql_insert_id();
-
-                // generate the query to update the new record with the previous values
-                foreach ($original_record as $key => $value) {
-                    if ($key != 'uid' && $key != 'pid' && $key != 'root') {
-                        $updateArray[$key] = $value;
-                    }
-                }
-                
-                $updateArray['pid'] = $pid;
-                $updateArray['root'] = $root;
-
-                // update the new record
-                if(is_array($updateArray)) {
-                    $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='.intval($newId), $updateArray);
-                    $returnArray['result'] = 200;
-                } else {
-                    $returnArray['result'] = 500;
-                }            
+                $returnArray['result'] = 200;
+            } catch(Exception $e) {
+                echo 'Message: ' .$e->getMessage();
+                $returnArray['result'] = 500;
             }
         } else {
             $returnArray['result'] = 'No user logged in.';
@@ -1023,6 +1077,87 @@ function pastePage($cmd, $uid, $pageUid)
     }
     return $returnArray;
         
+}
+
+
+function updateCopiedPage($uid, $pageUid, $contentToPaste)
+{
+    if ($_COOKIE['be_typo_user']) {
+        $uidArray = explode(':', $uid);
+        $uidToPaste = $uidArray[2];
+        
+        if($contentToPaste === 'pastePageAfter') {
+            $pageUid = -$pageUid;
+        } 
+            
+        $noOfDuplicates1 = 0;
+        $noOfDuplicates2 = 0;
+        $noOfDuplicatesFinal = 0;
+        if($pageUid < 0) {
+            $where1 = 'pid = (SELECT pid FROM pages WHERE uid = ' . intval($uidToPaste) . ') AND title = (SELECT title FROM pages WHERE deleted=0 AND uid = ' . intval($uidToPaste) . ' LIMIT 0,1) AND deleted = 0';
+        } else {
+            $where1 = 'pid='.intval($pageUid) . ' AND title = (SELECT title FROM pages WHERE deleted=0 AND pid = (SELECT pid FROM pages WHERE uid = ' . intval($uidToPaste) . ') LIMIT 0,1) AND deleted = 0';
+        }
+        
+        $res1 = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+            'uid, title',
+            'pages',
+            $where1,
+            '',
+            'uid'
+        );
+        if($res1) {
+
+            $noOfDuplicates1 = $GLOBALS['TYPO3_DB']->sql_num_rows($res1);
+            if($noOfDuplicates1 > 1) {
+                while ($row1 = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res1)) {
+                    $uid1 = $row1['uid'];
+                    $title1 = $row1['title'];
+                }
+
+                $where2 = 'pid=(SELECT pid FROM pages WHERE uid = ' . intval($uidToPaste) . ')' .
+                        ' AND title LIKE CONCAT((SELECT title FROM pages WHERE deleted=0 AND uid = ' . intval($uidToPaste) . '),\' (copy%\')' .
+                        ' AND deleted = 0';
+                //echo $where2.$title1;
+                $res2 = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+                    'uid, title',
+                    'pages',
+                    $where2
+                );
+            }
+            if($res2) {
+                $noOfDuplicates2 = $GLOBALS['TYPO3_DB']->sql_num_rows($res2);
+            }
+            $GLOBALS['TYPO3_DB']->sql_free_result($res1);
+            $GLOBALS['TYPO3_DB']->sql_free_result($res2);
+            $noOfDuplicatesFinal = (string)$noOfDuplicates1+$noOfDuplicates2-1;
+            if($noOfDuplicatesFinal > 0 && $title1) {
+                $updateArray = array('title' => $title1 . ' (copy ' .  $noOfDuplicatesFinal . ')', 'tstamp' => time());
+                $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='.intval($uid1), $updateArray);
+            }
+        }
+    }
+}
+
+
+/**
+* Returns a instance of TCEmain for handling local datamaps/cmdmaps
+*
+* @param boolean $stripslashesValues If TRUE, incoming values in the data-array have their slashes stripped.
+* @param boolean $dontProcessTransformations If set, then transformations are NOT performed on the input.
+* @return DataHandler
+*/
+function getLocalTCE($stripslashesValues = FALSE, $dontProcessTransformations = TRUE) {
+       $copyTCE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
+       $copyTCE->stripslashes_values = $stripslashesValues;
+       $copyTCE->copyTree = 9; //$this->copyTree;
+       $copyTCE->admin = 1;
+       // Copy forth the cached TSconfig
+       //$copyTCE->cachedTSconfig = $this->cachedTSconfig;
+       // Transformations should NOT be carried out during copy
+       $copyTCE->dontProcessTransformations = $dontProcessTransformations;
+       $copyTCE->bypassWorkspaceRestrictions = TRUE;
+       return $copyTCE;
 }
 
 

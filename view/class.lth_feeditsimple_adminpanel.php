@@ -148,7 +148,7 @@ class user_feeditsimple_adminpanel {
 		$be_typo_user = $_COOKIE['be_typo_user'];
 		//$res = $GLOBALS['TYPO3_DB']->sql_query("select * from pages where uid=4");
 		//$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'table', 'uid='.intval($uid), 'groupby', 'orderby', 'limit') or die('175; '.mysql_error());
-		try {
+		/**try {
 		    $sql = "CALL sp_lth_feedit_simple_user_sessions('".$beUserUid."','".$be_typo_user."')";
 		    //echo $sql;
 		    $res = $GLOBALS['TYPO3_DB']->sql_query($sql);
@@ -157,7 +157,7 @@ class user_feeditsimple_adminpanel {
 			
 		    }
 		//$res = $GLOBALS['TYPO3_DB']->sql_query("CALL sp_logError('".$var1."', '".$var2."')");
-
+**/
 
 	    // loading template
 	    $templateFile = $this->modTSconfig['properties']['skin.']['templateFile'];

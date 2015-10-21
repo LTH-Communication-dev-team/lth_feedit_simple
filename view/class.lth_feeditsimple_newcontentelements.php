@@ -321,5 +321,3 @@ class lth_feeditsimple_newcontentelements {
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/lth_feedit_simple/view/class.tx_feEditSimple_newcontentelements.php'])	{
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/lth_feedit_simple/view/class.tx_feEditSimple_newcontentelements.php']);
 }
-
-?>
