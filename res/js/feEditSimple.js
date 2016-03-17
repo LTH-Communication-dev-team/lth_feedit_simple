@@ -9,9 +9,36 @@ var saveBeforeStopUid = function(input) {
 };
 
 var redips = {};
+var feeditSimpleElementId;
+var colPos;
 
 $(document).ready(function()
 {
+    $('.lth_feeditsimple_contenta').dblclick(function() {
+        /*if($('.wysihtml5-toolbar').length > 0) {
+            return false;
+        }*/
+        feeditSimpleElementId = $(this).attr('data-pk');
+        var colId = $(this).closest('.connectedSortable').attr('id');
+        colPos = getColpos(colId);
+        $('#dropping').html($(this).html());
+        $('#feeditSimple-modalBox-1').modal("show");
+        
+        /*$('.modal-body-1').html($(this).html());
+        $('#feeditSimple-modalBox-1').modal({ backdrop: 'static' });
+        $('#feeditSimple-modalBox-1').modal("show");
+        makeEditable('.modal-body-1', 'text', 'okMessage');*/
+    });
+    
+    $('#feeditSimple-modalBox-1a').on('shown.bs.modal', function() {
+        //console.log('shown');
+        //$('#dropping').summernote({ height: 300, focus: true });
+        makeEditable('#dropping', 'text', 'okMessage');
+    }).on('hidden.bs.modal', function () {
+        //console.log('destroy');
+        $('#dropping').destroy();
+    });
+      
     $('#feeditSimple-helpButton').panelslider({
         side: 'right',
         duration: 200,
@@ -70,6 +97,9 @@ $(document).ready(function()
     $('#feeditSimple-cutPageButton').click(function() {
         var uid = $('body').attr('id');
         if(feeditSimpleSetCookie('feeditSimple-copycutpage', 'cut:pages:'+uid,1)) {
+            if($('#feeditSimple-pastePageAfterButton').length > 0) {
+                $(this).parent().next('li').after(pasteButtonText);
+            }
             var okMessage = {'header' : 'Cut', 'message': 'Page successfully cut'};
             showMessage(okMessage);
         } else {
@@ -81,12 +111,27 @@ $(document).ready(function()
     $('#feeditSimple-copyPageButton').click(function() {
         var uid = $('body').attr('id');
         if(feeditSimpleSetCookie('feeditSimple-copycutpage', 'copy:pages:'+uid,1)) {
+            if($('#feeditSimple-pastePageAfterButton').length > 0) {
+                $(this).parent().after(pasteButtonText);
+            }
             var okMessage = {'header' : 'Copy', 'message': 'Page successfully copied'};
             showMessage(okMessage);
         } else {
             showMessage({'header' : '500', 'message': 'no'});
         }
     });
+    
+    
+    function pasteButtonText()
+    {
+        var content = '<li><a id="feeditSimple-pastePageAfterButton" title="" href="javascript:">' +
+                    'Paste page after' +
+                    '</a></li>' +
+                '<li><a id="feeditSimple-pastePageIntoButton" title="" href="javascript:">' +
+                    'Paste page into' +
+                    '</a></li>';
+        return content;
+    }
     
     
     $('#feeditSimple-pastePageAfterButton').click(function() {
@@ -141,7 +186,7 @@ $(document).ready(function()
         ///////////////
     $('#feeditSimple-toggleHiddenElement').click(function() {
         var okMessage = {'header' : 'Show/Hide', 'message': 'Display hidden elements successfully changed'};
-        toggleHiddenObject('.hidden-1', 'hiddenElement', okMessage);
+        toggleHiddenObject('.note-editor.feEditSimple-hidden-1', 'hiddenElement', okMessage);
     });
     
     $('#feeditSimple-toggleHiddenInMenu').click(function() {
@@ -153,7 +198,6 @@ $(document).ready(function()
         var okMessage = {'header' : 'Show/Hide', 'message': 'Display hidden pages successfully Changed'};
         toggleHiddenObject('.feeditSimple-hiddenPage-1', 'hiddenPage', okMessage);
     });
-    ////////////////////////
 
     //Hide new content elements row on blur
     $("html").mouseup(function(e)
@@ -164,9 +208,7 @@ $(document).ready(function()
             subject.fadeOut();
         }
     });
-    //console.log($('#feEditSimple-normalColWrapper').is(':empty'));
-    //
-    //
+
     //add empty div if no content
     if($('#feEditSimple-normalColWrapper').is(':empty')) {
         $('#feEditSimple-normalColWrapper').html('<div class="feEditSimple-empty">Empty</div>');
@@ -178,6 +220,7 @@ $(document).ready(function()
         connectWith: '.connectedSortable',
         placeholder: 'ui-state-highlight',
         cursor: 'move',
+        handle : '.csc-default',
         update: function( event, ui ) {
             if(ui.item.attr('class').indexOf('feEditSimple-contentTypeItem') < 0) {
 
@@ -199,7 +242,7 @@ $(document).ready(function()
                 ajaxCall('moveContent', table, uid, pid, pageUid, okMessage);
             };
         }
-    }).disableSelection();
+    });
     
     //make it possible to drop new content element
     $('#feEditSimple-contentTypeToolbar > a').draggable({
@@ -237,42 +280,11 @@ $(document).ready(function()
             ajaxCall('moveImage', '', idList.join('_'), '', $('body').attr('id'), okMessage);
         },
         stop: function( event, ui ) {
-            /*if(ui.item.attr('class').indexOf('feEditSimple-contentTypeItem') < 0) {
-
-                var pid = '';
-                var pageUid = 0;
-                if(!ui.item.context.previousSibling) {
-                    // Sorting number is in the top
-                    pid = $('body').attr('id').toString(); //pid=6
-                    pageUid = pid;
-                } else {
-                    // Sorting number is inside the list
-                    pid = '-'+ui.item.context.previousSibling.id.toString(); //pid = -63
-                    pageUid = $('body').attr('id');
-                }
-
-                var table = 'tt_content';
-                var uid = ui.item.context.id;
-                var okMessage = {'header' : 'Move', 'message': 'Content element successfully moved'};
-                ajaxCall('moveContent', table, uid, pid, pageUid, okMessage);
-            };*/
+           
         }
     }).disableSelection();
     
-    var okMessage = {'header' : 'Save', 'message': 'Content element successfully updated'};
-    
-    /*make text elements editable
-    $('.csc-default').dblclick(function(e, ui){
-        //console.log('dblclick');
-        e.stopPropagation();
-        $(this).find('.lth_feeditsimple_content').editable('toggle');
-    });*/
-    
-    makeEditable('.lth_feeditsimple_content', 'text', okMessage);
-        
-    //make image elements editable
-    makeEditable('.csc-textpic-image', 'image', okMessage);
-    
+    var okMessage = {'header' : 'Save', 'message': 'Content element successfully updated'};    
 
     $('.feeditSimple-tableWrapper').dblclick(function(e,ui){
         //e.stopPropagation();
@@ -346,7 +358,7 @@ $(document).ready(function()
         //makte tables editable
     
 
-        makeEditable('.feeditSimple-table td', 'table', okMessage);
+        //makeEditable('.feeditSimple-table td', 'table', okMessage);
     
     });
 
@@ -364,23 +376,9 @@ $(document).ready(function()
                 break;
         }
     });
-    /*
-     * 
-     * @type {String|@exp;c@call;substring}
-     * before: function (e, element, target) {
-      e.preventDefault();
-      if (e.target.tagName == 'SPAN') {
-          e.preventDefault();
-          this.closemenu();
-          return false;
-      }
-      return true;
-  }
-     */
     
     //hide och show hidden content elements at startup
     var displayString = feeditSimpleGetCookie('feeditSimple-usersettings');
-    //console.log(displayString);
     if(displayString) {
         var displayObject = JSON.parse(unescape(displayString));
         if(displayObject['hiddenElement'] === 'none') {
@@ -590,6 +588,7 @@ function cute(imgId)
         data: {
             eID : 'lth_feedit_simple',
             cmd : 'getFiles',
+            pageUid : $('body').attr('id'),
             sid : Math.random(),
         },
         dataType: "json",
@@ -1072,8 +1071,99 @@ function makeEditable(selector, type, okMessage)
         }*/
         
     };
-
     if(type==='text' || type==='textpic') {
+        $(selector).summernote({ height: 300, focus: true });
+    }
+    
+    if(type==='text2' || type==='textpic2') {
+        if($('.wysihtml5-toolbar').length > 0) {
+            return false;
+        }
+        $(selector).wysihtml5({
+            "events": {
+                "load": function() {
+                    var formToken = '';
+                    var url = '';
+                    var pid = $('body').attr('id');
+            
+                    //$('#bootstrap-wysihtml5-insert-link-modal').modal({ backdrop: 'static' });
+                    if($('.editable-filemanager').length === 0) {
+                        $('.bootstrap-wysihtml5-insert-link-url').after('<button title="Files and images" type="button" class="btn editable-filemanager" \
+                            data-toggle="modal" data-backdrop="static" href="#feeditSimple-modalBox-2">\
+                            <i class="icon-folder-open"></i></button>'
+                        );
+                    }
+                    $("#feeditSimple-modalBox-2").on('show.bs.modal', function() {
+                        $(this).find('.modal-body-2').append('<div id="container" role="main">\
+                            <input type="text" value="" style="box-shadow:inset 0 0 4px #eee; width:100px; margin:0; padding:6px 12px; border-radius:4px;\
+                             border:1px solid silver; font-size:1.1em;" id="jstree_q" placeholder="Search">\
+                            <button class="btn" type="button">Default button</button>\
+                            </div>\
+                            <div id="feeditSimple-jstree"></div>\
+                            <div id="data">\
+				<div class="content code" style="display:none;"><textarea id="code" readonly="readonly"></textarea></div>\
+				<div class="content folder" style="display:none;"></div>\
+				<div class="content image" style="display:none; position:relative;">\
+                                <img src="" alt="" style="display:block; position:absolute; left:50%; top:50%; padding:0; max-height:90%; max-width:90%;" /></div>\
+				<div class="content default" style="text-align:center;">Select a node from the tree.</div>\
+			</div>');
+                        jstree();
+                    });
+                    if(feeditSimpleElementId==='new') {
+                        url = '/typo3/alt_doc.php?edit[tt_content]['+pid+']=new';
+                    } else {
+                        url = '/typo3/alt_doc.php?edit[tt_content]['+feeditSimpleElementId+']=edit';
+                    }
+                    $.ajax({
+                        url: url,
+                        type: 'post',
+                        dataType: 'json',
+                        complete: function(data) {
+                            formToken = $(data.responseText).find('input[name="formToken"]').val();
+                            $('#feeditSimple-modalBox-1 .modal-footer-1 .btn-primary').click(function() {
+                                var params = {};
+                                params['cmd'] = "edit";
+                                //params["record"] = $('input[name="record"]',this).val();
+                                params["data[tt_content]["+feeditSimpleElementId+"][colPos]"] = colPos;
+                                params["data[tt_content]["+feeditSimpleElementId+"][pid]"] = $('input[name="pid"]').val();
+                                params["data[tt_content]["+feeditSimpleElementId+"][header]"] = $('#feeditsimple-elHeader').val();
+                                params["data[tt_content]["+feeditSimpleElementId+"][CType]"] = $('input[name="CType"]').val();
+                                params["data[tt_content]["+feeditSimpleElementId+"][bodytext]"] = $('.wysihtml5-sandbox').html().replace(/(<a.*\?id\=)(.*?)(">)(.*?)(<\/a>)/g,
+                                function(match,$1,$2,$3,$4,$5){
+                                    return '<link ' + $2 + ' - internal-link "Opens internal link in current window">' + $4 + '</link>';
+                                });
+                                params["formToken"] = formToken;
+                                //console.log(params);
+                                $.ajax({
+                                    url: 'typo3/alt_doc.php?doSave=1',
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data: params,
+                                    complete: function(data) {
+                                        $('[data-pk="' + feeditSimpleElementId + '"]').html($('.wysihtml5-sandbox').html());
+                                        $('#feeditSimple-modalBox-1').modal('hide');
+                                    }
+                                });
+                                return false;
+                            });
+                        }
+                    });
+                },
+                "blur": function() { 
+                    return false;
+                },
+                "focus": function() { 
+                    return false;
+                }
+                //http://www.w3masters.nl/bootstrap-wysihtml5/
+            },
+            toolbar: {
+                fa: true
+            }
+        });
+    }
+    
+    if(type==='text1' || type==='textpic1') {
         //console.log(type+selector);
         $(selector).editable({
             //mode: 'inline',
@@ -1081,12 +1171,15 @@ function makeEditable(selector, type, okMessage)
             defaultValue: '<p class="feeditSimple-empty">Empty</p>',
             url: 'typo3/alt_doc.php?doSave=1',
             params: function(params) {
+                //$('body',$('.wysihtml5-sandbox').contents()).find('a[href*=\?id\=]').removeClass('internal-link').addClass('internal-link');
+                //$('body',$('.wysihtml5-sandbox').contents()).find('a').removeAttr('rel');
                 var colId = $(this).closest('.connectedSortable').attr('id');
                 var colPos = getColpos(colId);
                 
                 var uid = $(this).attr('id');
                 uid = uid.split('_').pop();
-                //console.log(uid);
+
+                //<link 40441 - internal-link "Opens internal link in current window">två</link>
                 params['_saveandclosedok_x'] = 1;
                 //_savedoc_x
                 params['cmd'] = "edit";
@@ -1095,7 +1188,10 @@ function makeEditable(selector, type, okMessage)
                 params["data[tt_content]["+uid+"][pid]"] = $('input[name="pid"]').val();
                 params["data[tt_content]["+uid+"][header]"] = $('#feeditsimple-elHeader').val();
                 params["data[tt_content]["+uid+"][CType]"] = $('input[name="CType"]').val();
-                params["data[tt_content]["+uid+"][bodytext]"] = params.value;
+                params["data[tt_content]["+uid+"][bodytext]"] = params.value.replace(/(<a.*\?id\=)(.*?)(">)(.*?)(<\/a>)/g,
+                function(match,$1,$2,$3,$4,$5){
+                    return '<link ' + $2 + ' - internal-link "Opens internal link in current window">' + $4 + '</link>';
+                });
                 params["formToken"] = $('input[name="formToken"]',this).val();
                 return params;
             },
@@ -1105,7 +1201,7 @@ function makeEditable(selector, type, okMessage)
                 "font-styles": false,
                 "format-code": true,
                 //"html": true, //Button which allows you to edit the generated HTML. Default false
-                "image": true, //Button to insert an image. Default true,    
+                "image": true, //Button to insert an image. Default true,  
             },
             success: function(response, newValue) {
                 //console.log(response);
@@ -1120,7 +1216,7 @@ function makeEditable(selector, type, okMessage)
                     return response.responseText;
                 }
             },
-            //onblur: 'ignore',
+            onblur: 'ignore',
             toggle: 'dblclick',
             inputclass: 'feeditSimple-textarea'
         });
@@ -1129,7 +1225,7 @@ function makeEditable(selector, type, okMessage)
             if(!editable) {
                 return false;
             }
-            
+
             //Disable rightclick
             disableBootstrapContextMenu();
             
@@ -1168,14 +1264,24 @@ function makeEditable(selector, type, okMessage)
                     formToken = $(data.responseText).find('input[name="formToken"]').val();
                     $(that).append('<input type="hidden" name="formToken" value="' + formToken + '" />' +
                         '<input type="hidden" name="pid" id="pid" value="' + pid + '" />');
-                    if($('.editable-filemanager').length < 0) {
-                        $('.bootstrap-wysihtml5-insert-link-url').after('<button title="Files and images" type="button" class="btn editable-filemanager">' +
-                            '<i class="icon-folder-open"></i></button>' +
-                            '<button title="Typo3 page-tree" type="button" class="btn editable-pagebrowser">' +
-                            '<i class="icon-list-alt"></i></button>');
+                    if($('.editable-filemanager').length === 0) {
+                        $('.bootstrap-wysihtml5-insert-link-url').after('<button title="Files and images" type="button" class="btn editable-filemanager" \
+                            data-toggle="modal" data-backdrop="static" href="#feeditSimple-modalBox">\
+                            <i class="icon-folder-open"></i></button>\
+                            <label class="checkbox">\
+                            <input type="checkbox" id="editable-new-window" value="1">\
+                            Open in new window\
+                            </label>'
+                        );
                     }
-                    $('.editable-filemanager').click(function() {
-                        $.fancybox.open([
+                        //<button class="btn">Launch modal</button>
+                        /*
+                         * <button title="Typo3 page-tree" type="button" class="btn editable-pagebrowser">\
+                                                    <i class="icon-list-alt"></i></button>
+                         */
+                     /*$('.editable-filemanager').click(function() {
+                        $('#feeditSimple-modalBox > .modal-body').html('<table id="feeditSimple-formhandlerTable" class="display" width="100%"><tr><td>ss</td><td>tt</td></tr></table>');
+                       $.fancybox.open([
                             {
                                 maxWidth: 800,
                                 maxHeight: 600,
@@ -1195,10 +1301,33 @@ function makeEditable(selector, type, okMessage)
                                 }
                             }
                         ]);
-                    });
 
-                    
-                    $('.editable-pagebrowser').click(function() {
+                    });*/
+                    $("#feeditSimple-modalBox-2").on('show.bs.modal', function() {
+                        $(this).find('.modal-body-2').append('<div id="container" role="main">\
+                            <div style="padding:15px;">\
+                            <input type="text" value="" style="box-shadow:inset 0 0 4px #eee; width:120px; margin:0; padding:6px 12px; border-radius:4px; border:1px solid silver; font-size:1.1em;" id="jstree_q" placeholder="Search">\
+                            <button class="btn" type="button">Default button</button>\
+                            </div>\
+                            <div id="feeditSimple-jstree"></div>\
+                            <div id="data">\
+				<div class="content code" style="display:none;"><textarea id="code" readonly="readonly"></textarea></div>\
+				<div class="content folder" style="display:none;"></div>\
+				<div class="content image" style="display:none; position:relative;">\
+                                <img src="" alt="" style="display:block; position:absolute; left:50%; top:50%; padding:0; max-height:90%; max-width:90%;" /></div>\
+				<div class="content default" style="text-align:center;">Select a node from the tree.</div></div>\
+			</div>');
+                        $(this).find('.modal-body-2').css({
+                            width:'400px', //probably not needed
+                            height:'400px', //probably not needed 
+                        });
+                        jstree();
+                    });
+                    $(".bootstrap-wysihtml5-insert-link-modal").on('hide.bs.modal', function() {
+                        console.log($('#editable-new-window').prop('checked'));
+                        console.log($(this));
+                    });
+                    /*$('.editable-pagebrowser').click(function() {
                         $.fancybox.open([
                             {
                                 maxWidth: 500,
@@ -1219,26 +1348,16 @@ function makeEditable(selector, type, okMessage)
                                 }
                             }
                         ]);
-                    });
+                    });*/
                 }
             });
             e.stopPropagation();
         });
     } else if(type=='image') {
-        createAddress();
-        $(selector).editable({
+        //createAddress();
+        /*$(selector).editable({
             //selector: 'img',
-            /*url: function() {
-                var selectedImage = $('#feeditSimple-imageSrc').val();
-                var title = $('#feeditSimple-imageTitle').val();
-                var target = $('#feeditSimple-imageTarget').val();
-                var width = $('#feeditSimple-imageWidth').val();
-                var height = $('#feeditSimple-imageHeight').val();
-                
-                $(this).closest('.feeditSimple-placeHolder').attr('src',selectedImage);
-                //console.log('1345');
-                return 'typo3/alt_doc.php?doSave=1';
-            },*/
+            /*
             send: 'always',
             url: 'typo3/alt_doc.php?doSave=1',
             params: function(params) {
@@ -1309,11 +1428,7 @@ function makeEditable(selector, type, okMessage)
             //onblur: 'ignore',
             title: 'Enter src, title and target',
             toggle: 'dblclick'
-            /*value: {
-                src: imgSrc, 
-                title: "Lenina", 
-                target: "15"
-            }*/
+
         });
 
         $(selector).on('shown', function(e, editable) {
@@ -1479,15 +1594,11 @@ function makeEditable(selector, type, okMessage)
                         }
                         //e.stopPropagation();
                     });
-                }/*,
-                error: function(xhr, status, error) {
-                    //var err = xhr.responseText + ")");
-                    console.log(xhr.responseText);
-                    showMessage({message : 'no', header : '1590'});
-                }*/
+                }
             }); 
             //e.stopPropagation();
-        });
+           
+        }); */
     } else if(type === 'table') {
         ////////////////////////
         //console.log(type+selector);
@@ -1576,6 +1687,68 @@ function makeEditable(selector, type, okMessage)
 		return result;
 	};
 })();
+
+function jstree()
+{
+    var to = false;
+    $('#jstree_q').keyup(function () {
+        if(to) { clearTimeout(to); }
+        to = setTimeout(function () {
+                var v = $('#jstree_q').val();
+                $('#feeditSimple-jstree').jstree(true).search(v);
+        }, 250);
+    });
+                                                        
+    $('#feeditSimple-jstree')
+        .jstree({
+            "core" : {
+              "animation" : 0,
+              "check_callback" : true,
+              "themes" : { "stripes" : true },
+              'data' : {
+                'url' : 'index.php?eID=lth_feedit_simple&cmd=getFiles&pageUid='+$('body').attr('id')+'&sid='+Math.random(),
+                //'url' : 'typo3conf/ext/lth_feedit_simple/vendor/jstree/demo/basic/roorjstree_1.json',
+                'data' : function (node) {
+                    //console.log(node);
+                    return { 'id' : node.id };
+                }
+              }
+            },
+            "types" : {
+                "#" : {
+                    "max_children" : 100,
+                    "max_depth" : 10,
+                    "valid_children" : ["root"]
+                },
+                "root" : {
+                    "icon" : "glyphicon glyphicon-file",
+                    "valid_children" : []
+                },
+                "default" : {
+                    "valid_children" : []
+                },
+                "file" : {
+                    "icon" : "glyphicon glyphicon-file",
+                    "valid_children" : []
+                },
+                "page" : {
+                    "icon" : "/typo3conf/ext/lth_feedit_simple/res/icons/globe.png",
+                    "valid_children" : []
+                }
+            },
+            "plugins" : [
+                "search", "state", "types", "wholerow"
+            ]
+        })
+        .on('ready.jstree', function (e, data) {
+            $('.jstree-anchor').click(function(){
+                //console.log(window.location.host);
+                $(".bootstrap-wysihtml5-insert-link-url").val('http://'+window.location.host + '/?id='+$(this).attr('id').replace('_anchor',''));
+                $("#feeditSimple-modalBox-2").modal('hide');
+            });
+              
+        });
+}
 
 
 function insertImage(uid, okMessage)
@@ -1915,7 +2088,7 @@ function feeditSimpleSetCookie(name, value, expires, domain, secure)
         if(expires) {
             var d = new Date();
             var n = d.getTimezoneOffset();
-            d.setTime(d.getTime() + (Math.abs(n)*60*1000) + (60*60*1000));
+            d.setTime(d.getTime() + (Math.abs(n)*60*1000) + (60*60*100));
         }
         var cookieStr = name + "=" + value;
         if(expires) {
@@ -2108,7 +2281,7 @@ function glueTogether(glue, theArray)
     }
 }
 
-
+/*
 function createAddress()
 {
     $('.csc-textpic-image').attr('data-type', 'address');
@@ -2122,13 +2295,13 @@ function createAddress()
     $.fn.editableutils.inherit(Address, $.fn.editabletypes.abstractinput);
 
     $.extend(Address.prototype, {
-        /** Renders input from tpl @method render() **/        
+        // Renders input from tpl @method render()      
         render: function() {
            this.$input = this.$tpl.find('input');
         },
         
-        /**    Default method to show value in element. Can be overwritten by display option.
-        @method value2html(value, element)  **/
+        //    Default method to show value in element. Can be overwritten by display option.
+        //@method value2html(value, element) 
         value2html: function(value, element) {
             if(!value) {
                 $(element).empty();
@@ -2143,15 +2316,15 @@ function createAddress()
             $(element).html(html); 
         },
         
-        /**        Gets value from element's html
-                @method html2value(html) **/        
+        //       Gets value from element's html
+         //       @method html2value(html)    
         html2value: function(html) {        
           
           return null;  
         },
       
-       /**        Converts value to string.         It is used in internal comparing (not for sending to server).
-                @method value2str(value)         **/
+       //    Converts value to string.         It is used in internal comparing (not for sending to server).
+         //       @method value2str(value)         
        value2str: function(value) {
            var str = '';
            if(value) {
@@ -2162,19 +2335,18 @@ function createAddress()
            return str;
        }, 
        
-       /*        Converts string to value. Used for reading value from 'data-value' attribute.
-                @method str2value(str)         */
+       //      Converts string to value. Used for reading value from 'data-value' attribute.
+                @method str2value(str)         
        str2value: function(str) {
-           /*
-           this is mainly for parsing value defined in data-value attribute. 
-           If you will always set value by javascript, no need to overwrite it
-           */
+           
+           //this is mainly for parsing value defined in data-value attribute. 
+           //If you will always set value by javascript, no need to overwrite it
            return str;
        },                
        
-       /**        Sets value of input.
-                @method value2input(value) 
-        @param {mixed} value       **/         
+       ///       Sets value of input.
+          //      @method value2input(value) 
+       // @param {mixed} value       
        value2input: function(value) {
            if(!value) {
              return;
@@ -2187,8 +2359,8 @@ function createAddress()
            this.$input.filter('[name="process"]').val(value.process);
        },       
        
-       /**        Returns value of input.
-                @method input2value()        **/          
+       //       Returns value of input.
+       //         @method input2value()                 
        input2value: function() { 
            return {
               src: this.$input.filter('[name="src"]').val(), 
@@ -2200,21 +2372,13 @@ function createAddress()
            };
        },        
        
-        /**        Activates input: sets focus on the first field.
-                @method activate()        **/        
+        //        Activates input: sets focus on the first field.
+        //        @method activate()              
         activate: function() {
             this.$input.filter('[name="src"]').focus();
         },  
        
-       /**        Attaches handler to submit form in case of 'showbuttons=false' mode
-                @method autosubmit()        **/       
-       /*autosubmit: function() {
-          /* this.$input.keydown(function (e) {
-                if (e.which === 13) {
-                    $(this).closest('form').submit();
-                }
-           });
-       }     */  
+       
     });
 
     Address.defaults = $.extend({}, $.fn.editabletypes.abstractinput.defaults, {
@@ -2222,12 +2386,7 @@ function createAddress()
                 
             '<div class="control-group">' +
             
-            '<label class="control-label" for="src">Src</label>' +
-            '<div class="controls">' +
-            '<input type="text" id="feeditSimple-imageSrc" placeholder="Src" name="src" class="input bootstrap-wysihtml5-insert-link-url" />' +
-            '<button title="File or image" type="button" class="btn editable-filemanager"><i class="icon-folder-open"></i></button>' +
-            '<button title="Delete image" type="button" class="btn editable-delete-image"><i class="icon-trash"></i></button>' +
-            '</div>'+            
+      
             
             '<label class="control-label ">Title</label>' +
             '<div class="controls"><input type="text" id="feeditSimple-imageTitle" placeholder="Title" name="title" class="input feeditSimple-imgTitle" /></div>' +
@@ -2286,12 +2445,13 @@ function createAddress()
 
     $.fn.editabletypes.address = Address;
 }
+*/
 //<div class="csc-textpicHeader csc-textpicHeader-###UID###"><h2>###HEADER###</h2></div>
 
 
 //***************************************************************EXTEND X-EDITABLE**********************************************************/
     //Add Code button
-(function(wysihtml5) {
+/*(function(wysihtml5) {
 var undef;
 
 wysihtml5.commands.formatCode = {
@@ -2324,7 +2484,7 @@ wysihtml5.commands.formatCode = {
     }
 };
 })(wysihtml5);
-
+*/
 
 //old code
 /*   

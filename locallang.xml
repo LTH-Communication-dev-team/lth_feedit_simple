@@ -121,6 +121,7 @@
 			<label index="js.pasteNotification">Pasting content</label>
 			<label index="js.updatingContent">Updating content</label>
 
+                        <label index="tx_ttnewshtml_code">HTML code</label>
 		</languageKey>
                 
                 <languageKey index="sv" type="array">
@@ -242,6 +243,8 @@
 			<label index="js.cutNotification">Cutting content</label>
 			<label index="js.pasteNotification">Pasting content</label>
 			<label index="js.updatingContent">Updating content</label>
+                        
+                        <label index="tx_ttnewshtml_code">HTML-kod</label>
               
 		</languageKey>
                 

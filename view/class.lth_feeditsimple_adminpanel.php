@@ -35,6 +35,9 @@
  * @subpackage feEditSimple
  */
 
+//use TYPO3\CMS\Core\Resource\Collection\FolderBasedFileCollection;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
+
 class user_feeditsimple_adminpanel {
 	/**
 	 * Admin panel related configuration.
@@ -87,8 +90,7 @@ class user_feeditsimple_adminpanel {
 
 	public function __construct()
 	{
-	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin) {
-
+	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && t3lib_div::_GP('type')!='200' && t3lib_div::_GP('type')!='225') {
 			// set up general configuration
 		if (!count($this->admPanelTSconfig)) {
 			$this->admPanelTSconfig = t3lib_BEfunc::getModTSconfig($GLOBALS['TSFE']->id, 'admPanel');
@@ -123,7 +125,7 @@ class user_feeditsimple_adminpanel {
 	 */
 	public static function showMenuBar($params, $parent)
 	{
-	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin) {
+	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && t3lib_div::_GP('type')!='200' && t3lib_div::_GP('type')!='225') {
 		$adminPanel = t3lib_div::makeInstance('user_feeditsimple_adminpanel');
 		$feEditContent = self::processAbsRefPrefix($parent, $adminPanel->display());
 		$parent->content = str_replace('</body>', $feEditContent . '</body>', $parent->content);
@@ -143,7 +145,79 @@ class user_feeditsimple_adminpanel {
 	    if ($this->disabled) {
 		    return;
 	    }
-	    
+            /*$folderIdentifier = 'images';
+            $start = 0;
+            $maxNumberOfItems = 1000000;
+            $useFilters = TRUE;
+            $recursive = TRUE;
+            $storageUid = 1;
+            $iPid = 1;
+            
+            $depth = 999999;
+$queryGenerator = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance( 'TYPO3\\CMS\\Core\\Database\\QueryGenerator' );
+$rGetTreeList = $queryGenerator->getTreeList($iPid, $depth, 0, 1); //Will be a string
+            $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("uid,pid,title","pages","uid IN($rGetTreeList)");
+            while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
+                $uid = $row['uid'];
+                $pid = $row['pid'];
+                $title = $row['title'];
+                $pageArray[] = array('id' => $uid, 'text' => $title, 'type' => '????', 'parent' => $pid);
+            }
+            echo '<pre>';
+           // $finalArray[] = array('id' => 'fileadmin', 'text' => 'fileadmin', 'type' => 'folder', 'children' => $filearray);
+           // echo json_encode($filearray);
+
+            print_r($pageArray);
+            //print_r($fileObjects);
+            //print_r($fileArray);
+            echo '</pre>';
+*/
+            //$storageRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\StorageRepository');
+/*
+//$fileObjects = [];
+$fileObjects = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getStorageObject($storageUid)->getFileIdentifiersInFolder('images', $useFilters, $recursive);     
+$folderObjects = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getStorageObject($storageUid)->getFolderIdentifiersInFolder('images', $useFilters, $recursive);
+//$folderObjects['/images/'] = '/images/';
+            //$filesAndFolders = array_merge($fileObjects, $folderObjects);
+            //asort($fileObjects);
+            //$finalarray[] = $this->build_tree($fileObjects);
+                
+            $fileObjects = array_merge($fileObjects, \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getStorageObject($storageUid)->getFileIdentifiersInFolder('test', $useFilters, $recursive));
+            $folderObjects = array_merge($folderObjects, \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getStorageObject($storageUid)->getFolderIdentifiersInFolder('test', $useFilters, $recursive));
+            
+            $fileArray[] = array('id' => '/images', 'text' => 'images', 'type' => 'folder', 'parent' => '#');
+            $fileArray[] = array('id' => '/test', 'text' => 'test', 'type' => 'folder', 'parent' => '#');
+
+
+            asort($folderObjects);
+            foreach($folderObjects as $key => $value) {
+                $keyArray = explode('/', rtrim($key, '/'));
+                $text = array_pop($keyArray);
+                $fileArray[] = array('id' => rtrim($key, '/'), 'text' => $text, 'type' => 'folder', 'parent' => implode('/', $keyArray));
+            }
+            
+            asort($fileObjects);
+            foreach($fileObjects as $key => $value) {
+                $keyArray = explode('/', $key);
+                $text = array_pop($keyArray);
+                $fileArray[] = array('id' => $key, 'text' => $text, 'type' => 'file', 'parent' => implode('/', $keyArray));
+            }
+ * 
+ */
+            //$finalarray = $this->build_tree($fileObjects);
+            /*foreach($fileArray as $fileentry) {
+                $patharray = array_reverse(explode('/',$fileentry));
+                $thisarray = $this->scanpath($patharray);
+                $filearray = array_merge_recursive($filearray, $thisarray);
+            }*/
+            //echo '<pre>';
+           // $finalArray[] = array('id' => 'fileadmin', 'text' => 'fileadmin', 'type' => 'folder', 'children' => $filearray);
+           // echo json_encode($filearray);
+
+            //print_r($folders);
+            //print_r($fileObjects);
+            //print_r($fileArray);
+            //echo '</pre>';
 	    $beUserUid = $GLOBALS["BE_USER"]->user["uid"];
 		$be_typo_user = $_COOKIE['be_typo_user'];
 		//$res = $GLOBALS['TYPO3_DB']->sql_query("select * from pages where uid=4");
@@ -183,44 +257,104 @@ class user_feeditsimple_adminpanel {
 	    $content = t3lib_parsehtml::getSubpart($this->template, '###MAIN_TEMPLATE###');
 	    return t3lib_parsehtml::substituteMarkerArray($content, $markers, '###|###');
 	}
+        
+        
+        protected function scanpath($patharray) {
+            $tree = [];
+            if(count($patharray)===1) {
+                $filename = array_pop($patharray);
+                $tree[] = array('id'=>$filename, 'text'=>$filename, 'type'=>'file');
+            } else {
+                $pathpart = array_pop($patharray);
+                $tree[$pathpart]['id'] = $pathpart;
+                $tree[$pathpart]['text'] = $pathpart;
+                $tree[$pathpart]['type'] = 'folder';
+                $tree[$pathpart]['children'] = $this->scanpath($patharray);
+                //array_push($tree[$pathpart], 'apple', 'banana');
+            }
+            return $tree;
+        }
+        
+        
+        protected function build_tree($path_list)
+        {
+            /*
+                 * "id" => str_replace('//','/', $dir . '/' . $f),
+                    //"text" => str_replace('/','',$f),
+                    "text" => $f,
+                    "type" => "folder",
+                    //"path" => $dir . '/' . $f,
+                    "children" => scanFiles($dir . '/' . $f) // 
+                 */
+            $path_tree = array();
+            foreach ($path_list as $path => $id) {
+                $list = explode('/', trim($path, '/'));
+                $last_dir =& $path_tree;
+                foreach ($list as $dir) {
+                    $last_dir =& $last_dir[$dir];
+                }
+                //$last_dir['__title'] = $title;
+                $last_dir['id'] = $id;
+                $last_dir['text'] = $id;
+                $last_dir['type'] = 'file';
+            }
+
+            return $path_tree;
+        }
 
 
 	/**
 	  * Gets the CSS and Javascript includes needed for the top panel
 	  * @return		void
 	  */
-	protected function getIncludes()
+        protected function getIncludes()
 	{
 	    $extPath = t3lib_extMgm::siteRelPath('lth_feedit_simple');
 	    $includes = array(
                 
                 //bootstrap
-		'bootstrap.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap.css'),
-		'bootstrap-responsive.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-responsive.css'),
-                'bootstrap.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap.js'),
+		//'bootstrap.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap.css'),
+		//'bootstrap-responsive.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-responsive.css'),
+                //'bootstrap.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap.js'),
                 
                 //bootstrap-datetimepicker
                 'datetimepicker.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/datetimepicker.css'),
 		'datetimepicker.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-datetimepicker.js'),
  
                 //x-editable (bootstrap) 
-                'bootstrap-editable.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-editable.css'),
-                'bootstrap-editable.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-editable.js'),
+                //'bootstrap-editable.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-editable.css'),
+                //'bootstrap-editable.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-editable.js'),
+                
+                //Summernote
+                'summernote.css' => $this->getLinkTag($extPath . 'vendor/summernote/summernote.css'),
+                'summernote.js' => $this->getScriptTag($extPath . 'vendor/summernote/summernote.js'),
+                
+                //Sortable
+                'sortable.js' => $this->getScriptTag($extPath . 'vendor/sortable/sortable.js'),
                 
                 //wysihtml5
-                'bootstrap-wysihtml5-0.0.2.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-wysihtml5-0.0.2.css'),
+                /*'bootstrap3-wysihtml5.all.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap3-wysihtml5.all.js'),
+                'bootstrap3-wysihtml5.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap3-wysihtml5.css'),
+                'bootstrap-theme.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-theme.css'),
+                'font-awesome.min.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/font-awesome.min.css'),
 		'wysihtml5-0.3.0.min.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/wysihtml5-0.3.0.min.js'),               
-                'bootstrap-wysihtml5-0.0.2.min.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-wysihtml5-0.0.2.min.js'),
+                'bootstrap-wysihtml5-0.0.2.min.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-wysihtml5-0.0.2.js'),
 		'wysihtml5.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/wysihtml5.js'),
-
-                /*load files needed for jquery file upload
-                'jquery.ui.widget.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/vendor/jquery.ui.widget.js'),
-                 'jquery.iframe-transport.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.iframe-transport.js'),
-                'jquery.fileupload.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.fileupload.js'),*/
+                load files needed for jquery file upload
+                */
                  
                 //load files for bootstrap-treeview
-                'bootstrap-treeview.css' => $this->getLinkTag($extPath . 'vendor/bootstraptreeview/css/bootstrap-treeview.css'),
-                'bootstrap-treeview.js' => $this->getScriptTag($extPath . 'vendor/bootstraptreeview/js/bootstrap-treeview.js'),
+                //'bootstrap-treeview.css' => $this->getLinkTag($extPath . 'vendor/bootstraptreeview/css/bootstrap-treeview.css'),
+                //'bootstrap-treeview.js' => $this->getScriptTag($extPath . 'vendor/bootstraptreeview/js/bootstrap-treeview.js'),
+                
+                //load files for jstree
+                'jstree.css' => $this->getLinkTag($extPath . 'vendor/jstree/themes/default/style.min.css'),
+                'jstree.min.js' => $this->getScriptTag($extPath . 'vendor/jstree/jstree.min.js'),
+                
+                //load files for jquery fileupload
+                'jquery.ui.widget.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/vendor/jquery.ui.widget.js'),
+                'jquery.iframe-transport.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.iframe-transport.js'),
+                'jquery.fileupload.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.fileupload.js'),
                 
                 //load files needed for bootstrap-contextmenu
                 'bootstrap-contextmenu.js' => $this->getScriptTag($extPath . 'vendor/bootstrapcontextmenu/bootstrap-contextmenu.js'),
@@ -242,19 +376,16 @@ class user_feeditsimple_adminpanel {
                 //load files needed for redips
                 'redips-table-min.js' => $this->getScriptTag($extPath . 'vendor/redips/redips-table-min.js'),
                 
+                //load files needed for bootstrap slider
+                'bootstrap-slider.min.js' => $this->getScriptTag($extPath . 'vendor/bootstrap-slider/bootstrap-slider.min.js'),
+                'bootstrap-slider.min.css' => $this->getLinkTag($extPath . 'vendor/bootstrap-slider/css/bootstrap-slider.min.css'),
+
                 // load files needed for extension itself
                 'lth_feedit_simple.css' => $this->getLinkTag($extPath . 'res/css/lth_feedit_simple.css'), 		
-		'feeditsimple.js' => $this->getScriptTag($extPath . 'res/js/feEditSimple.js'),
+		'lth_feedit_simple.js' => $this->getScriptTag($extPath . 'res/js/lth_feedit_simple.js'),
 	    );
-
-            		//'backend.js'   => $this->getScriptTag('typo3/js/backend.js'),
-	     //$cssFile = $this->modTSconfig['properties']['skin.']['cssFile'];
-	     //$includes[] = $this->getLinkTag($cssFile ? $cssFile : $extPath . 'res/css/fe_edit_advanced.css');
-
-	     return implode(chr(10), $includes);
-	}
-	
-	
+            return implode(chr(10), $includes);
+        }
 	/**
 	 * Builds the menu. Can hook in CSS and own menu here.
 	 *

@@ -1,16 +1,3 @@
-/*
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
-*/
-/* 
-    Created on : 2015-apr-09, 10:19:42
-    Author     : Tomas Havner <tomas.havner@kansli.lth.se>
-*/
-.editable-filemanager {
-    margin-left: 7px;
-}
-
 /**
  * CSS for Advanced Frontend Editing (feEditSimple)
  *
@@ -22,10 +9,10 @@ and open the template in the editor.
  * fe_formsOnPage.css)
  */
 body {
-    padding-top: 8px;
+    padding-top: 32px;
 }
 
-.panel {
+.sidepanel {
       display: none;
       width: 220px;
       padding: 20px;
@@ -242,15 +229,11 @@ div#feEditSimple-menuBar div.feEditSimple-fourthRow {
         background: url(../icons/typo3-black-200px-transparent.png) no-repeat;
         float:right;
     width: 105px;
-    height: 30px;
+    height: 25px;
 }
 
 .feeditSimple-mainMenu {
     width:100%;
-}
-.feEditSimple-logo {
-        width: 105px;
-    height: 30px;
 }
 
 div.feEditSimple-menuToolbar {
@@ -588,7 +571,7 @@ div.feEditSimple-contentWrapper .formsOnPage {
 }
 
 .feEditSimple-hiddenElement .feEditSimple-contentWrapper,
-.hidden .formsOnPage, .feEditSimple-hidden {
+.hidden .formsOnPage, .feEditSimple-hidden-1 {
 	opacity: 0.5;
 	-ms-filter: "alpha(opacity=50)";
 }
@@ -695,104 +678,7 @@ div.feEditSimple-contentWrapper form.typo3-editPanel {
 	border-width: 0 !important;
 }
 
-/* ---------------------- LIGHT BOX ---------------------------- */
-#feEditSimple-editWindow {
-	display: block;
-	position: fixed;
-	margin: 0;
-	padding: 0 10px;
-	top: 100px;
-	min-width: 200px;
-	min-height: 200px;
-	color: #333;
-	background-image: url(../icons/forms/back_opacity.png);
-	text-align: left;
-	z-index: 10000 !important;
-
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-}
-
-#feEditSimple-loading {
-	text-align: center;
-	color: white;
-	padding: 40px;
-	background: url('../icons/spinner.gif') center center no-repeat;
-	min-width: 200px;
-	max-width: 300px;
-}
-
-#feEditSimple-loading h3 {
-	color: white;
-}
-
-#feEditSimple-editWindowHeader {
-	color: white;
-	font-size: 14px;
-	padding: 10px 0;
-}
-
-#feEditSimple-editWindowContent {
-	background-color: #FFF;
-	margin: 2px;
-	padding-bottom: 10px;
-	overflow: auto;
-	min-width: 555px;
-}
-
-.feEditSimple-editControls {
-	width: 100%;
-	height: 50px;
-}
-
-#feEditSimple-overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 3420px;
-	z-index: 9000;
-	background-color: #000;
-
-	-moz-opacity: 0.5;
-	opacity: .50;
-	filter: alpha(opacity = 50);
-}
-
-/*----------------- IE6 SPECIFIC STUFF ------------------*/
-* html #feEditSimple-menuBar {
-	position: absolute;
-}
-
-* html #feEditSimple-editWindow {
-	position: absolute;
-}
-
-* html #feEditSimple-contextToolbar {
-	position: absolute;
-}
-
-* html #feEditSimple-overlay {
-	position: absolute;
-}
-
-#feEditSimple-menuBar div.feEditSimple-editPanelDiv {
-	background: none;
-	border: none;
-	min-width: 0;
-	position: static;
-}
-
-#feEditSimple-menuBar div.feEditSimple-allWrapper {
-	border: none;
-	margin-left: 12px;
-}
-
 /*------------------Modified-----------------------------------------------*/
-body {
-	margin-top: 34px;
-}
 
 div#feEditSimple-menuBar div#feEditSimple-pageEditToolbar {
 	float: left;
@@ -1559,4 +1445,155 @@ a {
 }
 .icon-fullscreen, .icon-white-fullscreen {
   background-position: -456px -144px;
+}
+
+#feeditSimple-modalBox {
+    top: 70px;
+}
+
+#feeditSimple-modalBox .modal-body  {
+    overflow: auto;
+    float: left;
+    width: 50%;
+    min-height: 400px;
+}
+
+#feeditSimple-modalBox .modal-body-left {
+    float: left;
+    width: 50%;
+    padding: 15px;
+    border-left: 1px solid;
+    min-height: 400px;
+}
+
+.modal-content {
+    padding: 10px;
+}
+
+#feeditSimple-jstree {
+    /*width:400px;
+    height:400px;*/
+}
+
+.note-editor {
+  min-height: 50px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-top: 1px blue dashed;
+}
+
+.sortable-ghost {
+    opacity:.2;
+}
+
+.feeditSimple-mainMenu a:link,a:visited{
+    text-decoration:none;
+}
+
+.note-handle {
+    display: none;
+}
+
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  -ms-filter: 'alpha(opacity=0)';
+  font-size: 200px;
+  direction: ltr;
+  cursor: pointer;
+}
+
+/* Fixes for IE < 8 */
+@media screen\9 {
+  .fileinput-button input {
+    filter: alpha(opacity=0);
+    font-size: 100%;
+    height: 100%;
+  }
+}
+
+.feeditSimple-placeHolder {
+    height:50%;
+    width: 50%;
+}
+
+#feeditSimple-jstree .folder { background:url('file_sprite.png') right bottom no-repeat; }
+#feeditSimple-jstree .file { background:url('file_sprite.png') 0 0 no-repeat; }
+#feeditSimple-jstree .file-pdf { background-position: -32px 0 }
+#feeditSimple-jstree .file-as { background-position: -36px 0 }
+#feeditSimple-jstree .file-c { background-position: -72px -0px }
+#feeditSimple-jstree .file-iso { background-position: -108px -0px }
+#feeditSimple-jstree .file-htm, #feeditSimple-jstree .file-html, #feeditSimple-jstree .file-xml, #feeditSimple-jstree .file-xsl { background-position: -126px -0px }
+#feeditSimple-jstree .file-cf { background-position: -162px -0px }
+#feeditSimple-jstree .file-cpp { background-position: -216px -0px }
+#feeditSimple-jstree .file-cs { background-position: -236px -0px }
+#feeditSimple-jstree .file-sql { background-position: -272px -0px }
+#feeditSimple-jstree .file-xls, #feeditSimple-jstree .file-xlsx { background-position: -362px -0px }
+#feeditSimple-jstree .file-h { background-position: -488px -0px }
+#feeditSimple-jstree .file-crt, #feeditSimple-jstree .file-pem, #feeditSimple-jstree .file-cer { background-position: -452px -18px }
+#feeditSimple-jstree .file-php { background-position: -108px -18px }
+#feeditSimple-jstree .file-jpg, .file-JPG, .file-JPEG, #feeditSimple-jstree .file-jpeg, #feeditSimple-jstree .file-png, #feeditSimple-jstree .file-gif, #feeditSimple-jstree .file-bmp { background-position: -126px -18px }
+#feeditSimple-jstree .file-ppt, #feeditSimple-jstree .file-pptx { background-position: -144px -18px }
+#feeditSimple-jstree .file-rb { background-position: -180px -18px }
+#feeditSimple-jstree .file-text, #feeditSimple-jstree .file-txt, #feeditSimple-jstree .file-md, #feeditSimple-jstree .file-log, #feeditSimple-jstree .file-htaccess { background-position: -254px -18px }
+#feeditSimple-jstree .file-doc, #feeditSimple-jstree .file-docx { background-position: -362px -18px }
+#feeditSimple-jstree .file-zip, #feeditSimple-jstree .file-gz, #feeditSimple-jstree .file-tar, #feeditSimple-jstree .file-rar { background-position: -416px -18px }
+#feeditSimple-jstree .file-js { background-position: -434px -18px }
+#feeditSimple-jstree .file-css { background-position: -144px -0px }
+#feeditSimple-jstree .file-fla { background-position: -398px -0px }
+
+#note-editor-noNormalContent, #note-editor-noRightContent {
+    height: 30px;
+}
+
+.slider {
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 150px !important;
+}
+
+.navbar-nav>li>a {
+    padding:5px 5px 5px 15px;
+}
+
+.navbar {
+    min-height:30px;
+}
+
+.dropdown a {
+    font-weight: 300;
+}
+
+.dropdown {
+    
+}
+
+.ui-widget-overlay { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: #aaaaaa;
+    opacity: 0.3;
+}
+
+.note-link-url {
+    width:75%;
+}
+
+.link-dialog {
+    top:70px;
+}
+
+.dropdown-submenu ul {
+    margin-left:35px;
 }

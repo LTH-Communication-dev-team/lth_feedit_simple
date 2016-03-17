@@ -20,3 +20,12 @@ CREATE TABLE lth_feedit_simple_user_sessions (
     be_user_id int(11) DEFAULT '0' NOT NULL,
     PRIMARY KEY (uid)
 );
+
+
+#
+# Table structure for table 'pages_language_overlay'
+#
+CREATE TABLE sys_file_reference (
+    imagewidth int(11) NULL,
+    imageheight int(11) NULL
+);

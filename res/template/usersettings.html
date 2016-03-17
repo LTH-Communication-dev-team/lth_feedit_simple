@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>User settings</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <form id="userSettings">
+            <div class="form-group">
+                <label for="lang">Language</label>
+                <select id="lang" class="form-control">
+                    <option value="">English</option>
+                    <option value="sv">Swedish</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="copyLevels">Recursive Copy: Enter the number of page sublevels to include, when a page is copied</label>
+                <select id="copyLevels" class="form-control">
+                    <option value="">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+            </div>
+            
+            <div class="">
+                  <input id="recursiveDelete" type="checkbox" value="1" />Recursive Delete(!): Allow ALL subpages to be deleted when deleting a page
+            </div>
+
+            <div style="margin-top:20px;">
+                <button type="button" class="btn btn-default">Save</button>
+            </div>
+        </form>
+    </body>
+</html>

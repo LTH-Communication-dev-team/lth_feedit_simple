@@ -22,10 +22,27 @@ $formToken = t3lib_div::_GP('formtoken');
 $contentToPaste = t3lib_div::_GP('contentToPaste');
 $path = t3lib_div::_GP('path');
 $sid = t3lib_div::_GP('sid');
+
 $content = array();
+
 switch($cmd) {
+    case "addFileToStorage":
+        $content = addFileToStorage($contentToPaste);
+	break;
+    case "getSysFileId":
+        $content = getSysFileId($uid);
+	break;
+     case "saveUserSettings":
+        $content = saveUserSettings($contentToPaste);
+	break;
+    case "getUserSettings":
+        $content = getUserSettings();
+	break;   
+    case "getNewId":
+        $content = getNewId($pageUid, $table);
+	break;
     case "getFiles":
-	$content = getFiles();
+	$content = getFiles($pageUid, $contentToPaste);
 	break;
     case "getPageTree":
 	$content = getPageTree();
@@ -101,12 +118,78 @@ switch($cmd) {
         break; 
 }
 
-if($cmd != 'fileupload') {
+
+if($cmd === 'getFiles') {
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($content);
+} else if($cmd != 'fileupload') {
     echo json_encode($content);
 }
 
 global $arrs;
 global $globalContent;
+
+
+function addFileToStorage($filePath)
+{
+    /*$storageRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\StorageRepository');
+    $storage = $storageRepository->findByUid(1);
+    $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => $newFile, 'crdate' => time()));
+    $fileObject = $storage->addFile($newFile, $storage->getRootLevelFolder(), 'newFile');*/
+    $fileObject = TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->retrieveFileOrFolderObject($filePath);
+}
+
+
+function getSysFileId($uid)
+{
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("uid", "sys_file", "identifier='".$uid."'");
+    $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+    $uid = $row['uid'];
+    $GLOBALS['TYPO3_DB']->sql_free_result($res);
+    
+    $returnArray = [];
+    $returnArray["uid"] = $uid;
+    return $returnArray;
+}
+
+
+function getUserSettings()
+{
+    $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+    $GLOBALS['BE_USER']->start();
+    $GLOBALS['BE_USER']->unpack_uc('');
+    //$beuserId = $GLOBALS['BE_USER']->user['uid'];
+    $lang = $GLOBALS['BE_USER']->user['lang'];
+    $recursiveDelete = $GLOBALS['BE_USER']->uc['recursiveDelete'];
+    $copyLevels = $GLOBALS['BE_USER']->uc['copyLevels'];
+    
+    $returnArray = [];
+    $returnArray["lang"] = $lang;
+    $returnArray["recursiveDelete"] = $recursiveDelete;
+    $returnArray["copyLevels"] = $copyLevels;
+    return $returnArray;
+}
+
+
+function saveUserSettings($contentToPaste)
+{
+    $contentToPasteArray = json_decode($contentToPaste, true);
+
+    $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+    $GLOBALS['BE_USER']->start();
+    //$GLOBALS['BE_USER']->unpack_uc('');
+    
+    $GLOBALS['BE_USER']->uc['recursiveDelete'] = $contentToPasteArray[1];
+    $GLOBALS['BE_USER']->uc['copyLevels'] = $contentToPasteArray[2];
+    
+    $GLOBALS['BE_USER']->writeUC();
+    
+    $beuserId = $GLOBALS['BE_USER']->user['uid'];
+    $GLOBALS['TYPO3_DB']->exec_UPDATEquery('be_users', 'uid='.intval($beuserId), array('lang' => $contentToPasteArray[0]));
+    $returnArray = [];
+    $returnArray["res"] = '200';
+    return $returnArray;
+}
 
 
 function getFormHandler($pageUid)
@@ -187,8 +270,14 @@ function getFormHandler($pageUid)
     return $returnArray;
 }
 
+function localDebug($input)
+{
+    echo '<pre>';
+    print_r($input);
+    echo '</pre>';
+}
 
-function getFiles()
+function getFiles($pageUid, $modalType)
 {
     if ($_COOKIE['be_typo_user']) {
 //        $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => PATH_t3lib, 'crdate' => time()));
@@ -203,14 +292,31 @@ function getFiles()
         $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
-        $beuserId = $GLOBALS['BE_USER']->user['uid'];
         $beuserFile_mountpoints = $GLOBALS['BE_USER']->user['file_mountpoints'];
+        $beuserDb_mountpoints = $GLOBALS['BE_USER']->user['db_mountpoints'];
         $beuserGroup = $GLOBALS['BE_USER']->user['usergroup'];
         
-        //To do: get file_mountpoins from be_user table
-        $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('sf.title, sf.path', 'be_groups b LEFT JOIN sys_filemounts sf ON FIND_IN_SET(sf.uid,b.file_mountpoints)', 'b.uid IN('.$beuserGroup.')');
+        //$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('sf.title, sf.path', 'be_groups b LEFT JOIN sys_filemounts sf ON FIND_IN_SET(sf.uid,b.file_mountpoints)', 'b.uid IN('.$beuserGroup.')');
+        /*
+         * SELECT sf.path, b.db_mountpoints AS bdbm, bg.db_mountpoints AS gdbm
+FROM be_users b 
+LEFT JOIN be_groups bg ON FIND_IN_SET(bg.uid, b.usergroup)
+LEFT JOIN sys_filemounts sf ON FIND_IN_SET(sf.uid,bg.file_mountpoints) OR FIND_IN_SET(sf.uid,b.file_mountpoints)
+WHERE b.uid=8
+         */
+        //$beuserId = 8;
+        $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("sf.path, p.uid, p.title",
+                "be_users b LEFT JOIN be_groups bg ON FIND_IN_SET(bg.uid, b.usergroup) " .
+                "LEFT JOIN sys_filemounts sf ON FIND_IN_SET(sf.uid,bg.file_mountpoints) OR FIND_IN_SET(sf.uid,b.file_mountpoints) " .
+                "LEFT JOIN pages p ON FIND_IN_SET(p.uid,b.db_mountpoints) OR FIND_IN_SET(p.uid,bg.db_mountpoints)",
+                "b.uid=" . $GLOBALS['BE_USER']->user['uid']);
+        $dbArray = array();
+        $pArray = array();
+
         while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
-            if(isset($row['path'])) {
+            $pArray[] = $row['path'];
+            $dbArray[$row['uid']] = $row['title'];
+            /*if(isset($row['path'])) {
                 $fTitle = $row['title'];
                 $fPath = $row['path'];
                 $dir = $_SERVER['DOCUMENT_ROOT'] . "/fileadmin/$fPath";
@@ -220,21 +326,107 @@ function getFiles()
                     "path" => $dir,
                     "items" => scanFiles($dir)
                 );
+            }*/
+        }
+        $pArray = array_unique(array_filter($pArray));
+        $dbArray = array_unique(array_filter($dbArray));
+        //localDebug($pArray);
+        $GLOBALS['TYPO3_DB']->sql_free_result($res);
+        
+        $storageUid = 1;
+        $useFilters = TRUE;
+        $recursive = TRUE;
+        $fileObjects = [];
+        $folderObjects = [];
+        
+        foreach($pArray as $key => $folderIdentifier) {
+            /*$dir = $_SERVER['DOCUMENT_ROOT'] . "/fileadmin$fPath";
+            $pResponse[] = array(
+                "id" => 'fileadmin' . $fPath,
+                "text" => str_replace('/','',$fPath),
+                "type" => "folder",
+                //"path" => $dir,
+                "children" => scanFiles($dir)
+            );*/
+            $fileArray[] = array('id' => rtrim($folderIdentifier, '/'), 'text' => $folderIdentifier, 'type' => 'folder', 'parent' => '#');
+
+            $fileObjects = array_merge($fileObjects, \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getStorageObject($storageUid)->getFileIdentifiersInFolder(rtrim($folderIdentifier, '/'), $useFilters, $recursive));
+            $folderObjects = array_merge($folderObjects, \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getStorageObject($storageUid)->getFolderIdentifiersInFolder(rtrim($folderIdentifier, '/'), $useFilters, $recursive));
+            
+        }
+
+        asort($folderObjects);
+        foreach($folderObjects as $key => $value) {
+            $keyArray = explode('/', rtrim($key, '/'));
+            $text = array_pop($keyArray);
+            $fileArray[] = array('id' => rtrim($key, '/'), 'text' => $text, 'type' => 'folder', 'parent' => implode('/', $keyArray));
+        }
+
+        asort($fileObjects);
+        foreach($fileObjects as $key => $value) {
+            $keyArray = explode('/', $key);
+            $text = array_pop($keyArray);
+            $fileArray[] = array('id' => $key, 'text' => $text, 'type' => 'file', 'icon' => 'glyphicon glyphicon-file', 'parent' => implode('/', $keyArray));
+        }
+        
+        if($modalType!='changeImage') {
+            foreach($dbArray as $key => $value) {
+                /*$actual_link = 'http://' . $_SERVER[HTTP_HOST] . '?id=' . $key . '&type=225&no_cache=1&sid=' . time();
+                $html = file_get_contents($actual_link);
+                //preg_match("/<body[^>]*>(.*?)<\/body>/is", $html, $matches);
+                $html = json_decode($html, true);*/
+                //array_reduce($html, 'array_merge', array());
+                //$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => $html, 'crdate' => time()));
+
+                /*$dbResponse[] = array(
+                    "id" => $key,
+                    "text" => $value,
+                    "type" => "page",
+                    "state" => array("selected" => false),
+                    "children" => $html
+                );*/
+
+                $depth = 999999;
+                $queryGenerator = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance( 'TYPO3\\CMS\\Core\\Database\\QueryGenerator' );
+                $rGetTreeList = $queryGenerator->getTreeList($key, $depth, 0, 1); //Will be a string
+                $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("uid,pid,title","pages","uid IN($rGetTreeList)");
+                while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
+                    $uid = $row['uid'];
+                    $pid = $row['pid'];
+                    $title = $row['title'];
+                    if($pid == 0) {
+                        $pid = '#';
+                    }
+                    $pageArray[] = array('id' => $uid, 'text' => $title, 'type' => 'page', 'parent' => $pid);
+                }
             }
+            $content = array_merge($fileArray, $pageArray);
+        } else {
+            $content = $fileArray;
         }
         $GLOBALS['TYPO3_DB']->sql_free_result($res);
-	//$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => $fPath, 'crdate' => time()));
-	///
-        
-        // Run the recursive function 
-        
-        $content = array(
-            "root" => $_SERVER['DOCUMENT_ROOT'],
-            "name" => "fileadmin",
+       /* $content[] = array(
+            //"root" => $_SERVER['DOCUMENT_ROOT'] . "/fileadmin/",
+            "id" => "path",
+            "text" => "fileadmin",
             "type" => "folder",
-            "path" => $_SERVER['DOCUMENT_ROOT'] . "/fileadmin/",
-            "items" => $response
-        );
+            //"path" => $_SERVER['DOCUMENT_ROOT'] . "/fileadmin/",
+            "children" => $pResponse
+        );*/
+        
+        
+        
+        //localDebug($fileArray);
+
+        /*$content[] = array(
+            //"root" => $_SERVER['DOCUMENT_ROOT'] . "/fileadmin/",
+            "id" => "pages",
+            "text" => "Pages",
+            "state" => array("selected" => false),
+            //"type" => "folder",
+            //"path" => $_SERVER['DOCUMENT_ROOT'] . "/fileadmin/",
+            "children" => $dbResponse
+        );*/
         ///
     } else {
         return false;
@@ -243,6 +435,27 @@ function getFiles()
     return $content;
 }
 
+
+function build_tree($path_list)
+{
+    $path_tree = array();
+    foreach ($path_list as $path => $id) {
+        $list = explode('/', trim($path, '/'));
+        $last_dir = &$path_tree;
+        foreach ($list as $dir) {
+            $last_dir['id'] = $dir;
+            $last_dir['text'] = $dir;
+            $last_dir['type'] = 'folder';
+            $last_dir =& $last_dir['children'][$dir];
+        }
+        //$last_dir['__title'] = $title;
+        $last_dir['id'] = $id;
+        $last_dir['text'] = $id;
+        $last_dir['type'] = 'file';
+    }
+    return $path_tree;
+}
+        
 
 function getPageTree()
 {
@@ -320,7 +533,7 @@ function deleteContent($uid)
 }
 
 
-function build_tree($file_path='', $level=0)
+/*function build_tree($file_path='', $level=0)
 {
     foreach ($arrs as $arr) {
         if ($arr['file_path'] != $file_path) {
@@ -329,7 +542,7 @@ function build_tree($file_path='', $level=0)
         }
     }
 }
-
+*/
 
 function generateToken($table, $uid, $formToken)
 {
@@ -947,9 +1160,19 @@ function deletePage($cmd, $pageUid)
             $GLOBALS['TYPO3_DB']->sql_free_result($res);
 
             if($pid) {
-                //Set deleted to 1
+                /*Set deleted to 1
                 $updateArray = array ('deleted' => 1, 'tstamp' => time());
-                $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='.intval($pageUid), $updateArray);
+                $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='.intval($pageUid), $updateArray);*/
+                if (!is_object($GLOBALS['LANG'])) {
+                    $GLOBALS['LANG'] = t3lib_div::makeInstance('language');
+                    $GLOBALS['LANG']->csConvObj = t3lib_div::makeInstance('t3lib_cs');
+                }
+                $GLOBALS['TCA']['pages'] = array('exist' => TRUE);
+                $localTCE = getLocalTCE();
+                $cmd = array();
+                $cmd['pages'][$pageUid]['delete'] = 1;
+                $localTCE->start(array(), $cmd);
+                $localTCE->process_cmdmap();
                 $returnArray['pid'] = $pid;
                 $returnArray['result'] = 200;
             } else {
@@ -1056,7 +1279,7 @@ function pastePage($cmd, $uid, $pageUid)
                 $GLOBALS['TCA']['pages']['columns']['categories']['config'] = array('type' =>  'select');
 
 
-                            $localTCE = getLocalTCE();
+                $localTCE = getLocalTCE();
                 $cmd = array();
                 $cmd['pages'][$uidToPaste][$pasteType] = $pageUid;
                 $localTCE->start(array(), $cmd, $GLOBALS['BE_USER']);
@@ -1272,7 +1495,7 @@ function logout($url)
         
         $values = array ('tx_feEditSimple_usersettings' => $_COOKIE['lth_feedit_simple_usersettings'], 'tstamp' => time());
         
-        $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('be_users', 'uid='.intval($beuserid), $values) or die("289; ".mysql_error());
+        $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('be_users', 'uid='.intval($beuserid), $values) or die("1378; ".mysql_error());
         $returnArray['url'] = $url;
         return $returnArray;
     }
@@ -1292,18 +1515,26 @@ function scanFiles($dir)
             if(is_dir($dir . '/' . $f)) {
                 // The path is a folder
                 $files[] = array(
-                    "name" => str_replace('/','',$f),
+                    "id" => str_replace('//','/', $dir . '/' . $f),
+                    //"text" => str_replace('/','',$f),
+                    "text" => $f,
                     "type" => "folder",
-                    "path" => $dir . '/' . $f,
-                    "items" => scanFiles($dir . '/' . $f) // Recursively get the contents of the folder
+                    //"path" => $dir . '/' . $f,
+                    "children" => scanFiles($dir . '/' . $f) // Recursively get the contents of the folder
                 );
             } else {
                 // It is a file
+                //$id = 'fileadmin' . array_pop(explode('fileadmin', str_replace('//','/',$dir . $f)));
+                $ext = strpos($f, '.') !== FALSE ? substr($f, strrpos($f, '.') + 1) : '';
                 $files[] = array(
-                    "name" => str_replace('/','',$f),
-                    "type" => "file",
-                    "path" => $dir . '/' . $f,
-                    "size" => filesize($dir . '/' . $f) // Gets the size of this file
+                    //"id" => str_replace('/','',$f),
+                    "id" => $f,
+                    //"text" => str_replace('/','',$f),
+                    "text" => $f,
+                    "type" => 'file',
+                    'icon' => 'file file-'.substr($f, strrpos($f,'.') + 1),
+                    //"path" => $dir . '/' . $f,
+                    //"size" => filesize($dir . '/' . $f) // Gets the size of this file
                 );
             }
         }
@@ -1313,17 +1544,24 @@ function scanFiles($dir)
 
 function scanPages($db_mountpoint)
 {
-    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('node.uid, node.title, node.lft, node.rgt, node.pid', 
+    /*$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('node.uid, node.title, node.lft, node.rgt, node.pid', 
         'pages AS node JOIN pages AS parent ON node.lft BETWEEN parent.lft AND parent.rgt',
-        'parent.uid = ' . intval($db_mountpoint) . ' AND node.deleted=0 AND node.hidden=0', '', 'node.lft', '');
+        'parent.uid = ' . intval($db_mountpoint) . ' AND node.deleted=0 AND node.hidden=0', '', 'node.lft', '');*/
+    $iPid = $db_mountpoint;
+$depth = 999999;
+$queryGenerator = \TYPO3\CMS\Linkvalidator::makeInstance( 'TYPO3\\CMS\\Linkvalidator\\LinkAnalyzer' );
+//TYPO3\CMS\Linkvalidator
+$rGetTreeList = $queryGenerator->extGetTreeList($iPid, $depth, 0, 1); //Will be a string
+$aPids = explode(',',$rGetTreeList);
         // Build array
     $treeArray = array();
-    while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
-        $uid = $row['uid'];
-        $treeArray[] = array('href' => '#', 'text' => $row['title']
+    //while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
+    foreach($aPids as $key => $value) {
+    $uid= $value[0];
+    $title = $value[1];
+        $treeArray[] = array('href' => '#', 'text' => $title
             . '<span class="icon share-icon glyphicon glyphicon-share"><a href="javascript:" onclick="parent.movePage(' . $uid . ',this);";>before</a></span>'
-            . '<span class="icon unshare-icon glyphicon glyphicon-unshare"><a href="javascript:" onclick="parent.movePage(' . $uid . ',this);";>after</a></span>',
-            'lft' => $row['lft'], 'rgt' => $row['rgt'], 'uid' => $row['uid'], 'pid' => $row['pid']);
+            . '<span class="icon unshare-icon glyphicon glyphicon-unshare"><a href="javascript:" onclick="parent.movePage(' . $uid . ',this);";>after</a></span>');
     }
     $GLOBALS['TYPO3_DB']->sql_free_result($res);
     

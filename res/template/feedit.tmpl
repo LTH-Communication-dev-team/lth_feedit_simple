@@ -6,46 +6,58 @@
 <div id="###CSSPREFIX###-container">
 ###MENU_BAR###
 </div>
+
+<div id="context-menu-no-content">
+    <ul class="dropdown-menu" role="menu">
+        <li class="dropdown-header">Content elements</li>
+        <li class="menu-item dropdown dropdown-submenu"><a href="javascript:" tabindex="-1">New content element after this</a>
+            <ul class="dropdown-menu">
+                <li><a class="feeditSimple-newcontent-textpic" href="javascript:">Text and images</a></li>
+                <!-- <li><a class="feeditSimple-newcontent-images" href="javascript:">Images only</a></li> -->
+            </ul>
+        </li>
+    </ul>
+</div>
+
 <!-- Your custom menu with dropdown-menu as default styling -->
 <div id="context-menu">
     <ul class="dropdown-menu" role="menu">
-        <li class="dropdown-header">Content elements</li>
-        <li><a tabindex="-1">Edit</a></li>
-        <li class="menu-item dropdown dropdown-submenu"><a tabindex="-1">New content element after this</a>
+        <!-- <li class="dropdown-header">Content elements</li> -->
+        <li class="menu-item dropdown dropdown-submenu"><a href="javascript:" tabindex="-1">New content element after this</a>
             <ul class="dropdown-menu">
-                <li><a class="feeditSimple-newcontent-textpic" href="#">Text and images</a></li>
-                <li><a class="feeditSimple-newcontent-images" href="#">Images only</a></li>
+                <li><a class="feeditSimple-newcontent-textpic" href="javascript:">Text and images</a></li>
+                <!-- <li><a class="feeditSimple-newcontent-images" href="javascript:">Images only</a></li> -->
             </ul>
         </li>
-        <li><a tabindex="-1">Insert image</a></li>
-        <li><a tabindex="-1">Delete</a></li>
-        <li><a tabindex="-1">Cut</a></li>
-        <li><a tabindex="-1">Copy</a></li>
-        <li><a tabindex="-1">Paste</a></li>
-        <li><a tabindex="-1">Hide</a></li>
-        <li><a tabindex="-1">Show</a></li>
-        <li class="menu-item dropdown dropdown-submenu"><a tabindex="-1">Image orientation</a>
+        <li><a href="javascript:" tabindex="-1">Insert image</a></li>
+        <li><a href="javascript:" tabindex="-1">Delete</a></li>
+       <!-- <li><a tabindex="-1">Cut</a></li>
+        <li><a href="javascript:" tabindex="-1">Copy</a></li>
+        <li><a href="javascript:" tabindex="-1">Paste</a></li>
+        <li><a href="javascript:" tabindex="-1">Hide</a></li>
+        <li><a href="javascript:" tabindex="-1">Show</a></li> -->
+        <li class="menu-item dropdown dropdown-submenu"><a href="javascript:" tabindex="-1">Image orientation</a>
             <ul id="image_orientation" class="dropdown-menu">
-                <li><a class="feeditSimple-imageorient-0" href="javascript:">Above, center</a></li>
-                <li><a class="feeditSimple-imageorient-1" href="javascript:">Above, right</a></li>
-                <li><a class="feeditSimple-imageorient-2" href="javascript:">Above, left</a></li>
-                <li><a class="feeditSimple-imageorient-8" href="javascript:">Below, center</a></li>
-                <li><a class="feeditSimple-imageorient-9" href="javascript:">Below, right</a></li>
-                <li><a class="feeditSimple-imageorient-10" href="javascript:">Below, left</a></li>
-                <li><a class="feeditSimple-imageorient-17" href="javascript:">In text, right</a></li>
-                <li><a class="feeditSimple-imageorient-18" href="javascript:">In text, left</a></li>
+                <li><a href="javascript:" class="feeditSimple-imageorient-0" href="javascript:">Above, center</a></li>
+                <li><a href="javascript:" class="feeditSimple-imageorient-1" href="javascript:">Above, right</a></li>
+                <li><a href="javascript:" class="feeditSimple-imageorient-2" href="javascript:">Above, left</a></li>
+                <li><a href="javascript:" class="feeditSimple-imageorient-8" href="javascript:">Below, center</a></li>
+                <li><a href="javascript:" class="feeditSimple-imageorient-9" href="javascript:">Below, right</a></li>
+                <li><a href="javascript:" class="feeditSimple-imageorient-10" href="javascript:">Below, left</a></li>
+                <li><a href="javascript:" class="feeditSimple-imageorient-17" href="javascript:">In text, right</a></li>
+                <li><a href="javascript:" class="feeditSimple-imageorient-18" href="javascript:">In text, left</a></li>
                 <li class="divider"></li>
-                <li><a class="feeditSimple-imageorient-25" href="javascript:">Beside Text, Right</a></li>
-                <li><a class="feeditSimple-imageorient-26" href="javascript:">Beside Text, Left</a></li>
+                <li><a href="javascript:" class="feeditSimple-imageorient-25" href="javascript:">Beside Text, Right</a></li>
+                <li><a href="javascript:" class="feeditSimple-imageorient-26" href="javascript:">Beside Text, Left</a></li>
             </ul>
         </li>
-        <li class="menu-item dropdown dropdown-submenu"><a tabindex="-1">Image quality and type</a>
+     <!--   <li class="menu-item dropdown dropdown-submenu"><a tabindex="-1">Image quality and type</a>
             <ul id="image_compression" class="dropdown-menu">
-                <li><a class="feeditSimple-image_compression-1" href="javascript:">None (ignores all other options)</a></li>
-                <li><a class="feeditSimple-image_compression-10" href="javascript:">GIF/256</a></li>
-                <li><a class="feeditSimple-image_compression-11" href="javascript:">GIF/128</a></li>
-                <li><a class="feeditSimple-image_compression-12" href="javascript:">GIF/64</a></li>
-                <li><a class="feeditSimple-image_compression-13" href="javascript:">GIF/32</a></li>
+                <li><a href="javascript:" class="feeditSimple-image_compression-1" href="javascript:">None (ignores all other options)</a></li>
+                <li><a href="javascript:" class="feeditSimple-image_compression-10" href="javascript:">GIF/256</a></li>
+                <li><a href="javascript:" class="feeditSimple-image_compression-11" href="javascript:">GIF/128</a></li>
+                <li><a href="javascript:" class="feeditSimple-image_compression-12" href="javascript:">GIF/64</a></li>
+                <li><a href="javascript:" class="feeditSimple-image_compression-13" href="javascript:">GIF/32</a></li>
                 <li><a class="feeditSimple-image_compression-14" href="javascript:">GIF/16</a></li>
                 <li><a class="feeditSimple-image_compression-15" href="javascript:">GIF/8</a></li>
                 <li><a class="feeditSimple-image_compression-39" href="javascript:">PNG</a></li>
@@ -75,28 +87,61 @@
                 <li><a class="feeditSimple-image_effects-25" href="javascript:">Brighter</a></li>
                 <li><a class="feeditSimple-image_effects-26" href="javascript:">Darker</a></li>
             </ul>
-        </li>
+        </li> -->
     </ul>
 </div>
 <input type="hidden" name="TSFE_ADMIN_PANEL[preview_showHiddenRecords]" value="1" id="TSFE_ADMIN_PANEL-preview_showHiddenRecords" />
+
 <!-- Modal -->
-<div class="modal fade" id="feeditSimple-modalBox">
-  <div class="modal-header">
-    <a class="close" data-dismiss="modal">×</a>
-    <h3>Formhandler admin</h3>
-  </div>
-  <div class="modal-body">
-  </div>
-  <div class="modal-footer">
-    <a href="#" class="btn">Close</a>
-    <a href="#" class="btn btn-primary">Save changes</a>
-  </div>
+<div class="modal fade" id="feeditSimple-modalBox" tabindex="-1" data-backdrop="static" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">×</a>
+                <h3>Edit</h3>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-body-left">
+            </div>
+            <div class="modal-footer">
+              <!--   <a href="#" class="btn">Close</a>
+                <a href="#" class="btn btn-primary">Save changes</a>
+                -->
+                <input type="hidden" id="modalType" />
+                <input type="hidden" id="chosenImage" data-src="" data-pid="" />
+            </div> 
+        </div>
+    </div>
 </div>
 
-<div id="feeditSimple-sidePanel" class="panel">
+<!-- Modal 2-->
+<div class="modal fade" id="feeditSimple-modalBox-2" tabindex="-1" data-backdrop="static" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" data-dismiss="modal">×</a>
+                <h3>Edit</h3>
+            </div>
+            <div class="modal-body" style="overflow:scroll;">
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn">Close</a>
+                <a href="#" class="btn btn-primary">Save changes</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="feeditSimple-sidePanel" class="sidepanel">
     <div class="panel-header"></div>
     <div class="panel-body"></div>
 </div>
+
+<input type="hidden" id="lth_feedit_simple-saveIds" />
+<input type="hidden" id="lth_feedit_simple-deleteIds" />
 <!-- ###MAIN_TEMPLATE### end -->
 
 
@@ -115,33 +160,35 @@
 <h1>Template, holding the menubar</h1>
 <!-- ###MENU_OPENED### begin -->
 <div class="" id="###CSSPREFIX###-menuBar">
-	<div class="navbar" style="margin-bottom:0px;">
-		<div id="" class="navbar-inner">###PAGE_EDIT_PANEL###</div>
-		<!-- ###SECTIONS_FIRST_ROW### begin -->
-			<!-- ###SECTION### begin -->
-				<div id="###SECTION_CSSID###" class="###CSSPREFIX###-menuToolbar" ###SECTION_INLINECSS###>###SECTION_ITEMS###</div>
-			<!-- ###SECTION### end -->
-			<!-- ###SINGLE_ITEM### begin -->###ITEM_SEPARATOR######ITEM_NAME###<!-- ###SINGLE_ITEM### end -->
-			<!-- ###SEPARATOR### begin --><span class="###CSSPREFIX###-separator separatorBar"></span><!-- ###SEPARATOR### end -->
-				
-		<!-- ###SECTIONS_FIRST_ROW### end -->
-		
-		<!-- ###USERLISTING### begin -->
-			<dl class="###CSSPREFIX###-menuUserlist"><dt>###USER_LABEL###</dt><dd>###USER_LIST###</dd></dl>
-		<!-- ###USERLISTING### end -->
-	</div>
-	<div id="###CSSPREFIX###-secondRow" class="###CSSPREFIX###-secondRow">
-	<!-- ###SECTIONS_SECOND_ROW### begin -->
-		Templates from first Row are used!
-	<!-- ###SECTIONS_SECOND_ROW### end-->
-	</div>
-        <div class="###CSSPREFIX###-thirdRow">
-            <form class="form-inline">
+    <div class="navbar navbar-default" style="margin-bottom:0px;">
+        <div class="container-fluid">###PAGE_EDIT_PANEL###</div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <!-- ###SECTIONS_FIRST_ROW### begin -->
+            <!-- ###SECTION### begin -->
+            <div id="###SECTION_CSSID###" class="###CSSPREFIX###-menuToolbar" ###SECTION_INLINECSS###>###SECTION_ITEMS###</div>
+            <!-- ###SECTION### end -->
+            <!-- ###SINGLE_ITEM### begin -->###ITEM_SEPARATOR######ITEM_NAME###<!-- ###SINGLE_ITEM### end -->
+            <!-- ###SEPARATOR### begin --><span class="###CSSPREFIX###-separator separatorBar"></span><!-- ###SEPARATOR### end -->
 
-            </form>
+            <!-- ###SECTIONS_FIRST_ROW### end -->
+
+            <!-- ###USERLISTING### begin -->
+                        <dl class="###CSSPREFIX###-menuUserlist"><dt>###USER_LABEL###</dt><dd>###USER_LIST###</dd></dl>
+            <!-- ###USERLISTING### end -->
         </div>
-        <div class="###CSSPREFIX###-fourthRow">
-        </div>
+    </div>
+    <div id="###CSSPREFIX###-secondRow" class="###CSSPREFIX###-secondRow">
+        <!-- ###SECTIONS_SECOND_ROW### begin -->
+            Templates from first Row are used!
+        <!-- ###SECTIONS_SECOND_ROW### end-->
+    </div>
+    <div class="###CSSPREFIX###-thirdRow">
+        <form class="form-inline">
+
+        </form>
+    </div>
+    <div class="###CSSPREFIX###-fourthRow">
+    </div>
 </div>
 <!-- ###MENU_OPENED### end -->
 

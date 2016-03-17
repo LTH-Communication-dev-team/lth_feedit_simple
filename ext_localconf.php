@@ -9,37 +9,23 @@ $TYPO3_CONF_VARS['FE']['eID_include']['lth_feedit_simple'] = 'EXT:lth_feedit_sim
 
 t3lib_extMgm::addTypoScript('lth_feedit_simple', 'setup', '
     #############################################
-    ## TypoScript added by extension "FE Editing Advanced"
+    ## TypoScript added by extension "lth_feedit_simple"
     #############################################
 
+[globalVar = GP:type = ]
     page.headTag = <head><meta http-equiv="X-UA-Compatible" content="IE=9" />
-    styles.content.get.stdWrap {
-        #prepend = TEXT
-        #prepend.value = 0
-        #prepend.dataWrap = |-pages-{TSFE:id}
-        #prepend.wrap3 = <div class="feEditSimple-firstWrapper" id="feEditSimple-firstWrapper-colPos-|"></div>
-	#prepend.required=1
-        dataWrap = <div class="connectedSortable" id="feEditSimple-normalColWrapper">|</div>
-    }
+    styles.content.get.stdWrap.dataWrap = <div class="connectedSortable" id="feEditSimple-normalColWrapper"><div style="display: none;" id="note-editor-noNormalContent">Right click here to insert content</div>|</div>
     
-    styles.content.getRight.stdWrap {
-	required=1
-        dataWrap = <div class="connectedSortable" id="feEditSimple-rightColWrapper">|</div>
-    }
-    
-    styles.content.getLeft.stdWrap {
-	required=1
-        dataWrap = <div class="connectedSortable" id="feEditSimple-leftColWrapper">|</div>
-    }
-    
+    styles.content.getRight.stdWrap.dataWrap = <div class="connectedSortable" id="feEditSimple-rightColWrapper"><div style="display: none;" id="note-editor-noRightContent">Right click here to insert content</div>|</div>
+    styles.content.getRight.stdWrap.required=1
+
+    styles.content.getLeft.stdWrap.dataWrap = <div class="connectedSortable" id="feEditSimple-leftColWrapper">|</div>
+    styles.content.getLeft.stdWrap.required=1
     
     lib.left-nav.includeNotInMenu = 1
     lib.main-nav.includeNotInMenu = 1
-
-    #styles.content.getRight.stdWrap < styles.content.get.stdWrap
-    #styles.content.getRight.stdWrap.prepend.value = 2
-
-    ', 43); // add this code AFTER the "css_styled_content" code (43) (because CSC empties styles > and would delete our changes)
+[global]
+', 43); // add this code AFTER the "css_styled_content" code (43) (because CSC empties styles > and would delete our changes)
 
 	// Settings needed to be forced for showing hidden records to work
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addUserTSConfig('
@@ -53,4 +39,17 @@ t3lib_extMgm::addTypoScript('lth_feedit_simple', 'setup', '
             }
         }
         options.enableBookmarks = 1
+');
+
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig('
+    TCEFORM.tt_content {
+        # Disable fields that specify/change image dimensions
+        imagewidth.disabled = 1
+        imageheight.disabled = 1
+        section_frame.disabled = 1
+
+        # Limit column selection
+        imagecols.keepItems = 1, 2, 3, 4
+        imagecols.types.textpic.keepItems = 1, 2
+    }
 ');

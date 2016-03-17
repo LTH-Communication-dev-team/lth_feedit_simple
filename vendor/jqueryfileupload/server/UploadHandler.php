@@ -1051,23 +1051,29 @@ class UploadHandler
         $this->destroy_image_object($file_path);
     }
 
-    protected function handle_file_upload($uploaded_file, $name, $size, $type, $error,
-            $index = null, $content_range = null) {
+    protected function handle_file_upload($uploaded_file, $name, $size, $type, $error, $index = null, $content_range = null) {
         $file = new \stdClass();
         $file->name = $this->get_file_name($uploaded_file, $name, $size, $type, $error,
             $index, $content_range);
         $file->size = $this->fix_integer_overflow((int)$size);
         $file->type = $type;
+
         if ($this->validate($uploaded_file, $file, $error, $index)) {
+
             $this->handle_form_data($file, $index);
             $upload_dir = $this->get_upload_path();
+
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, $this->options['mkdir_mode'], true);
             }
             $file_path = $this->get_upload_path($file->name);
             $append_file = $content_range && is_file($file_path) &&
                 $file->size > $this->get_file_size($file_path);
+                        
+echo $file_path;
             if ($uploaded_file && is_uploaded_file($uploaded_file)) {
+                            
+
                 // multipart/formdata uploads (POST method uploads)
                 if ($append_file) {
                     file_put_contents(

@@ -67,7 +67,6 @@ class lth_feeditsimple_newcontentelements {
 	 */
 	function init()	{
 
-
 			// Setting class files to include:
 		if (is_array($TBE_MODULES_EXT['xMOD_db_new_content_el']['addElClasses']))	{
 			$this->include_once = array_merge($this->include_once,$GLOBALS['TBE_MODULES_EXT']['xMOD_db_new_content_el']['addElClasses']);
