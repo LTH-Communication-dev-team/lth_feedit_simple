@@ -14,9 +14,9 @@ t3lib_extMgm::addTypoScript('lth_feedit_simple', 'setup', '
 
 [globalVar = GP:type = ]
     page.headTag = <head><meta http-equiv="X-UA-Compatible" content="IE=9" />
-    styles.content.get.stdWrap.dataWrap = <div class="connectedSortable" id="feEditSimple-normalColWrapper"><div style="display: none;" id="note-editor-noNormalContent">Right click here to insert content</div>|</div>
+    styles.content.get.stdWrap.dataWrap = <div class="connectedSortable" id="feEditSimple-normalColWrapper">|</div>
     
-    styles.content.getRight.stdWrap.dataWrap = <div class="connectedSortable" id="feEditSimple-rightColWrapper"><div style="display: none;" id="note-editor-noRightContent">Right click here to insert content</div>|</div>
+    styles.content.getRight.stdWrap.dataWrap = <div class="connectedSortable" id="feEditSimple-rightColWrapper">|</div>
     styles.content.getRight.stdWrap.required=1
 
     styles.content.getLeft.stdWrap.dataWrap = <div class="connectedSortable" id="feEditSimple-leftColWrapper">|</div>

@@ -576,6 +576,11 @@ div.feEditSimple-contentWrapper .formsOnPage {
 	-ms-filter: "alpha(opacity=50)";
 }
 
+.feEditSimple-hidden-0 {
+    opacity: 1;
+    -ms-filter: "alpha(opacity=100)";
+}
+
 .feEditSimple-label,
 input.feEditSimple-editButton,
 .feEditSimple-dragHandle {
@@ -1455,10 +1460,10 @@ a {
     overflow: auto;
     float: left;
     width: 50%;
-    min-height: 400px;
+    min-height: 600px;
 }
 
-#feeditSimple-modalBox .modal-body-left {
+#feeditSimple-modalBox .modal-body-right {
     float: left;
     width: 50%;
     padding: 15px;
@@ -1468,6 +1473,7 @@ a {
 
 .modal-content {
     padding: 10px;
+    modal-content: 850px;
 }
 
 #feeditSimple-jstree {
@@ -1478,7 +1484,7 @@ a {
 .note-editor {
   min-height: 50px;
   margin-top: 10px;
-  cursor: pointer;
+  cursor: text;
   border-top: 1px blue dashed;
 }
 
@@ -1596,4 +1602,8 @@ a {
 
 .dropdown-submenu ul {
     margin-left:35px;
+}
+
+.lth_feeditsimple_hidden {
+    display: none;
 }

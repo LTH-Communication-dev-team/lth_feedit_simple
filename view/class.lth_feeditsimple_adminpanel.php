@@ -90,6 +90,7 @@ class user_feeditsimple_adminpanel {
 
 	public function __construct()
 	{
+            
 	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && t3lib_div::_GP('type')!='200' && t3lib_div::_GP('type')!='225') {
 			// set up general configuration
 		if (!count($this->admPanelTSconfig)) {
@@ -142,82 +143,10 @@ class user_feeditsimple_adminpanel {
 	public function display()
 	{
 	    
-	    if ($this->disabled) {
+	    if ($this->disabled || t3lib_div::_GP('type')=='77' || t3lib_div::_GP('type')=='200') {
 		    return;
 	    }
-            /*$folderIdentifier = 'images';
-            $start = 0;
-            $maxNumberOfItems = 1000000;
-            $useFilters = TRUE;
-            $recursive = TRUE;
-            $storageUid = 1;
-            $iPid = 1;
             
-            $depth = 999999;
-$queryGenerator = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance( 'TYPO3\\CMS\\Core\\Database\\QueryGenerator' );
-$rGetTreeList = $queryGenerator->getTreeList($iPid, $depth, 0, 1); //Will be a string
-            $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("uid,pid,title","pages","uid IN($rGetTreeList)");
-            while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
-                $uid = $row['uid'];
-                $pid = $row['pid'];
-                $title = $row['title'];
-                $pageArray[] = array('id' => $uid, 'text' => $title, 'type' => '????', 'parent' => $pid);
-            }
-            echo '<pre>';
-           // $finalArray[] = array('id' => 'fileadmin', 'text' => 'fileadmin', 'type' => 'folder', 'children' => $filearray);
-           // echo json_encode($filearray);
-
-            print_r($pageArray);
-            //print_r($fileObjects);
-            //print_r($fileArray);
-            echo '</pre>';
-*/
-            //$storageRepository = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Resource\\StorageRepository');
-/*
-//$fileObjects = [];
-$fileObjects = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getStorageObject($storageUid)->getFileIdentifiersInFolder('images', $useFilters, $recursive);     
-$folderObjects = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getStorageObject($storageUid)->getFolderIdentifiersInFolder('images', $useFilters, $recursive);
-//$folderObjects['/images/'] = '/images/';
-            //$filesAndFolders = array_merge($fileObjects, $folderObjects);
-            //asort($fileObjects);
-            //$finalarray[] = $this->build_tree($fileObjects);
-                
-            $fileObjects = array_merge($fileObjects, \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getStorageObject($storageUid)->getFileIdentifiersInFolder('test', $useFilters, $recursive));
-            $folderObjects = array_merge($folderObjects, \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getStorageObject($storageUid)->getFolderIdentifiersInFolder('test', $useFilters, $recursive));
-            
-            $fileArray[] = array('id' => '/images', 'text' => 'images', 'type' => 'folder', 'parent' => '#');
-            $fileArray[] = array('id' => '/test', 'text' => 'test', 'type' => 'folder', 'parent' => '#');
-
-
-            asort($folderObjects);
-            foreach($folderObjects as $key => $value) {
-                $keyArray = explode('/', rtrim($key, '/'));
-                $text = array_pop($keyArray);
-                $fileArray[] = array('id' => rtrim($key, '/'), 'text' => $text, 'type' => 'folder', 'parent' => implode('/', $keyArray));
-            }
-            
-            asort($fileObjects);
-            foreach($fileObjects as $key => $value) {
-                $keyArray = explode('/', $key);
-                $text = array_pop($keyArray);
-                $fileArray[] = array('id' => $key, 'text' => $text, 'type' => 'file', 'parent' => implode('/', $keyArray));
-            }
- * 
- */
-            //$finalarray = $this->build_tree($fileObjects);
-            /*foreach($fileArray as $fileentry) {
-                $patharray = array_reverse(explode('/',$fileentry));
-                $thisarray = $this->scanpath($patharray);
-                $filearray = array_merge_recursive($filearray, $thisarray);
-            }*/
-            //echo '<pre>';
-           // $finalArray[] = array('id' => 'fileadmin', 'text' => 'fileadmin', 'type' => 'folder', 'children' => $filearray);
-           // echo json_encode($filearray);
-
-            //print_r($folders);
-            //print_r($fileObjects);
-            //print_r($fileArray);
-            //echo '</pre>';
 	    $beUserUid = $GLOBALS["BE_USER"]->user["uid"];
 		$be_typo_user = $_COOKIE['be_typo_user'];
 		//$res = $GLOBALS['TYPO3_DB']->sql_query("select * from pages where uid=4");
@@ -318,16 +247,13 @@ $folderObjects = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getSto
                 //'bootstrap.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap.js'),
                 
                 //bootstrap-datetimepicker
-                'datetimepicker.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/datetimepicker.css'),
-		'datetimepicker.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-datetimepicker.js'),
+                //'datetimepicker.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/datetimepicker.css'),
+		//'datetimepicker.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-datetimepicker.js'),
  
-                //x-editable (bootstrap) 
-                //'bootstrap-editable.css' => $this->getLinkTag($extPath . 'vendor/x-editable/css/bootstrap-editable.css'),
-                //'bootstrap-editable.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-editable.js'),
-                
                 //Summernote
                 'summernote.css' => $this->getLinkTag($extPath . 'vendor/summernote/summernote.css'),
                 'summernote.js' => $this->getScriptTag($extPath . 'vendor/summernote/summernote.js'),
+                //'jquery-ui.min.css' => $this->getLinkTag('fileadmin/templates/css/jquery-ui.min.css'),
                 
                 //Sortable
                 'sortable.js' => $this->getScriptTag($extPath . 'vendor/sortable/sortable.js'),
@@ -342,11 +268,7 @@ $folderObjects = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getSto
 		'wysihtml5.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/wysihtml5.js'),
                 load files needed for jquery file upload
                 */
-                 
-                //load files for bootstrap-treeview
-                //'bootstrap-treeview.css' => $this->getLinkTag($extPath . 'vendor/bootstraptreeview/css/bootstrap-treeview.css'),
-                //'bootstrap-treeview.js' => $this->getScriptTag($extPath . 'vendor/bootstraptreeview/js/bootstrap-treeview.js'),
-                
+                                 
                 //load files for jstree
                 'jstree.css' => $this->getLinkTag($extPath . 'vendor/jstree/themes/default/style.min.css'),
                 'jstree.min.js' => $this->getScriptTag($extPath . 'vendor/jstree/jstree.min.js'),
@@ -356,15 +278,17 @@ $folderObjects = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getSto
                 'jquery.iframe-transport.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.iframe-transport.js'),
                 'jquery.fileupload.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/jquery.fileupload.js'),
                 
-                //load files needed for bootstrap-contextmenu
-                'bootstrap-contextmenu.js' => $this->getScriptTag($extPath . 'vendor/bootstrapcontextmenu/bootstrap-contextmenu.js'),
+                //load files needed for jquery-contextmenu
+                'jquery.contextMenu.min.css' => $this->getLinkTag($extPath . 'vendor/jquery-contextmenu/jquery.contextMenu.min.css'),
+                'jquery.contextMenu.min.js' => $this->getScriptTag($extPath . 'vendor/jquery-contextmenu/jquery.contextMenu.min.js'),
+                'jquery.ui.position.min.js' => $this->getScriptTag($extPath . 'vendor/jquery-contextmenu/jquery.ui.position.min.js'),
                 
                 //load files needed for datatables
                 'jquery.dataTables.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/jquery.dataTables.min.css'),
                 'buttons.bootstrap.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/buttons.bootstrap.min.css'),
                 'buttons.dataTables.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/buttons.dataTables.min.css'),
                 'jquery.dataTables.min.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/jquery.dataTables.min.js'),
-                'dataTables.buttons.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/dataTables.buttons.min.js'),
+                'dataTables.buttons.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/dataTables.buttons.js'),
                 'jszip.min.js' => $this->getScriptTag('//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js'),
                 'pdfmake.min.js' => $this->getScriptTag('//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js'),
                 'vfs_fonts.js' => $this->getScriptTag('//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js'),
@@ -443,7 +367,7 @@ $folderObjects = \TYPO3\CMS\Core\Resource\ResourceFactory::getInstance()->getSto
 			}
 
 			// render new content element icons
-			$this->renderNewContentElementIcons($menuConfig, $tsMenuBar);
+			//$this->renderNewContentElementIcons($menuConfig, $tsMenuBar);
 
 			if (in_array('context', $menuConfig)) {
 				$tsContext = t3lib_div::trimExplode(',', $tsMenuBar['contextMenu']);

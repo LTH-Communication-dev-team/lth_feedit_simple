@@ -330,6 +330,7 @@
 				activeGroup = options.group;
 
 				dragStartFn = function () {
+                                    //console.log('333');
 					// Delayed drag has been triggered
 					// we can re-enable the events: touchmove/mousemove
 					_this._disableDelayedDrag();

@@ -93,6 +93,11 @@ class lth_feeditsimple_newcontentelements {
 	 * @return	void
 	 */
 	function main()	{
+            
+            if(t3lib_div::_GP('type')=='77') {
+                return false;
+            }
+            
 	    $this->init();
 
 	    $wizardItems = $this->getWizardItems();

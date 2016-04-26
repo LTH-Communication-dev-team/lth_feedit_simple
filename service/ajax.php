@@ -196,7 +196,7 @@ function getFormHandler($pageUid)
 {
     $arraySize = 0;
     $tempArray = array();
-    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid, params', 'tx_formhandler_log', 'pid='.intval($pageUid), '', '', '');
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid, params', 'tx_formhandler_log', 'pid='.intval($pageUid), '');
     $recordsTotal = $GLOBALS["TYPO3_DB"]->sql_num_rows($res);
     while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
         /*$uid = $row['uid'];
@@ -366,10 +366,10 @@ WHERE b.uid=8
         foreach($fileObjects as $key => $value) {
             $keyArray = explode('/', $key);
             $text = array_pop($keyArray);
-            $fileArray[] = array('id' => $key, 'text' => $text, 'type' => 'file', 'icon' => 'glyphicon glyphicon-file', 'parent' => implode('/', $keyArray));
+            $fileArray[] = array('id' => $key, 'text' => $text, 'type' => 'file', 'icon' => 'glyphicon glyphicon-file', 'parent' => implode('/', $keyArray), 'li_attr' => array("data-type" => "file"));
         }
         
-        if($modalType!='changeImage') {
+        //if($modalType!='changeImage') {
             foreach($dbArray as $key => $value) {
                 /*$actual_link = 'http://' . $_SERVER[HTTP_HOST] . '?id=' . $key . '&type=225&no_cache=1&sid=' . time();
                 $html = file_get_contents($actual_link);
@@ -397,13 +397,13 @@ WHERE b.uid=8
                     if($pid == 0) {
                         $pid = '#';
                     }
-                    $pageArray[] = array('id' => $uid, 'text' => $title, 'type' => 'page', 'parent' => $pid);
+                    $pageArray[] = array('id' => $uid, 'text' => $title, 'type' => 'page', 'parent' => $pid, 'li_attr' => array("data-type" => "page"));
                 }
             }
-            $content = array_merge($fileArray, $pageArray);
-        } else {
+            $content = array_merge($pageArray, $fileArray);
+        /*} else {
             $content = $fileArray;
-        }
+        }*/
         $GLOBALS['TYPO3_DB']->sql_free_result($res);
        /* $content[] = array(
             //"root" => $_SERVER['DOCUMENT_ROOT'] . "/fileadmin/",
@@ -567,7 +567,6 @@ function setClipboard($uid, $table, $contentToPaste)
         $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
-        $beuserid = $GLOBALS['BE_USER']->user['uid'];
         
         if($GLOBALS['BE_USER']->user['uid']) {
             $beuserId = intval($GLOBALS['BE_USER']->user['uid']);
@@ -593,19 +592,15 @@ function setClipboard($uid, $table, $contentToPaste)
 function getClipboard()
 {
     if ($_COOKIE['be_typo_user']) {
-        require_once (PATH_t3lib.'class.t3lib_befunc.php');
-        require_once (PATH_t3lib.'class.t3lib_userauthgroup.php');
-        require_once (PATH_t3lib.'class.t3lib_beuserauth.php');
-        require_once (PATH_t3lib.'class.t3lib_tsfebeuserauth.php');
-        
         $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
+
         if($GLOBALS['BE_USER']->user['uid']) {
             $beuserId = intval($GLOBALS['BE_USER']->user['uid']);
             $time = time();
             try {
-                $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('tx_feEditSimple_clipboard', 'be_users', 'uid=' . $beuserId);
+                $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('tx_feEditSimple_clipboard', 'be_users', 'uid=' . intval($beuserId));
                 $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
                 if(count($row) > 0) {
                     return array('result' => 200, 'content' => $row['tx_feEditSimple_clipboard']);

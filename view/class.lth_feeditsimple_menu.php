@@ -361,6 +361,7 @@ class lth_feeditsimple_menu {
 	 */
 	public function build() {
 		$this->init();
+                
 
 		$markers = array(
 			'EXTPATH'   => t3lib_extMgm::siteRelPath('lth_feedit_simple'),
