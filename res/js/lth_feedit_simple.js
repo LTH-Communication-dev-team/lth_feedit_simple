@@ -293,8 +293,8 @@ $(document).ready(function () {
     }
 
     //
-    $('.note-link-btn').prop('disabled', false);
-    $('.note-link-btn').removeClass('disabled');
+    $('.note-link-btn').prop('disabled', true);
+    $('.note-link-btn').addClass('disabled');
     $('.fancybox-enlarge img').unwrap();
     //$('.fancybox-enlarge').removeClass('fancybox-enlarge');
     $('.link-dialog').prependTo('body');
@@ -305,19 +305,30 @@ $(document).ready(function () {
         <li>To make a mail link: Type the emailaddress (e.g. webmaster@lth.se)</li>\
         <li>To make an internal link to a page or a file: Click the folder button to the rigt of the link-field below</li>\
     </ul>');
-    
 
-    $('.csc-textpic-imagewrap').mousedown(function(e){ 
-        if( e.button == 2 ) { 
+    cancelRightClick();
+
+    //Document ready ends********************************************************************************************************************
+});
+
+
+function cancelRightClick()
+{
+    $('.csc-textpic-imagewrap').mousedown(function(e) {
+        if( e.button == 2 ) {
           //$('.note-image-popover').hide();
           //console.log(e);
           return false; 
         } 
         return true; 
-    }); 
-
-    //Document ready ends********************************************************************************************************************
-});
+    });
+    $( ".csc-textpic-imagewrap" ).contextmenu(function(e) {
+        //console.log(e.button);
+        if( e.button == 2 ) {
+            return false;
+        }
+    });
+}
 
 
 function addNoContent(selector)
@@ -554,7 +565,7 @@ function makeSortable(selector, group)
 function saveChanges()
 {
     var saveIdsArray = $('#lth_feedit_simple-saveIds').val().split(',');
-    var deleteIdsArray = $('#lth_feedit_simple-deleteIds').val().split(',');
+    //var deleteIdsArray = $('#lth_feedit_simple-deleteIds').val().split(',');
 
     $(saveIdsArray).each(function (i, el) {
         //console.log(el);
@@ -667,7 +678,7 @@ function saveChanges()
                             var newId = data.responseText.split(']=edit&amp;doSave=1').shift().split('="/typo3/alt_doc.php?&amp;edit[tt_content][').pop();
                             $('#new').attr('id', 'c' + newId);
                             $('#note-editor-new').attr('id', 'note-editor-' + newId);
-                            //enableContextMenu('note-editor-' + newId);
+                            enableContextMenu('note-editor-' + newId);
                         }
                     }
                 });
@@ -929,7 +940,7 @@ function getCtype(rel)
 //get template for new content element
 function getContentTemplate(rel)
 {
-    var templateArray = {'textpic': '<div id="new" class="csc-default">\
+    var templateArray = {'textpic': '<div id="new" class="csc-default" title="">\
         <div class="lth_feeditsimple_content">New element...\
         </div>\
         </div>'
@@ -962,8 +973,7 @@ function enableContextMenu(selector)
             //window.console && console.log(m) || alert(m);
             var keyArray = key.split('_');
             var uid = $(this).attr('id').replace('note-editor-','');
-            var imageOrientationId = $(this).attr('data-imageorient');
-
+            //var imageOrientationId = $(this).attr('data-imageorient');
             feeditSimpleContentCommand(keyArray[0], uid, keyArray[1]);
         },
         items: {
@@ -972,15 +982,16 @@ function enableContextMenu(selector)
                 "icon": "add",
                 "items": {
                     "Text and images": {"name": "Text and images"}
-                }
+                },
+                "disabled": function(){ return $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }
             },
-            "Insert image": {"name": "Insert image"},
+            "Insert image_17": {"name": "Insert image", "disabled": function(){ return $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }},
             /*"Cut": {"name": "Cut"},
             "Copy": {"name": "Copy"},
             "Paste": {"name": "Paste"},*/
-            "Hide": {"name": "Hide","disabled": function(){ return $(this).hasClass('feEditSimple-hidden-1'); }},
-            "Show": {"name": "Show","disabled": function(){ return $(this).hasClass('feEditSimple-hidden-0'); }},
-            "Delete": {"name": "Delete", "icon": "delete"},
+            "Hide": {"name": "Hide","disabled": function(){ return $(this).hasClass('feEditSimple-hidden-1') || $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }},
+            "Show": {"name": "Show","disabled": function(){ return $(this).hasClass('feEditSimple-hidden-0') || $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }},
+            "Delete": {"name": "Delete", "icon": "delete", "disabled": function(){ return $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }},
             "image_orientation": {
                 "name": "Image orientation",
                 "items": {
@@ -993,8 +1004,10 @@ function enableContextMenu(selector)
                     "In text, right_17": {"name": "In text, right"},
                     "In text, left_18": {"name": "In text, left"},
                     "Beside Text, Right_25": {"name": "Beside Text, Right"},
-                    "Beside Text, Left_26": {"name": "Beside Text, Left"}             }
-            }
+                    "Beside Text, Left_26": {"name": "Beside Text, Left"}
+                },
+                "disabled": function(){ return $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }
+            },
         }
                     
     /////
@@ -1153,7 +1166,7 @@ function feeditSimpleContentCommand(cmd, uid, imageOrientationId)
             break;
         case 'Insert image':
             var okMessage = {'header': 'Image', 'message': 'Image successfully inserted'};
-            insertImage(uid, 'new', '');
+            insertImage(uid, 'new', imageOrientationId);
             break;
          case 'Text and images':
             var okMessage = {'header': 'Image', 'message': 'Content element successfully inserted'};
@@ -1185,7 +1198,6 @@ function feeditSimpleContentCommand(cmd, uid, imageOrientationId)
 
 function insertImage(uid, type, imageOrientationId)
 {
-    //console.log(uid);
     var newIndex = $('#note-editor-' + uid).find('.feeditSimple-placeHolder').length;
     if(imageOrientationId == '') {
         $('#note-editor-' + uid).attr('data-imageOrient');
@@ -1206,7 +1218,7 @@ function insertImage(uid, type, imageOrientationId)
         var content = '<div class="lth_feeditsimple_content">' + $(innerContainer).find('.lth_feeditsimple_content').html() + '</div>';
         
         var newImage = '<figure class="csc-textpic-image csc-textpic-last">\
-            <img id="new' + newIndex + '" class="feeditSimple-placeHolder" src="typo3conf/ext/lth_feedit_simple/res/icons/placeholder.png" alt="" />\
+            <img id="new' + newIndex + '" class="feeditSimple-placeHolder" style="height:100px; width:100px;" src="typo3conf/ext/lth_feedit_simple/res/icons/placeholder.png" alt="" />\
             </figure>';
         
         if(noOfImages == 0 && type == 'new') {
@@ -1264,6 +1276,7 @@ function insertImage(uid, type, imageOrientationId)
         });
         //make editable
         makeEditable('#c' + uid);
+        cancelRightClick();
     });
 }
 
@@ -1300,7 +1313,6 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                     feeditSimpleSetCookie('feeditSimple-copycutitem', 'copy:' + table + ':' + data.oldUid, 1);
                 }
             } else if (cmd === 'deleteContent' && data.result == 200) {
-                console.log(contentToPaste);
                 if($('#'+contentToPaste).find('.note-editor').length==0) {
                     addNoContent('#'+contentToPaste);
                 }
