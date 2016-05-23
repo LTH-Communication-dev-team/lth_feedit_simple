@@ -248,9 +248,9 @@ class lth_feeditsimple_menu {
                 </li> -->
 
 		<li id="" class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newTooltip').'">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:addTooltip').'">
                         <span class="icon-plus"></span>
-                        <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:new').'</span>
+                        <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:add').'</span>
                     </a>
                     <ul class="dropdown-menu">
                            <!--  <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newPageTooltip').'" href="#" onclick="newPage();return false;">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:newPage').'</a></li>
@@ -284,7 +284,7 @@ class lth_feeditsimple_menu {
                 </li>
              
                 <li id="" class="dropdown">
-                    <a id="feeditSimple-helpButton" href="#feeditSimple-sidePanel" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:helpTooltip').'");return false;" href="#">
+                    <a id="feeditSimple-helpButton" href="javascript:" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:helpTooltip').'");return false;" href="#">
                         <span class="icon-question-sign"></span>
                         <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:help').'</span>
                     </a>
@@ -327,20 +327,41 @@ class lth_feeditsimple_menu {
                 </li>
                 
                 <li id="" class="" style="padding-top:4px;margin-left:20px;">
-                    <button type="button" id="lth_feedit_simple-saveChanges" class="btn btn-success btn-xs" disabled>Save</button>
+                    <button type="button" id="lth_feedit_simple-saveChanges" class="btn btn-success btn-xs" disabled>' . $GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:saveButton').'</button>
                 </li>
                 
                 <li id="feEditSimple-logo">
                     <a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:topLogoTooltip').'" href="http://typo3.org">
                     <span class="feEditSimple-logo"></span></a>
-                    <!-- <div class="btn-group btn-toggle"> 
-    	<button class="btn btn-xs active btn-success">ON</button>
-    	<button class="btn btn-xs btn-default">OFF</button>
-    	</div> -->
                 </li>
                 
                 
             </ul>';
+                
+               /* <div class="btn-group btn-toggle"> 
+    <button class="btn btn-xs btn-default">ON</button>
+    <button class="btn btn-xs btn-primary active">OFF</button>
+  </div>
+                $content .= "<script>$('.btn-toggle').click(function() {
+        console.log('???');
+    $(this).find('.btn').toggleClass('active');  
+    
+    if ($(this).find('.btn-primary').size()>0) {
+    	$(this).find('.btn').toggleClass('btn-primary');
+    }
+    if ($(this).find('.btn-danger').size()>0) {
+    	$(this).find('.btn').toggleClass('btn-danger');
+    }
+    if ($(this).find('.btn-success').size()>0) {
+    	$(this).find('.btn').toggleClass('btn-success');
+    }
+    if ($(this).find('.btn-info').size()>0) {
+    	$(this).find('.btn').toggleClass('btn-info');
+    }
+    
+    $(this).find('.btn').toggleClass('btn-default');
+       
+});</script>";*/
             return $content;
         }
         

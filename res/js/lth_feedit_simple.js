@@ -52,6 +52,7 @@ $(document).ready(function () {
         $(this).closest('.note-editor').attr('data-orgimages', tmpData);
         $(this).attr('width','');
         $(this).attr('h','');
+        $(this).attr('data-id',$(this).attr('id'));
     });
     $('#imagesFromStart').val(tmpArray.join(','));
     //$modal.on('show', function () { ... }
@@ -82,7 +83,7 @@ $(document).ready(function () {
             
             $(this).find('.modal-body-right').append('<label>Upload files</label><ul><li>Choose a folder in the list to the left click the button below to select a file to upload</li></ul><span class="btn btn-success fileinput-button disabled">\
                     <i class="glyphicon glyphicon-plus"></i>\
-                    <span>Select files...</span>\
+                    <span>' + lth_feedit_simple_messages.select_files + '</span>\
                     <input id="jstree-fileupload" type="file" name="files[]" multiple />\
                 </span>\
                 <br>\
@@ -117,7 +118,7 @@ $(document).ready(function () {
                 },
                 success: function (data) {
                     $('.panel-body').load("/typo3conf/ext/lth_feedit_simple/res/template/usersettings.html", function () {
-                        $('.panel-header').html('<h1>User settings</h1>');
+                        $('.panel-header').html('<h1>' + lth_feedit_simple_messages.user_settings + '</h1>');
                         //console.log(data.lang + ';' + data.recursiveDelete + ';' + data.copyLevels);
                         if (data.copyLevels > 10) {
                             data.copyLevels = 10;
@@ -166,6 +167,7 @@ $(document).ready(function () {
                     $('#feeditSimple-modalBox-2 .modal-body .' + $(this).attr('class')).show(200);
                 });
                 $('#feeditSimple-modalBox-2 .modal-header').append($('#feeditSimple-modalBox-2 .modal-body .help_header'));
+                $('#feeditSimple-modalBox-2 .modal-footer').hide();
             });
         });
     });
@@ -222,17 +224,17 @@ $(document).ready(function () {
     }
 
     $('#feeditSimple-toggleHiddenElement').click(function () {
-        var okMessage = {'header': 'Show/Hide', 'message': 'Display hidden elements successfully changed'};
+        var okMessage = {'header': 'Show/Hide', 'message': lth_feedit_simple_messages.display_hidden_elements_changed};
         toggleHiddenObject('.note-editor.feEditSimple-hidden-1', 'hiddenElement', okMessage);
     });
 
     $('#feeditSimple-toggleHiddenInMenu').click(function () {
-        var okMessage = {'header': 'Show/Hide', 'message': 'Display hidden in menu successfully changed'};
+        var okMessage = {'header': 'Show/Hide', 'message': lth_feedit_simple_messages.display_hidden_in_menu_changed};
         toggleHiddenObject('.feEditSimple-hiddenInMenu-1', 'hiddenInMenu', okMessage)
     });
 
     $('#feeditSimple-toggleHiddenPage').click(function () {
-        var okMessage = {'header': 'Show/Hide', 'message': 'Display hidden pages successfully Changed'};
+        var okMessage = {'header': 'Show/Hide', 'message': lth_feedit_simple_messages.display_hidden_pages_changed};
         toggleHiddenObject('.feEditSimple-hiddenPage-1', 'hiddenPage', okMessage);
     });
 
@@ -248,19 +250,9 @@ $(document).ready(function () {
         
     $('#feeditSimple-addRightColumn').click(function () {
         if($('#feEditSimple-rightColWrapper').length > 0) {
-            alert('There is already a right column');
+            alert(lth_feedit_simple_messages.there_is_already_a_right_column);
         } else {
             $('#text_wrapper').removeClass('grid-23').addClass('grid-15');
-            /*$('#feEditSimple-normalColWrapper').after('<div class="connectedSortable" id="feEditSimple-rightColWrapper">\
-                <div id="content_sidebar_wrapper" class="grid-8 omega">\
-                <div id="content_sidebar">\
-                <div id="new" class="csc-default">\
-                <div class="lth_feeditsimple_content">New element...\
-                </div>\
-                </div>\
-                </div>\
-                </div>\
-                </div>');*/
             $('#text_wrapper').after('<div id="content_sidebar_wrapper" class="grid-8 omega">\
             <div id="content_sidebar">\
             <div class="connectedSortable" id="feEditSimple-rightColWrapper">\
@@ -314,7 +306,8 @@ $(document).ready(function () {
 
 function cancelRightClick()
 {
-    $('.csc-textpic-imagewrap').mousedown(function(e) {
+    //console.log('???');
+    $('.csc-textpic-imagewrap img').mousedown(function(e) {
         if( e.button == 2 ) {
           //$('.note-image-popover').hide();
           //console.log(e);
@@ -322,7 +315,7 @@ function cancelRightClick()
         } 
         return true; 
     });
-    $( ".csc-textpic-imagewrap" ).contextmenu(function(e) {
+    $( ".csc-textpic-imagewrap img" ).contextmenu(function(e) {
         //console.log(e.button);
         if( e.button == 2 ) {
             return false;
@@ -341,25 +334,23 @@ function addNoContent(selector)
 
 function imageClick(that)
 {
+    $('#chosenImage').attr('data-id', $(that).attr('id'));
     $('#chosenImage').attr('data-src', $(that).attr('src'));
     $('#chosenImage').css('width', $(that).css('width'));
     $('#chosenImage').css('height', $(that).css('height'));
     $('#chosenImage').attr('data-pid', $(that).closest('.note-editor').attr('id').split('-').pop());
 
-    $('.imgSlider').slider({'value':parseInt($(that).css('width'))});
+
+    $('.imgSlider').bootstrapSlider({'value':parseInt($(that).css('width'))});
     $('.imgSlider').on("slide", function(slideEvt) {
+        //console.log(slideEvt);
+        
         var chosenImageSrc = $('#chosenImage').attr('data-src');
         var chosenImageRatio = $('#chosenImage').height() / $('#chosenImage').width();
-        //console.log(chosenImageRatio);
-        $('img[src="' + chosenImageSrc + '"]').css('width', slideEvt.value);
-        $('img[src="' + chosenImageSrc + '"]').css('height', chosenImageRatio * slideEvt.value);
-        //$('.note-editor img[src="' + chosenImageSrc + '"]').parent().css({'width':slideEvt.value+'%'});
-        //$('.note-editor img[src="' + chosenImageSrc + '"]').parent().css({'height':slideEvt.value+'%'});
-        //console.log(slideEvt.value);
-    });
-    $('.imgSlider').on('slideStop', function () {
-        var chosenImageSrc = $('#chosenImage').attr('data-src');
-        addId($('img[src="' + chosenImageSrc + '"]').closest('.note-editor').attr('id').split('-').pop());
+        var chosenImageId = $('#chosenImage').attr('data-id');
+        //console.log($("img[data-type='"+chosenImageId+"']"));
+        $("img[data-id='"+chosenImageId+"']").css('width', slideEvt.value);
+        $("img[data-id='"+chosenImageId+"']").css('height', chosenImageRatio * slideEvt.value);
     });
 }
 
@@ -508,10 +499,6 @@ function sendFile(file, editor, welEditable)
 function makeSortable(selector, group)
 {
     sortable = Sortable.create(selector, {
-        /*group: {
-            name: 'feEditSimpleContentArea',
-            put: ['feEditSimpleContentElements']
-        },*/
         group: group,
         animation: 100,
         delay: 300,
@@ -537,17 +524,6 @@ function makeSortable(selector, group)
         },
         // Element is dropped into the list from another list
         onAdd: function (evt) {
-            /*var template = getContentTemplate(String(evt.item.outerHTML));
-
-            var okMessage = {'header': 'New element', 'message': 'Content element successfully created'};
-            $('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper').find('.feEditSimple-contentTypeItem').replaceWith(template);
-            makeEditable('#new');
-            $('#new').next().attr('id', 'note-editor-new');
-            makeSortable(selector);
-            if (okMessage) {
-                showMessage(okMessage);
-            }
-            $('.feEditSimple-secondRow').fadeOut();*/
             var colId = $('#' + selector).closest('.connectedSortable').attr('id');
             
             if($('#feEditSimple-normalColWrapper .note-editor').length == 0) {
@@ -646,13 +622,6 @@ function saveChanges()
                 //params["data[tt_content]["+id+"][header]"] = $('#feeditsimple-elHeader').val();
                 params["data[tt_content][" + id + "][CType]"] = 'textpic';
                 params["data[tt_content][" + id + "][_TRANSFORM_bodytext]"] = 'RTE';
-                /*params["data[tt_content][" + id + "][bodytext]"] = $('#note-editor-' + id).find('.lth_feeditsimple_content').html().replace(/(<a.*\?id\=)(.*?)(">)(.*?)(<\/a>)/g,
-                        function (match, $1, $2, $3, $4, $5) {
-                            return '<link ' + $2 + ' - internal-link "Opens internal link in current window">' + $4 + '</link>';
-                        });*/
-                /*$('#note-editor-' + id).find('.lth_feeditsimple_content').find( 'a[href*="?id="]' ).replaceWith(function(){
-        return $('<link  - internal-link "Opens internal link in current window">' + $(this).html() + "</link>");
-    });*/
                 var bodytext = $('#note-editor-' + id).find('.lth_feeditsimple_content').html();
                 bodytext = bodytext.replace(/<p>&nbsp;<\/p>/gi,'').replace(/<p><\/p>/gi, '').replace(/\n+/g, '\n').replace(/<b><b>/gi, '<b>').replace(/<\/b><\/b>/gi, '</b>');
                 //<link 1524 - internal-link "Opens internal link in current window">
@@ -663,22 +632,21 @@ function saveChanges()
                 }
                 params["formToken"] = formToken;
                 //console.log(params);
-                //http://130.235.208.15/typo3/alt_doc.php?edit[tt_content][-343]=new&defVals[tt_content][colPos]=0&defVals[tt_content][sys_language_uid]=0&returnUrl=%2Ftypo3%2Fsysext%2Fcms%2Flayout%2Fdb_layout.php%3Fid%3D6&defVals[tt_content][CType]=textpic&defVals[tt_content][imageorient]=17
                 $.ajax({
                     url: url + '&doSave=1' + extraUrl,
                     type: 'post',
                     dataType: 'json',
                     data: params,
                     complete: function (data) {
-                        //console.log('tjo');
                         $('#lth_feedit_simple-saveChanges').prop('disabled', true);
                         var okMessage = {'header': 'Save', 'message': 'Content successfully saved'};
                         showMessage(okMessage);
-                        if (id === 'new') {
+                        if (id=='new') {
                             var newId = data.responseText.split(']=edit&amp;doSave=1').shift().split('="/typo3/alt_doc.php?&amp;edit[tt_content][').pop();
                             $('#new').attr('id', 'c' + newId);
+                            //$('#note-editor-new').attr('data-imageorient', $(this).prev().attr('data-imageorient'));
                             $('#note-editor-new').attr('id', 'note-editor-' + newId);
-                            enableContextMenu('note-editor-' + newId);
+                            enableContextMenu('#note-editor-' + newId);
                         }
                     }
                 });
@@ -745,12 +713,6 @@ function jstree()
                 }
             }
         },
-        /*
-         * 'types' : {
-						'default' : { 'icon' : 'folder' },
-						'file' : { 'valid_children' : [], 'icon' : 'file' }
-					},
-         */
         "types": {
             "#": {
                 "max_children": 100,
@@ -807,8 +769,10 @@ function jstree()
                         },
                         success: function (data) {
                             //console.log($('img[src="'+newSrc+'"]'));
-                            $('img[src="fileadmin' + newSrc + '"]').attr('id', uniqid() + 'new');
+                            var newId = uniqid() + 'new';
+                            $('img[src="fileadmin' + newSrc + '"]').attr('id', newId);
                             $('img[src="fileadmin' + newSrc + '"]').attr('data-uid_local', data.uid);
+                            $('img[src="fileadmin' + newSrc + '"]').attr('data-id', newId);
                         },
                         error: function (data) {
                             alert('Something went wrong');
@@ -941,8 +905,7 @@ function getCtype(rel)
 function getContentTemplate(rel)
 {
     var templateArray = {'textpic': '<div id="new" class="csc-default" title="">\
-        <div class="lth_feeditsimple_content">New element...\
-        </div>\
+        <div contentEditable=true class="lth_feeditsimple_content" data-text="Enter text here: Please save the element to insert images etc"></div>\
         </div>'
     };
     var CType;
@@ -985,7 +948,7 @@ function enableContextMenu(selector)
                 },
                 "disabled": function(){ return $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }
             },
-            "Insert image_17": {"name": "Insert image", "disabled": function(){ return $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }},
+            "Insert image_": {"name": "Insert image", "disabled": function(){ return $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }},
             /*"Cut": {"name": "Cut"},
             "Copy": {"name": "Copy"},
             "Paste": {"name": "Paste"},*/
@@ -1009,81 +972,9 @@ function enableContextMenu(selector)
                 "disabled": function(){ return $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }
             },
         }
-                    
-    /////
-    
-          /*  "edit": {"name": "Edit", "icon": "edit"},
-            "cut": {"name": "Cut", "icon": "cut"},
-            "sep1": "---------",
-            "quit": {"name": "Quit", "icon": "quit"},
-            "sep2": "---------",
-            "fold1": {
-                "name": "Sub group", 
-                "items": {
-                    "fold1-key1": {"name": "Foo bar"},
-                    "fold2": {
-                        "name": "Sub group 2", 
-                        "items": {
-                            "fold2-key1": {"name": "alpha"},
-                            "fold2-key2": {"name": "bravo"},
-                            "fold2-key3": {"name": "charlie"}
-                        }
-                    },
-                    "fold1-key3": {"name": "delta"}
-                }
-            },
-            "fold1a": {
-                "name": "Other group", 
-                "items": {
-                    "fold1a-key1": {"name": "echo"},
-                    "fold1a-key2": {"name": "foxtrot"},
-                    "fold1a-key3": {"name": "golf"}
-                }
-            }
-        }*/
     });
-
-    /*$('.context-menu-one').on('click', function(e){
-        console.log('clicked', this);
-    })*/
 }
 
-
-/*function enableBootstrapContextMenu(content, selector, target)
-{
-    if(content) {
-        $(selector).contextmenu({
-            target: target,
-            before: function (e, context) {
-                return true;
-            },
-            onItem: function (context, e) {
-                feeditSimpleContentCommand(context, e);// execute on menu item selection
-                e.stopPropagation();
-                this.closemenu(e);
-            }
-        });
-    } else {
-        $(selector).contextmenu({
-            target: target,
-            before: function (e, context) {
-                return true;
-            },
-            onItem: function (context, e) {
-                feeditSimpleContentCommand(context, e);// execute on menu item selection
-                e.stopPropagation();
-                this.closemenu(e);
-            }
-        });
-    }
-}
-
-
-function disableBootstrapContextMenu()
-{
-    $('.csc-default').attr("disabled", true);
-}
-*/
 
 function feeditSimpleContentCommand(cmd, uid, imageOrientationId)
 {
@@ -1152,10 +1043,6 @@ function feeditSimpleContentCommand(cmd, uid, imageOrientationId)
         case 'In text, left':
         case 'Beside Text, Right':
         case 'Beside Text, Left':
-            //var imageOrientationId = e.target.className.split('-').pop();
-            //console.log(imageOrientationId);
-            //console.log(cmd.toLowerCase().replace(',','').replace(' ', '-'));
-            //var okMessage = {'header': 'Image', 'message': 'Image orientation successfully updated'};
             if($('#note-editor-' + uid).find('.csc-textpic-imagewrap').length > 0) {
                 //changeImageOrientation(cmd.toLowerCase().replace(', ', '-').replace(' ', '-'), uid, imageOrientationId);
                 var okMessage = {'header': 'Image', 'message': 'Image successfully replaces'};
@@ -1183,24 +1070,23 @@ function feeditSimpleContentCommand(cmd, uid, imageOrientationId)
                 makeSortable(document.getElementById('feEditSimple-rightColWrapper'), 'connectedSortable');
             }
             $('#note-editor-' + uid).closest('.connectedSortable').find('.note-editor-temp').remove();
-            if (okMessage) {
-                showMessage(okMessage);
-            }
-            //$('.feEditSimple-secondRow').fadeOut();
-            //e.stopPropagation();
             break;           
         default:
             //default code block
     }
-    //$('#context-menu').hide();
 }
 
 
 function insertImage(uid, type, imageOrientationId)
 {
-    var newIndex = $('#note-editor-' + uid).find('.feeditSimple-placeHolder').length;
+    //console.log(imageOrientationId + ';' + uid);
     if(imageOrientationId == '') {
-        $('#note-editor-' + uid).attr('data-imageOrient');
+        //console.log('???');
+        imageOrientationId = $('#note-editor-' + uid).attr('data-imageorient');
+        console.log(imageOrientationId);
+        if(!imageOrientationId) {
+            imageOrientationId = '17';
+        }
     }
     var noOfImages = $('#note-editor-' + uid).find('.csc-textpic-image').length;
     var innerContainer = $('#note-editor-' + uid + ' .note-editable');
@@ -1218,7 +1104,7 @@ function insertImage(uid, type, imageOrientationId)
         var content = '<div class="lth_feeditsimple_content">' + $(innerContainer).find('.lth_feeditsimple_content').html() + '</div>';
         
         var newImage = '<figure class="csc-textpic-image csc-textpic-last">\
-            <img id="new' + newIndex + '" class="feeditSimple-placeHolder" style="height:100px; width:100px;" src="typo3conf/ext/lth_feedit_simple/res/icons/placeholder.png" alt="" />\
+            <img id="new' + noOfImages + '" data-id="new' + noOfImages + '" class="feeditSimple-placeHolder" style="height:100px; width:100px;" src="typo3conf/ext/lth_feedit_simple/res/icons/placeholder.png" alt="" />\
             </figure>';
         
         if(noOfImages == 0 && type == 'new') {
@@ -1270,10 +1156,14 @@ function insertImage(uid, type, imageOrientationId)
         $(innerContainer).html(responseContent);
         $('#note-editor-' + uid).attr('data-imageorient', imageOrientationId);
 
-        $('[id="new' + newIndex + '"]').click(function () {
-            $('#chosenImage').attr('data-src', $(this).attr('src'));
-            $('#chosenImage').attr('data-pid', $(this).closest('.note-editor').attr('id').split('-').pop());    
-        });
+        //$('[id="new' + newIndex + '"]').click(function () {*/
+        if(type=='new') {
+            $('#new' + noOfImages).click(function () {
+                $('#chosenImage').attr('data-src', $(this).attr('src'));
+                $('#chosenImage').attr('data-pid', $(this).closest('.note-editor').attr('id').split('-').pop());
+                imageClick($(this));
+            });
+        }
         //make editable
         makeEditable('#c' + uid);
         cancelRightClick();
@@ -1304,8 +1194,6 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                 $('#c' + pid).next().after(data.content);
                 var uidArray = uid.split(':');
                 makeEditable('#c' + uidArray.pop(), '');
-                //$('#feEditSimple-normalColWrapper, #feEditSimple-rightColWrapper').sortable('refresh');
-                //makeSortable(document.getElementById('feEditSimple-normalColWrapper'), 'connectedSortable');
                 if($('#feEditSimple-rightColWrapper').length > 0) {
                     makeSortable(document.getElementById('feEditSimple-rightColWrapper'), 'connectedSortable');
                 }
@@ -1326,15 +1214,10 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                         $('#note-editor-' + uid).hide();
                     }
                 }
-
-                //$('#note-editor-' + uid).css('opacity', '0.5');
-                //$('#note-editor-' + uid).css('-ms-filter', 'alpha(opacity=50)');
-            } else if (cmd === 'showContent' && data.result == 200) {
+             } else if (cmd === 'showContent' && data.result == 200) {
                 $('#note-editor-' + uid).removeClass('feEditSimple-hidden-1');
                 $('#note-editor-' + uid).addClass('feEditSimple-hidden-0');
-                //$('#note-editor-' + uid).css('opacity', '1');
-                //$('#note-editor-' + uid).css('-ms-filter', 'alpha(opacity=100)');
-            } else if (cmd === 'pastePageAfter' || cmd === 'pastePageInto') {
+             } else if (cmd === 'pastePageAfter' || cmd === 'pastePageInto') {
                 if (data.oldUid) {
                     feeditSimpleSetCookie('feeditSimple-copycutpage', 'copy:pages:' + data.oldUid, 1);
                 } else {
@@ -1419,22 +1302,34 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                 $('#feeditSimple-modalBox-2 .modal-footer').html('');
 
                 $('#feeditSimple-formhandlerTable').DataTable({
-                    /*"aaData": data.data,
-                     "aoColumns": [ resultColumns ],
-                     "sPaginationType": "full_numbers",
-                     "aaSorting": [[0, "asc"]],
-                     "bJQueryUI": true,
-                     "bDestroy": true,*/
                     "aaData": data.data,
                     "aoColumns": resultColumns,
                     dom: 'Bfrtip',
                     buttons: [
-                        'copyHtml5',
-                        'excelHtml5',
-                        'csvHtml5',
-                        'pdfHtml5'
+                        {
+                            extend: 'collection',
+                            text: 'Export',
+                            buttons: [
+                                'excel',
+                                'csv'
+                            ]
+                        },
+                        'colvis'
                     ]
                 });
+                
+                /*
+                 * buttons: ['copyHtml5',
+                        'excelHtml5',
+                        'csvHtml5',
+                        'pdfHtml5',
+                        'colvis'
+                        {
+                            extend: 'colvis',
+                            //columns: ':not(:first-child)'
+                        }
+                    ]
+                 */
 
                 $("#feeditSimple-modalBox-2").modal({
                     persist: true,
@@ -1447,14 +1342,12 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
 
                 $("#feeditSimple-modalBox-2").on('shown', function () {
                     var tableWidth = $('#feeditSimple-formhandlerTable').width() + 50;
-                    //var tableHeight = $('#feeditSimple-formhandlerTable').height()+200;
                     if (!tableWidth) {
                         tableWidth = '800';
                         //tableHeight = '800';
                     }
                     $(this).css('width', tableWidth + 'px');
                     //console.log($(this).find('.modal-body'));
-                    //$(this).find('.dataTables_wrapper').css('height', tableHeight + 'px');
                 });
             } else if (cmd === 'getImgId') {
                 //console.log(contentToPaste);
@@ -1466,9 +1359,7 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
 
             if (data.result == 200 && okMessage) {
                 showMessage(okMessage);
-            } /*else if (okMessage) {
-                showMessage({message: '500' + cmd + data.result, header: '1671'});
-            }*/
+            }
         },
         error: function (err) {
             console.log(err);

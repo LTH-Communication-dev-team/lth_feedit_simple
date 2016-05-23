@@ -8,7 +8,7 @@
  * (Styles for the editing forms inside the lightbox are located in
  * fe_formsOnPage.css)
  */
-body {
+body, #lu_header_wrapper {
     padding-top: 32px;
 }
 
@@ -1496,6 +1496,10 @@ a {
     text-decoration:none;
 }
 
+.feeditSimple-mainMenu .dropdown-menu {
+    font-size:12px;
+}
+
 .note-handle {
     display: none;
 }
@@ -1526,10 +1530,10 @@ a {
   }
 }
 
-.feeditSimple-placeHolder {
+/*.feeditSimple-placeHolder {
     height:50%;
     width: 50%;
-}
+}*/
 
 #feeditSimple-jstree .folder { background:url('file_sprite.png') right bottom no-repeat; }
 #feeditSimple-jstree .file { background:url('file_sprite.png') 0 0 no-repeat; }
@@ -1607,3 +1611,13 @@ a {
 .lth_feeditsimple_hidden {
     display: none;
 }
+
+[contentEditable=true]:empty:not(:focus):before{
+    content:attr(data-text)
+}
+
+.help_start td {
+    padding:20px;
+}
+
+.btn-primary{color:#fff;background-color:#337ab7;border-color:#2e6da4}.btn-primary.focus,.btn-primary:focus{color:#fff;background-color:#286090;border-color:#122b40}.btn-primary:hover{color:#fff;background-color:#286090;border-color:#204d74}

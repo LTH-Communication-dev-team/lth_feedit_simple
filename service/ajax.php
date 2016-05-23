@@ -232,18 +232,21 @@ function getFormHandler($pageUid)
         unset($tempArray['step-2-next']);
         unset($tempArray['submitField']);
         unset($tempArray['submitted']);
-        $columnsArray[] = array_keys($tempArray);
+        if(is_array($tempArray)) $columnsArray[] = array_keys($tempArray);
         $dataArray[] = $tempArray;
         
     }
-
+    
     $tempArray = array();
-    $columnsArray = array_unique($columnsArray);
-    $columnsArray = array_filter($columnsArray);
-    $dataArray = array_filter($dataArray);
-    foreach($columnsArray as $cKey => $cValue) {
-        $columnsArray = $cValue;
-    }    
+    if($columnsArray) {
+        
+        $columnsArray = array_unique($columnsArray);
+        $columnsArray = array_filter($columnsArray);
+        $dataArray = array_filter($dataArray);
+        foreach($columnsArray as $cKey => $cValue) {
+            $columnsArray = $cValue;
+        }
+    }
 
     $dataTempArray = array();
     foreach($dataArray as $aKey => $aValue) {
@@ -296,20 +299,11 @@ function getFiles($pageUid, $modalType)
         $beuserDb_mountpoints = $GLOBALS['BE_USER']->user['db_mountpoints'];
         $beuserGroup = $GLOBALS['BE_USER']->user['usergroup'];
         
-        //$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('sf.title, sf.path', 'be_groups b LEFT JOIN sys_filemounts sf ON FIND_IN_SET(sf.uid,b.file_mountpoints)', 'b.uid IN('.$beuserGroup.')');
-        /*
-         * SELECT sf.path, b.db_mountpoints AS bdbm, bg.db_mountpoints AS gdbm
-FROM be_users b 
-LEFT JOIN be_groups bg ON FIND_IN_SET(bg.uid, b.usergroup)
-LEFT JOIN sys_filemounts sf ON FIND_IN_SET(sf.uid,bg.file_mountpoints) OR FIND_IN_SET(sf.uid,b.file_mountpoints)
-WHERE b.uid=8
-         */
-        //$beuserId = 8;
         $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("sf.path, p.uid, p.title",
                 "be_users b LEFT JOIN be_groups bg ON FIND_IN_SET(bg.uid, b.usergroup) " .
                 "LEFT JOIN sys_filemounts sf ON FIND_IN_SET(sf.uid,bg.file_mountpoints) OR FIND_IN_SET(sf.uid,b.file_mountpoints) " .
                 "LEFT JOIN pages p ON FIND_IN_SET(p.uid,b.db_mountpoints) OR FIND_IN_SET(p.uid,bg.db_mountpoints)",
-                "b.uid=" . $GLOBALS['BE_USER']->user['uid']);
+                "b.uid=" . $GLOBALS['BE_USER']->user['uid'] . ' OR b.uid=5');
         $dbArray = array();
         $pArray = array();
 
@@ -399,12 +393,19 @@ WHERE b.uid=8
                     }
                     $pageArray[] = array('id' => $uid, 'text' => $title, 'type' => 'page', 'parent' => $pid, 'li_attr' => array("data-type" => "page"));
                 }
+                $GLOBALS['TYPO3_DB']->sql_free_result($res);
             }
-            $content = array_merge($pageArray, $fileArray);
+            if($pageArray && $fileArray) {
+                $content = array_merge($pageArray, $fileArray);
+            } elseif($pageArray) {
+                $content = $pageArray;
+            } elseif($fileArray) {
+                $content = $fileArray;
+            }
         /*} else {
             $content = $fileArray;
         }*/
-        $GLOBALS['TYPO3_DB']->sql_free_result($res);
+        
        /* $content[] = array(
             //"root" => $_SERVER['DOCUMENT_ROOT'] . "/fileadmin/",
             "id" => "path",

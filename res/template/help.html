@@ -27,33 +27,9 @@ and open the template in the editor.
                         </tr>
                         <tr>
                             <td><a class="help_show_hide_content" href="javascript:">Gömma och visa innehåll</a></td>
-                            <td><a class="help_goto_backend" href="javascript:">Gå till Typo3 backend</a></td>
+                            <td><a class="help_formhandler" href="javascript:">Formhandler admin</a></td>
+                            <td><a class="help_goto_backend" href="javascript:">Öppna Typo3 backend</a></td>
                             <td><a class="help_loginout" href="javascript:">Logga in/ut</a></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
                         </tr>
                     </tbody>
                 </table>
@@ -170,6 +146,7 @@ and open the template in the editor.
                         <li>Högerklicka på ett innehållselement och välj "Infoga innehåll efter detta"</li>
                         <li>Välj text med bild; ett nytt element skapas under detta</li>
                         <li>När något ändrats blir knappen "Spara" i verktygsraden aktiv. Klicka för att spara.</li>
+                        <li><b>OBS! För att kunna lägga in bilder måste du först spara</b></li>
                         <li><b>Radera innehåll</b></li>
                         <li>Högerklicka på ett innehållselement och välj "Radera innehåll"</li>
                         <li>Svara ok i dialogrutan som kommer upp; elementet tas bort</li>
@@ -208,7 +185,7 @@ and open the template in the editor.
             <div class="help_move_content lth_feeditsimple_hidden">
                 <h2>Flytta innehåll</h2>
                 <div>
-                    <img src="typo3conf/ext/lth_feedit_simple/res/images/movecontent.gif" style="width:427px;height:97px;" alt=""/>
+                    <!-- <img src="typo3conf/ext/lth_feedit_simple/res/images/movecontent.gif" style="width:427px;height:97px;" alt=""/> -->
                 </div>
                 <div>
                     <ul>
@@ -239,6 +216,25 @@ and open the template in the editor.
                     </ul>
                 </div>
             </div>
+            <div class="help_goto_backend lth_feeditsimple_hidden">
+                <h2>Öppna Typo3 backend</h2>
+                <div>
+                    <ul>
+                        <li>Klicka på ditt användarnamn i toppmenyn</li>
+                        <li>Välj "Öppna Typo3 backend i menyn.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="help_formhandler lth_feeditsimple_hidden">
+                <h2>Formhandler manager</h2>
+                <div>
+                    <ul>
+                        <li>Klicka på ditt användarnamn i toppmenyn</li>
+                        <li>Välj "Öppna Formhandler manager i menyn verktyg.</li>
+                        <li>OBS Alternativet är bara aktivt om det finns något formhandler formulär på sidan</li>
+                    </ul>
+                </div>
+            </div>            
         </div>
     </body>
 </html>

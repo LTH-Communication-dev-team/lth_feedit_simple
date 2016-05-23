@@ -25,6 +25,8 @@
                         <label index="pageShowPageInMenu">Show Page in Menu</label>
 			<label index="pageShowPageInMenuTooltip">Set the visibility in menu of this page to display.</label>
                          
+                        <label index="add">Add</label>
+                        <label index="newTooltip">Add right column.</label>
                         <label index="new">New</label>
 			<label index="newTooltip">Create new page, content element or news item.</label>
                         <label index="newPage">New Page</label>
@@ -148,7 +150,9 @@
                         <label index="pageShowPageInMenu">Visa sidan i menyn</label>
                         <label index="pageShowPageInMenuTooltip">"Visa denna sida i menyn.</label>
                          
-                        <label index="new">Lägg till</label>
+                        <label index="add">Lägg till</label>
+                        <label index="addTooltip">Lägg till högerkolumn.</label>
+                        <label index="new">Nytt</label>
 			<label index="newTooltip">Skapa ny sida, innehållselement eller nyhet.</label>
                         <label index="newPage">Ny sida</label>
 			<label index="newPageTooltip">Skapa en ny sida inuti den befintliga sidan.</label>

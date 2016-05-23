@@ -91,7 +91,7 @@ class user_feeditsimple_adminpanel {
 	public function __construct()
 	{
             
-	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && t3lib_div::_GP('type')!='200' && t3lib_div::_GP('type')!='225') {
+	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && t3lib_div::_GP('type')!='200' && t3lib_div::_GP('type')!='77') {
 			// set up general configuration
 		if (!count($this->admPanelTSconfig)) {
 			$this->admPanelTSconfig = t3lib_BEfunc::getModTSconfig($GLOBALS['TSFE']->id, 'admPanel');
@@ -148,7 +148,7 @@ class user_feeditsimple_adminpanel {
 	    }
             
 	    $beUserUid = $GLOBALS["BE_USER"]->user["uid"];
-		$be_typo_user = $_COOKIE['be_typo_user'];
+            $be_typo_user = $_COOKIE['be_typo_user'];
 		//$res = $GLOBALS['TYPO3_DB']->sql_query("select * from pages where uid=4");
 		//$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'table', 'uid='.intval($uid), 'groupby', 'orderby', 'limit') or die('175; '.mysql_error());
 		/**try {
@@ -160,7 +160,16 @@ class user_feeditsimple_adminpanel {
 			
 		    }
 		//$res = $GLOBALS['TYPO3_DB']->sql_query("CALL sp_logError('".$var1."', '".$var2."')");
-**/
+            **/
+            
+            //Language
+            $syslang = $GLOBALS['TSFE']->config['config']['language'];
+            if(!$syslang) {
+                $syslang = 'en';
+            }
+            if($syslang=='se') {
+                $syslang='sv';
+            }
 
 	    // loading template
 	    $templateFile = $this->modTSconfig['properties']['skin.']['templateFile'];
@@ -178,7 +187,7 @@ class user_feeditsimple_adminpanel {
 		    // @todo	This code runs after content has been created,
 		    // thus we cannot insert data into the head using the page renderer.  Are there any other options?
 	    if ($this->menuOpen) {
-		    $markers['INCLUDES'] = $this->getIncludes();
+		    $markers['INCLUDES'] = $this->getIncludes($syslang);
 	    } else {
 		    $markers['INCLUDES'] = $this->getLinkTag(t3lib_extMgm::siteRelPath('lth_feedit_simple') . 'res/css/fe_edit_closed.css');
 	    }
@@ -236,7 +245,7 @@ class user_feeditsimple_adminpanel {
 	  * Gets the CSS and Javascript includes needed for the top panel
 	  * @return		void
 	  */
-        protected function getIncludes()
+        protected function getIncludes($syslang)
 	{
 	    $extPath = t3lib_extMgm::siteRelPath('lth_feedit_simple');
 	    $includes = array(
@@ -293,6 +302,7 @@ class user_feeditsimple_adminpanel {
                 'pdfmake.min.js' => $this->getScriptTag('//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js'),
                 'vfs_fonts.js' => $this->getScriptTag('//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js'),
                 'buttons.html5.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/buttons.html5.min.js'),
+                'buttons.colVis.min.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/buttons.colVis.min.js'),
                 
                 //load files needed for jquery panelslider
                 'jquery.panelslider.min.js' => $this->getScriptTag($extPath . 'vendor/jquery-panelslider/jquery.panelslider.min.js'),
@@ -307,6 +317,7 @@ class user_feeditsimple_adminpanel {
                 // load files needed for extension itself
                 'lth_feedit_simple.css' => $this->getLinkTag($extPath . 'res/css/lth_feedit_simple.css'), 		
 		'lth_feedit_simple.js' => $this->getScriptTag($extPath . 'res/js/lth_feedit_simple.js'),
+                'lth_feedit_simple_lang' => $this->getScriptTag($extPath . 'res/js/lth_feedit_simple_lang_' . $syslang . '.js')
 	    );
             return implode(chr(10), $includes);
         }
