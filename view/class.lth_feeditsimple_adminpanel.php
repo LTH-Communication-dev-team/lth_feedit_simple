@@ -90,8 +90,9 @@ class user_feeditsimple_adminpanel {
 
 	public function __construct()
 	{
-            
+           
 	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && t3lib_div::_GP('type')!='200' && t3lib_div::_GP('type')!='77') {
+                
 			// set up general configuration
 		if (!count($this->admPanelTSconfig)) {
 			$this->admPanelTSconfig = t3lib_BEfunc::getModTSconfig($GLOBALS['TSFE']->id, 'admPanel');
@@ -126,7 +127,7 @@ class user_feeditsimple_adminpanel {
 	 */
 	public static function showMenuBar($params, $parent)
 	{
-	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && t3lib_div::_GP('type')!='200' && t3lib_div::_GP('type')!='225') {
+	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && t3lib_div::_GP('type')!='200' && t3lib_div::_GP('type')!='77') {
 		$adminPanel = t3lib_div::makeInstance('user_feeditsimple_adminpanel');
 		$feEditContent = self::processAbsRefPrefix($parent, $adminPanel->display());
 		$parent->content = str_replace('</body>', $feEditContent . '</body>', $parent->content);
@@ -142,7 +143,6 @@ class user_feeditsimple_adminpanel {
 	    */
 	public function display()
 	{
-	    
 	    if ($this->disabled || t3lib_div::_GP('type')=='77' || t3lib_div::_GP('type')=='200') {
 		    return;
 	    }

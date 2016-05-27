@@ -22,8 +22,8 @@ t3lib_extMgm::addTypoScript('lth_feedit_simple', 'setup', '
     styles.content.getLeft.stdWrap.dataWrap = <div class="connectedSortable" id="feEditSimple-leftColWrapper">|</div>
     styles.content.getLeft.stdWrap.required=1
     
-    lib.left-nav.includeNotInMenu = 1
-    lib.main-nav.includeNotInMenu = 1
+    #lib.left-nav.includeNotInMenu = 1
+    #lib.main-nav.includeNotInMenu = 1
 [global]
 ', 43); // add this code AFTER the "css_styled_content" code (43) (because CSC empties styles > and would delete our changes)
 
@@ -33,9 +33,9 @@ t3lib_extMgm::addTypoScript('lth_feedit_simple', 'setup', '
             enable.edit = 1
             hide = 1
             override {
-                preview = 1
-                preview.showHiddenPages = 1
-                preview.showHiddenRecords = 1
+                #preview = 1
+                #preview.showHiddenPages = 1
+                #preview.showHiddenRecords = 1
             }
         }
         options.enableBookmarks = 1
