@@ -571,7 +571,7 @@ div.feEditSimple-contentWrapper .formsOnPage {
 }
 
 .feEditSimple-hiddenElement .feEditSimple-contentWrapper,
-.hidden .formsOnPage, .feEditSimple-hidden-1 {
+.hidden .formsOnPage, .feEditSimple-hidden-1, .feEditSimple-hiddenInMenu-1, .feEditSimple-hiddenPage-1 {
 	opacity: 0.5;
 	-ms-filter: "alpha(opacity=50)";
 }

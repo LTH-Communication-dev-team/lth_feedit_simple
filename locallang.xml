@@ -48,12 +48,19 @@
                                                 
                         <label index="displayTooltip">Display.</label>
                         <label index="display">Display</label>
-                        <label index="displayHiddenContentTooltip">Display hidden content elements.</label>
-                        <label index="displayHiddenContent">Display hidden Content elements</label>
-                        <label index="displayHiddenInMenuTooltip">Display pages hidden in menu.</label>
-                        <label index="displayHiddenInMenu">Display sidor hidden in menu</label>
-                        <label index="displayHiddenPageTooltip">Display hidden pages.</label>
-                        <label index="displayHiddenPage">Display hidden pages</label>
+                        <label index="displayHiddenContentNoneTooltip">Display hidden content elements.</label>
+                        <label index="displayHiddenContentNone">Display hidden Content elements</label>
+                        <label index="displayHiddenInMenuNoneTooltip">Display pages hidden in menu.</label>
+                        <label index="displayHiddenInMenuNone">Display sidor hidden in menu</label>
+                        <label index="displayHiddenPageNoneTooltip">Display hidden pages.</label>
+                        <label index="displayHiddenPageNone">Display hidden pages</label>
+                        
+                        <label index="displayHiddenContentBlockTooltip">Hide hidden content elements.</label>
+                        <label index="displayHiddenContentBlock">Hide hidden Content elements</label>
+                        <label index="displayHiddenInMenuBlockTooltip">Hide pages hidden in menu.</label>
+                        <label index="displayHiddenInMenuBlock">Hide sidor hidden in menu</label>
+                        <label index="displayHiddenPageBlockTooltip">Hide hidden pages.</label>
+                        <label index="displayHiddenPageBlock">Hide hidden pages</label>
                         
                         <label index="help">Help</label>
 			<label index="helpTooltip">Display help.</label>
@@ -173,12 +180,19 @@
                         
                         <label index="displayTooltip">Visa.</label>
                         <label index="display">Visa</label>
-                        <label index="displayHiddenContentTooltip">Visa gömda innehållselement.</label>
-                        <label index="displayHiddenContent">Visa gömda innehållselement</label>
-                        <label index="displayHiddenInMenuTooltip">Visa sidor gömda i meny.</label>
-                        <label index="displayHiddenInMenu">Visa sidor gömda i meny</label>
-                        <label index="displayHiddenPageTooltip">Visa gömda sidor.</label>
-                        <label index="displayHiddenPage">Visa gömda sidor</label>
+                        <label index="displayHiddenContentNoneTooltip">Visa gömda innehållselement.</label>
+                        <label index="displayHiddenContentNone">Visa gömda innehållselement</label>
+                        <label index="displayHiddenInMenuNoneTooltip">Visa sidor gömda i meny.</label>
+                        <label index="displayHiddenInMenuNone">Visa sidor gömda i meny</label>
+                        <label index="displayHiddenPageNoneTooltip">Visa gömda sidor.</label>
+                        <label index="displayHiddenPageNone">Visa gömda sidor</label>
+                                                
+                        <label index="displayHiddenContentBlockTooltip">Dölj gömda innehållselement.</label>
+                        <label index="displayHiddenContentBlock">Dölj gömda innehållselement</label>
+                        <label index="displayHiddenInMenuBlockTooltip">Dölj sidor gömda i meny.</label>
+                        <label index="displayHiddenInMenuBlock">Dölj sidor gömda i meny</label>
+                        <label index="displayHiddenPageBlockTooltip">Dölj gömda sidor.</label>
+                        <label index="displayHiddenPageBlock">Dölj gömda sidor</label>
                                                 
                         <label index="help">Hjälp</label>
 			<label index="helpTooltip">Visa hjälp.</label>

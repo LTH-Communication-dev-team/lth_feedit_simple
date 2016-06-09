@@ -26,6 +26,9 @@ $sid = t3lib_div::_GP('sid');
 $content = array();
 
 switch($cmd) {
+    case "updateFeUserSettings":
+        updateFeUserSettings($contentToPaste);
+	break;
     case "addFileToStorage":
         $content = addFileToStorage($contentToPaste);
 	break;
@@ -168,6 +171,16 @@ function getUserSettings()
     $returnArray["recursiveDelete"] = $recursiveDelete;
     $returnArray["copyLevels"] = $copyLevels;
     return $returnArray;
+}
+
+
+function updateFeUserSettings($contentToPaste)
+{
+    $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+    $GLOBALS['BE_USER']->start();
+    
+    $beuserId = $GLOBALS['BE_USER']->user['uid'];
+    $GLOBALS['TYPO3_DB']->exec_UPDATEquery('be_users', 'uid='.intval($beuserId), array('tx_feEditSimple_usersettings' => $contentToPaste, 'tstamp' => time()));
 }
 
 

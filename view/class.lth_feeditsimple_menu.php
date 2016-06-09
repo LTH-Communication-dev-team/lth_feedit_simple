@@ -123,6 +123,7 @@ class lth_feeditsimple_menu {
 	 * @todo	Any reason this isn't a constructor?
 	 */
 	public function init() {
+
 		$this->cObj = t3lib_div::makeInstance('tslib_cObj');
 		$this->pid  = intval($GLOBALS['TSFE']->id);
 		$this->modTSconfig = t3lib_BEfunc::getModTSconfig($this->pid, 'FeEdit');
@@ -166,6 +167,14 @@ class lth_feeditsimple_menu {
         
         function insertMenu()
         {
+            /*if(!$feeditsimpleUsersettings) {
+                $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("tx_feEditSimple_usersettings", "be_users", "uid=" . intval($GLOBALS['BE_USER']->user['uid']));
+                $row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res);
+                $feeditsimpleUsersettings = $row['tx_feEditSimple_usersettings'];
+                $GLOBALS['TYPO3_DB']->sql_free_result($res);    
+            }*/
+            
+
             $pageUid = $GLOBALS['TSFE']->id;
             $userSettingsArray = array();
             if(isset($_COOKIE['feeditSimple-usersettings'])) {
@@ -185,9 +194,9 @@ class lth_feeditsimple_menu {
                         echo 'Message: ' .$e->getMessage();
                     }
                 } else {
-                    $userSettingsArray["hiddenElement"] = "none";
-                    $userSettingsArray["hiddenInMenu"] = "none";
-                    $userSettingsArray["hiddenPage"] = "none";
+                    $userSettingsArray["hiddenElement"] = "None";
+                    $userSettingsArray["hiddenInMenu"] = "None";
+                    $userSettingsArray["hiddenPage"] = "None";
                     $feeditsimpleUsersettings = json_encode($userSettingsArray);
                     try {
                         setcookie("feeditSimple-usersettings", $feeditsimpleUsersettings, "0", "/");
@@ -277,9 +286,9 @@ class lth_feeditsimple_menu {
                         <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:display').'</span>
                     </a>
                         <ul class="dropdown-menu">
-                            <li><a id="feeditSimple-toggleHiddenElement" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenContentTooltip').'" href="javascript:"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenContent').'</span><span id="hiddenElement" style="display:' . str_replace('block','inline-block',$userSettingsArray['hiddenElement']) . '" class="icon-ok"></span></a></li>
-                            <li><a id="feeditSimple-toggleHiddenInMenu" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenInMenuTooltip').'" href="javascript:"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenInMenu').'</span><span id="hiddenInMenu" style="display:' . str_replace('block','inline-block',$userSettingsArray['hiddenInMenu']) . '" class="icon-ok"></span></a></li>
-                            <li><a id="feeditSimple-toggleHiddenPage" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenPageTooltip').'" href="javascript:"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenPage').'</span><span id="hiddenPage" style="display:' . str_replace('block','inline-block',$userSettingsArray['hiddenPage']) . '" class="icon-ok"></a></li>
+                            <li><a id="feeditSimple-toggleHiddenElement" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenContent'.$userSettingsArray['hiddenElement'].'Tooltip').'" href="javascript:"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenContent'.$userSettingsArray['hiddenElement']).'</span></a></li>
+                            <li><a id="feeditSimple-toggleHiddenInMenu" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenInMenu'.$userSettingsArray['hiddenInMenu'].'Tooltip').'" href="javascript:"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenInMenu'.$userSettingsArray['hiddenInMenu']).'</span></a></li>
+                            <li><a id="feeditSimple-toggleHiddenPage" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenPage'.$userSettingsArray['hiddenPage'].'Tooltip').'" href="javascript:"><span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:displayHiddenPage'.$userSettingsArray['hiddenPage']).'</span></a></li>
                         </ul>
                 </li>
              
@@ -336,9 +345,11 @@ class lth_feeditsimple_menu {
                 </li>
                 
                 
-            </ul>';
+            </ul>
+		<input type="hidden" name="TSFE_ADMIN_PANEL[preview_showHiddenPages]" value="' . ($GLOBALS['BE_USER']->uc['TSFE_adminConfig']['preview_showHiddenPages'] ? 1 : 0) . '" id="preview_showHiddenPages" />
+		<input type="hidden" name="TSFE_ADMIN_PANEL[preview_showHiddenRecords]" value="' . ($GLOBALS['BE_USER']->uc['TSFE_adminConfig']['preview_showHiddenRecords'] ? 1 : 0) . '" id="preview_showHiddenRecords" />';
                 
-               /* <div class="btn-group btn-toggle"> 
+                /* <div class="btn-group btn-toggle"> 
     <button class="btn btn-xs btn-default">ON</button>
     <button class="btn btn-xs btn-primary active">OFF</button>
   </div>

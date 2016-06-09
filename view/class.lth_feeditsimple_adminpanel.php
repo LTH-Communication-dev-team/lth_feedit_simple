@@ -90,7 +90,9 @@ class user_feeditsimple_adminpanel {
 
 	public function __construct()
 	{
-           
+            /*
+             * http://vkans-th0.kansli.lth.se/index.php?id=9&TSFE_ADMIN_PANEL%5BDUMMY%5D=310202&TSFE_ADMIN_PANEL%5Bdisplay_top%5D=1&TSFE_ADMIN_PANEL%5Bdisplay_preview%5D=1&TSFE_ADMIN_PANEL%5Bpreview_showHiddenPages%5D=0&TSFE_ADMIN_PANEL%5Bpreview_showHiddenPages%5D=1&TSFE_ADMIN_PANEL%5Bpreview_showHiddenRecords%5D=0&TSFE_ADMIN_PANEL%5Bpreview_showHiddenRecords%5D=1&TSFE_ADMIN_PANEL%5Bpreview_simulateDate%5D_hr=&TSFE_ADMIN_PANEL%5Bpreview_simulateDate%5D=&TSFE_ADMIN_PANEL%5Bpreview_simulateUserGroup%5D=0&TSFE_ADMIN_PANEL%5Bdisplay_cache%5D=&TSFE_ADMIN_PANEL%5Bdisplay_edit%5D=&TSFE_ADMIN_PANEL%5Bdisplay_tsdebug%5D=&TSFE_ADMIN_PANEL%5Bdisplay_info%5D=#0
+             */
 	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && t3lib_div::_GP('type')!='200' && t3lib_div::_GP('type')!='77') {
                 
 			// set up general configuration

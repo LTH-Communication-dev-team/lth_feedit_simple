@@ -4,14 +4,6 @@ $(document).ready(function () {
 
     makeEditable('.csc-default.textpic, .csc-default.text');
 
-    /*var el = document.getElementById('feEditSimple-contentTypeToolbar');
-    var sortable = Sortable.create(el, {
-        group: {
-            name: 'feEditSimpleContentElements',
-            pull: 'clone'
-        },
-        animation: 100
-    });*/
     //makeSortable(document.getElementById('feEditSimple-contentTypeToolbar'));
     makeSortable(document.getElementById('feEditSimple-normalColWrapper'), 'connectedSortable');
     if($('#feEditSimple-rightColWrapper').length > 0) {
@@ -225,7 +217,8 @@ $(document).ready(function () {
 
     $('#feeditSimple-toggleHiddenElement').click(function () {
         var okMessage = {'header': 'Show/Hide', 'message': lth_feedit_simple_messages.display_hidden_elements_changed};
-        toggleHiddenObject('.note-editor.feEditSimple-hidden-1', 'hiddenElement', okMessage);
+        //toggleHiddenObject('.note-editor.feEditSimple-hidden-1', 'hiddenElement', okMessage);
+        toggleHiddenObject($(this).text(), 'hiddenElement', okMessage);
     });
 
     $('#feeditSimple-toggleHiddenInMenu').click(function () {
@@ -240,13 +233,13 @@ $(document).ready(function () {
 
     
     if($('.Tx-Formhandler').length > 0) {
-            $('#feeditSimple-formHandler').click(function () {
-                ajaxCall('getFormHandler', '', '', '', $('body').attr('id'), '', '');
-            });
-        } else {
-            $('#feeditSimple-formHandler').prop('disabled', true);
-            $('#feeditSimple-formHandler').css('opacity', '0.5');
-        }
+        $('#feeditSimple-formHandler').click(function () {
+            ajaxCall('getFormHandler', '', '', '', $('body').attr('id'), '', '');
+        });
+    } else {
+        $('#feeditSimple-formHandler').prop('disabled', true);
+        $('#feeditSimple-formHandler').css('opacity', '0.5');
+    }
         
     $('#feeditSimple-addRightColumn').click(function () {
         if($('#feEditSimple-rightColWrapper').length > 0) {
@@ -266,20 +259,56 @@ $(document).ready(function () {
     });    
 
     //hide och show hidden content elements at startup
+    /*
+     * 
+     * 
+     */
     var displayString = feeditSimpleGetCookie('feeditSimple-usersettings');
     if (displayString) {
         var displayObject = JSON.parse(unescape(displayString));
-        if (displayObject['hiddenElement'] === 'none') {
-            $('.note-editor.feEditSimple-hidden-1').hide();
+        var preview_showHiddenPages = $('#preview_showHiddenPages').val();
+        var preview_showHiddenRecords = $('#preview_showHiddenRecords').val();
+        
+        //console.log(displayObject['hiddenElement'] + preview_showHiddenRecords);
+        if(displayObject['hiddenElement'] === 'Block' && preview_showHiddenRecords === '0') {
+            //$('#preview_showHiddenRecords').val('1');
+            var params = {};
+            console.log('275a');
+            params["TSFE_ADMIN_PANEL[preview_showHiddenRecords]"] = '1';
+            $.ajax({
+                type: "POST",
+                url: "/",
+                data: params,
+                success: function(){    
+                    location.reload();   
+                }
+            });
         }
-        if (displayObject['hiddenInMenu'] === 'none') {
-            $('.feEditSimple-hiddenInMenu-1').hide();
-        } else {
+
+        if(displayObject['hiddenPage'] === 'Block' && preview_showHiddenPages === '0') {
+            //$('#preview_showHiddenPages').val('1');
+            //location.reload(true);
+            var params = {};
+            console.log('290a');
+            params["TSFE_ADMIN_PANEL[preview_showHiddenPages]"] = '1';
+            $.ajax({
+                type: "POST",
+                url: "/",
+                data: params,
+                success: function(){    
+                    location.reload();   
+                }
+            });
+        }
+        
+        if (displayObject['hiddenElement'] === 'None') {
+            //$('.note-editor.feEditSimple-hidden-1').hide();
+        }
+        if (displayObject['hiddenInMenu'] === 'Block') {
+            $('.feEditSimple-hiddenInMenu-1').show(200);
             $('.feEditSimple-hiddenInMenu-1 a').append('<span class="icon-eye-close"></span>');
         }
-        if (displayObject['hiddenPage'] === 'none') {
-            $('.feEditSimple-hiddenPage-1').hide();
-        } else {
+        if (displayObject['hiddenPage'] === 'Block') {
             $('.feEditSimple-hiddenPage-1 a').append('<span class="icon-ban-circle"></span>');
         }
     }
@@ -1369,9 +1398,62 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
 }
 
 
-function toggleHiddenObject(inputClass, myType, okMessage)
+function convertNoneBlock(string)
 {
+    var output;
+    output = string.replace('Block', '1');
+    output = string.replace('None', '0');
+    return output;
+}
+
+
+function toggleHiddenObject(label, myType, okMessage)
+{
+    //console.log('???');
+    //http://vkans-th0.kansli.lth.se/index.php?id=9&TSFE_ADMIN_PANEL%5BDUMMY%5D=310202&TSFE_ADMIN_PANEL%5Bdisplay_top%5D=1&TSFE_ADMIN_PANEL%5Bdisplay_preview%5D=1&TSFE_ADMIN_PANEL%5Bpreview_showHiddenPages%5D=0&TSFE_ADMIN_PANEL%5Bpreview_showHiddenPages%5D=1&TSFE_ADMIN_PANEL%5Bpreview_showHiddenRecords%5D=0&TSFE_ADMIN_PANEL%5Bpreview_showHiddenRecords%5D=1&TSFE_ADMIN_PANEL%5Bpreview_simulateDate%5D_hr=&TSFE_ADMIN_PANEL%5Bpreview_simulateDate%5D=&TSFE_ADMIN_PANEL%5Bpreview_simulateUserGroup%5D=0&TSFE_ADMIN_PANEL%5Bdisplay_cache%5D=&TSFE_ADMIN_PANEL%5Bdisplay_edit%5D=&TSFE_ADMIN_PANEL%5Bdisplay_tsdebug%5D=&TSFE_ADMIN_PANEL%5Bdisplay_info%5D=#0
     var displayString = feeditSimpleGetCookie('feeditSimple-usersettings');
+    var displayObject = JSON.parse(unescape(displayString));
+        
+    if (displayString) {
+        var showHiddenPages, showHiddenRecords;
+        if (displayObject[myType] == 'None' && myType === 'hiddenPage') {
+            showHiddenPages = '1';
+            displayObject[myType] = 'Block';
+            showHiddenRecords = convertNoneBlock(displayObject['hiddenElement']);
+        } else if(displayObject[myType] == 'Block' && myType === 'hiddenPage') {
+            showHiddenPages = '0';
+            displayObject[myType] = 'None';
+            showHiddenRecords = convertNoneBlock(displayObject['hiddenElement']);;
+        } else if(displayObject[myType] == 'None' && myType === 'hiddenElement') {
+            showHiddenRecords = '1';
+            displayObject[myType] = 'Block';
+            showHiddenPages = convertNoneBlock(displayObject['hiddenPage']);;
+        } else if(displayObject[myType] == 'Block' && myType === 'hiddenElement') {
+            showHiddenRecords = '0';
+            displayObject[myType] = 'None';
+            showHiddenPages = convertNoneBlock(displayObject['hiddenPage']);
+        } else if(displayObject[myType] == 'None' && myType === 'hiddenInMenu') {
+            displayObject[myType] = 'Block';
+        } else if(displayObject[myType] == 'Block' && myType === 'hiddenInMenu') {
+            displayObject[myType] = 'None';
+        }
+        
+        feeditSimpleSetCookie('feeditSimple-usersettings', JSON.stringify(displayObject), 0);
+        var pageId = $('body').attr('id');
+        var url = 'index.php?id=' + pageId + '&TSFE_ADMIN_PANEL%5Bdisplay_preview%5D=1&TSFE_ADMIN_PANEL%5Bpreview_showHiddenPages%5D='+showHiddenPages+'&TSFE_ADMIN_PANEL%5Bpreview_showHiddenRecords%5D='+showHiddenRecords;
+        
+        ajaxCall('updateFeUserSettings','pages','','','','',JSON.stringify(displayObject));
+        
+        $.ajax({
+            type: "POST",
+            url: url,
+            //data: infoPO,
+            success: function(){    
+                location.reload();
+            }
+        });
+    }
+    /*var displayString = feeditSimpleGetCookie('feeditSimple-usersettings');
     if (displayString) {
         var displayObject = JSON.parse(unescape(displayString));
         //console.log(inputClass+','+myType + ',' + displayObject[myType]);
@@ -1410,7 +1492,7 @@ function toggleHiddenObject(inputClass, myType, okMessage)
         //showMessage(okMessage);
     } else {
 
-    }
+    }*/
 }
 
 

@@ -7,13 +7,23 @@ $TYPO3_CONF_VARS['SC_OPTIONS']['tslib/class.tslib_fe.php']['contentPostProc-outp
 	// Add AJAX support
 $TYPO3_CONF_VARS['FE']['eID_include']['lth_feedit_simple'] = 'EXT:lth_feedit_simple/service/ajax.php';
 
+/*\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
+    'lth.' . $_EXTKEY
+);*/
+
+$feeditsimpleUsersettings = $_COOKIE['feeditSimple-usersettings'];
+$userSettingsArray = json_decode($feeditsimpleUsersettings, TRUE);
+
+//login hook
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processCmdmapClass'][] = 'LTH\\get_menu\\Hooks\\ProcessCmdmap';
+$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['postUserLookUp'][] = 'LTH\\lth_feedit_simple\\Hooks\\ProcessCmdmap->postUserLookUp';
+
 t3lib_extMgm::addTypoScript('lth_feedit_simple', 'setup', '
     #############################################
     ## TypoScript added by extension "lth_feedit_simple"
     #############################################
-
+    
 [globalVar = GP:type = ]
-    page.headTag = <head><meta http-equiv="X-UA-Compatible" content="IE=9" />
     styles.content.get.stdWrap.dataWrap = <div class="connectedSortable" id="feEditSimple-normalColWrapper">|</div>
     
     styles.content.getRight.stdWrap.dataWrap = <div class="connectedSortable" id="feEditSimple-rightColWrapper">|</div>
@@ -32,11 +42,11 @@ t3lib_extMgm::addTypoScript('lth_feedit_simple', 'setup', '
         admPanel {
             enable.edit = 1
             hide = 1
-            override {
+            #override {
                 #preview = 1
                 #preview.showHiddenPages = 1
                 #preview.showHiddenRecords = 1
-            }
+            #}
         }
         options.enableBookmarks = 1
 ');
