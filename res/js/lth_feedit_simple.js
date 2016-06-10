@@ -1,5 +1,5 @@
 $(document).ready(function () {
-        
+            
     $('.csc-textpic-text').children().unwrap();
 
     makeEditable('.csc-default.textpic, .csc-default.text');

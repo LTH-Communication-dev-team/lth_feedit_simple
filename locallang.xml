@@ -271,10 +271,14 @@
 			<label index="pageTooltip">Ändra, flytta eller radera sidan.</label>
 			<label index="pageEditPage">Ändra sidans egenskaper</label>
 			<label index="pageEditPageTooltip">Ändra sidans egenskaper.</label>
-                        <label index="pageMovePage">Flytta sidan</label>
-			<label index="pageMovePageTooltip">Flytta sidan.</label>
+                        <label index="pageCutPage">Klipp ut sidan</label>
+			<label index="pageCutPageTooltip">Klipp ut denna sida.</label>
                         <label index="pageCopyPage">Kopiera sidan</label>
-			<label index="pageCopyPageTooltip">Kopiera sidan.</label>
+			<label index="pageCopyPageTooltip">Kopiera denna sida.</label>
+                        <label index="pagePastePageAfter">Klistra in efter</label>
+			<label index="pagePastePageAfterTooltip">Klistra in sidan efter den nuvarande.</label>
+                        <label index="pagePastePageInto">Klistra in inuti</label>
+			<label index="pagePastePageIntoTooltip">Klistra in sidan inuti den nuvarande.</label> 
                         <label index="pageDeletePage">Radera sidan</label>
 			<label index="pageDeletePageTooltip">Radera sidan.</label>
                         <label index="pageHidePage">Göm sidan</label>
@@ -286,7 +290,9 @@
                         <label index="pageShowPageInMenu">Visa sidan i menyn</label>
                         <label index="pageShowPageInMenuTooltip">"Visa denna sida i menyn.</label>
                          
-                        <label index="new">Lägg till</label>
+                        <label index="add">Lägg till</label>
+                        <label index="addTooltip">Lägg till högerkolumn.</label>
+                        <label index="new">Nytt</label>
 			<label index="newTooltip">Skapa ny sida, innehållselement eller nyhet.</label>
                         <label index="newPage">Ny sida</label>
 			<label index="newPageTooltip">Skapa en ny sida inuti den befintliga sidan.</label>
@@ -307,12 +313,19 @@
                         
                         <label index="displayTooltip">Visa.</label>
                         <label index="display">Visa</label>
-                        <label index="displayHiddenContentTooltip">Visa gömda innehållselement.</label>
-                        <label index="displayHiddenContent">Visa gömda innehållselement</label>
-                        <label index="displayHiddenInMenuTooltip">Visa sidor gömda i meny.</label>
-                        <label index="displayHiddenInMenu">Visa sidor gömda i meny</label>
-                        <label index="displayHiddenPageTooltip">Visa gömda sidor.</label>
-                        <label index="displayHiddenPage">Visa gömda sidor</label>
+                        <label index="displayHiddenContentNoneTooltip">Visa gömda innehållselement.</label>
+                        <label index="displayHiddenContentNone">Visa gömda innehållselement</label>
+                        <label index="displayHiddenInMenuNoneTooltip">Visa sidor gömda i meny.</label>
+                        <label index="displayHiddenInMenuNone">Visa sidor gömda i meny</label>
+                        <label index="displayHiddenPageNoneTooltip">Visa gömda sidor.</label>
+                        <label index="displayHiddenPageNone">Visa gömda sidor</label>
+                                                
+                        <label index="displayHiddenContentBlockTooltip">Dölj gömda innehållselement.</label>
+                        <label index="displayHiddenContentBlock">Dölj gömda innehållselement</label>
+                        <label index="displayHiddenInMenuBlockTooltip">Dölj sidor gömda i meny.</label>
+                        <label index="displayHiddenInMenuBlock">Dölj sidor gömda i meny</label>
+                        <label index="displayHiddenPageBlockTooltip">Dölj gömda sidor.</label>
+                        <label index="displayHiddenPageBlock">Dölj gömda sidor</label>
                                                 
                         <label index="help">Hjälp</label>
 			<label index="helpTooltip">Visa hjälp.</label>
@@ -352,6 +365,9 @@
 			<label index="upIcon">Upp</label>
 			<label index="upTitle">Flytta detta up.</label>
                         
+                        <label index="hideContentElementsRowTooltip">Göm infoga innehållselement.</label>
+                        <label index="hideContentElementsRow">Göm infoga innehållselement</label>
+                        
                         <label index="saveButton">Spara</label>
 			<label index="saveCloseButton">Spara &amp; Stäng</label>
 			<label index="closeButton">Stäng</label>
@@ -378,6 +394,8 @@
 			<label index="js.cutNotification">Cutting content</label>
 			<label index="js.pasteNotification">Pasting content</label>
 			<label index="js.updatingContent">Updating content</label>
+                        
+                        <label index="tx_ttnewshtml_code">HTML-kod</label>
               
 		</languageKey>
 	</data>

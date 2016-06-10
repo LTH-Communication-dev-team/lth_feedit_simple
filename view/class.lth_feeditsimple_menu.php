@@ -174,7 +174,6 @@ class lth_feeditsimple_menu {
                 $GLOBALS['TYPO3_DB']->sql_free_result($res);    
             }*/
             
-
             $pageUid = $GLOBALS['TSFE']->id;
             $userSettingsArray = array();
             if(isset($_COOKIE['feeditSimple-usersettings'])) {

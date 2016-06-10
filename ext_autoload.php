@@ -5,6 +5,6 @@
 $extensionPath = t3lib_extMgm::extPath('lth_feedit_simple');
 return array(
     'lth_feeditsimple_adminpanel' => $extensionPath . 'view/class.lth_feeditsimple_adminpanel.php',
-    'lth_feeditsimple_menu' => $extensionPath . 'view/class.lth_feeditsimple_menu.php',
-    'lth_feeditsimple_newcontentelements' => $extensionPath . 'view/class.lth_feeditsimple_newcontentelements.php',
+    'lth_feeditsimple_menu' => $extensionPath . 'view/class.lth_feeditsimple_menu.php'/*,
+    'lth_feeditsimple_newcontentelements' => $extensionPath . 'view/class.lth_feeditsimple_newcontentelements.php',*/
 );
