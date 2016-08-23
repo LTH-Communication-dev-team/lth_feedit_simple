@@ -54,8 +54,8 @@ t3lib_extMgm::addTypoScript('lth_feedit_simple', 'setup', '
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig('
     TCEFORM.tt_content {
         # Disable fields that specify/change image dimensions
-        imagewidth.disabled = 1
-        imageheight.disabled = 1
+        #imagewidth.disabled = 1
+        #imageheight.disabled = 1
         section_frame.disabled = 1
 
         # Limit column selection
