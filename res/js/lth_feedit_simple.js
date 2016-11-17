@@ -1112,7 +1112,7 @@ function insertImage(uid, type, imageOrientationId)
     if(imageOrientationId == '') {
         //console.log('???');
         imageOrientationId = $('#note-editor-' + uid).attr('data-imageorient');
-        console.log(imageOrientationId);
+        //console.log(imageOrientationId);
         if(!imageOrientationId) {
             imageOrientationId = '17';
         }

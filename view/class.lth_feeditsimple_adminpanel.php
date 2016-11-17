@@ -295,7 +295,7 @@ class user_feeditsimple_adminpanel {
                 'jquery.ui.position.min.js' => $this->getScriptTag($extPath . 'vendor/jquery-contextmenu/jquery.ui.position.min.js'),
                 
                 //load files needed for datatables
-                'jquery.dataTables.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/jquery.dataTables.min.css'),
+                /*'jquery.dataTables.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/jquery.dataTables.min.css'),
                 'buttons.bootstrap.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/buttons.bootstrap.min.css'),
                 'buttons.dataTables.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/buttons.dataTables.min.css'),
                 'jquery.dataTables.min.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/jquery.dataTables.min.js'),
@@ -304,7 +304,7 @@ class user_feeditsimple_adminpanel {
                 'pdfmake.min.js' => $this->getScriptTag('//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js'),
                 'vfs_fonts.js' => $this->getScriptTag('//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js'),
                 'buttons.html5.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/buttons.html5.min.js'),
-                'buttons.colVis.min.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/buttons.colVis.min.js'),
+                'buttons.colVis.min.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/buttons.colVis.min.js'),*/
                 
                 //load files needed for jquery panelslider
                 'jquery.panelslider.min.js' => $this->getScriptTag($extPath . 'vendor/jquery-panelslider/jquery.panelslider.min.js'),
