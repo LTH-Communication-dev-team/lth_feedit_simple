@@ -1711,7 +1711,7 @@
 							if(!dat[i].children) {
 								dat[i].children = [];
 							}
-							m[dat[i].id.toString()] = dat[i];
+							if(dat[i].id) m[dat[i].id.toString()] = dat[i];
 						}
 						// 2) populate children (foreach)
 						for(i = 0, j = dat.length; i < j; i++) {
