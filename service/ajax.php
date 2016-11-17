@@ -366,14 +366,14 @@ function getFiles($pageUid, $modalType)
         foreach($folderObjects as $key => $value) {
             $keyArray = explode('/', rtrim($key, '/'));
             $text = array_pop($keyArray);
-            if($id) $fileArray[] = array('id' => rtrim($key, '/'), 'text' => $text, 'type' => 'folder', 'parent' => implode('/', $keyArray));
+            $fileArray[] = array('id' => rtrim($key, '/'), 'text' => $text, 'type' => 'folder', 'parent' => implode('/', $keyArray));
         }
 
         asort($fileObjects);
         foreach($fileObjects as $key => $value) {
             $keyArray = explode('/', $key);
             $text = array_pop($keyArray);
-            if($id) $fileArray[] = array('id' => $key, 'text' => $text, 'type' => 'file', 'icon' => 'glyphicon glyphicon-file', 'parent' => implode('/', $keyArray), 'li_attr' => array("data-type" => "file"));
+            $fileArray[] = array('id' => $key, 'text' => $text, 'type' => 'file', 'icon' => 'glyphicon glyphicon-file', 'parent' => implode('/', $keyArray), 'li_attr' => array("data-type" => "file"));
         }
         
         //if($modalType!='changeImage') {
@@ -404,7 +404,7 @@ function getFiles($pageUid, $modalType)
                     if($pid == 0) {
                         $pid = '#';
                     }
-                    if($id) $pageArray[] = array('id' => $uid, 'text' => $title, 'type' => 'page', 'parent' => $pid, 'li_attr' => array("data-type" => "page"));
+                    $pageArray[] = array('id' => $uid, 'text' => $title, 'type' => 'page', 'parent' => $pid, 'li_attr' => array("data-type" => "page"));
                 }
                 $GLOBALS['TYPO3_DB']->sql_free_result($res);
             }
