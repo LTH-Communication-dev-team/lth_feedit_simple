@@ -1715,7 +1715,7 @@
 						}
 						// 2) populate children (foreach)
 						for(i = 0, j = dat.length; i < j; i++) {
-							m[dat[i].parent.toString()].children.push(dat[i].id.toString());
+							if(m[dat[i].parent.toString()]) m[dat[i].parent.toString()].children.push(dat[i].id.toString());
 							// populate parent.children_d
 							p.children_d.push(dat[i].id.toString());
 						}
