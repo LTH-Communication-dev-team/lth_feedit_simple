@@ -282,7 +282,7 @@ class user_feeditsimple_adminpanel {
                                  
                 //load files for jstree
                 'jstree.css' => $this->getLinkTag($extPath . 'vendor/jstree/themes/default/style.min.css'),
-                'jstree.min.js' => $this->getScriptTag($extPath . 'vendor/jstree/jstree.js'),
+                'jstree.min.js' => $this->getScriptTag($extPath . 'vendor/jstree/jstree.min.js'),
                 
                 //load files for jquery fileupload
                 'jquery.ui.widget.js' => $this->getScriptTag($extPath . 'vendor/jqueryfileupload/js/vendor/jquery.ui.widget.js'),
