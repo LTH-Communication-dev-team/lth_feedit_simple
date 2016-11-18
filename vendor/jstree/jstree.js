@@ -1740,10 +1740,12 @@
 						// Flat JSON support (for easy import from DB):
 						// 1) convert to object (foreach)
 						for(i = 0, j = dat.length; i < j; i++) {
+                                                    try {
 							if(!dat[i].children) {
 								dat[i].children = [];
 							}
 							m[dat[i].id.toString()] = dat[i];
+                                                        }catch(e){}
 						}
 						// 2) populate children (foreach)
 						for(i = 0, j = dat.length; i < j; i++) {
