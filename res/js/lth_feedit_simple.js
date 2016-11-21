@@ -58,7 +58,15 @@ $(document).ready(function () {
     });
     
     $("#feeditSimple-modalBox").on('show.bs.modal', function (e) {
-            
+        var header, imageList;
+        if($('.note-link-url').is(':visible')) {
+            $(this).find("li[data-type='page']").css('display','block');
+            header = 'Link browser';
+            imageList = false;
+        } else {
+            header = 'Image browser';
+            imageList = true;
+        }
         if ($('#feeditSimple-jstree').length === 0) {
             $(this).find('.modal-body').append('<input type="text" value="" style="box-shadow:inset 0 0 4px #eee; width:120px; margin:0; padding:6px 12px; border-radius:4px; border:1px solid silver; font-size:1.1em;" id="jstree_q" placeholder="Search" />\
                 <div style="padding:15px;" id="container" role="main">\
@@ -71,7 +79,7 @@ $(document).ready(function () {
                 </div>\
             </div>');
             //$(this).find('.modal-body').prepend('<ul><li><a href="#"><i class="jstree-icon jstree-themeicon" role="presentation"></i>Web pages</a></li></ul>');
-            $(this).find('.modal-header').append('<h3>Link browser</h3>');
+            $(this).find('.modal-header').append('<h3>' + header + '</h3>');
             
             $(this).find('.modal-body-right').append('<label>Upload files</label><ul><li>Choose a folder in the list to the left click the button below to select a file to upload</li></ul><span class="btn btn-success fileinput-button disabled">\
                     <i class="glyphicon glyphicon-plus"></i>\
@@ -91,6 +99,8 @@ $(document).ready(function () {
             
             //jstree($('#modalType').val());
             jstree();
+        } else {
+            toggleNonImages(imageList);     
         }
     });
 
@@ -714,9 +724,13 @@ function array_unique(list)
 
 function jstree()
 {
+    var imageList;
     if($('.note-link-url').is(':visible')) {
-            $(this).find("li[data-type='page']").css('display','block');
-        }
+        $(this).find("li[data-type='page']").css('display','block');
+        imageList = false;
+    } else {
+        imageList = true;
+    }
     //console.log(modalType);
     var to = false;
     $('#jstree_q').keyup(function () {
@@ -833,7 +847,23 @@ function jstree()
                 uploadFile($("#feeditSimple-jstree").jstree("get_selected"));
             }
         });
+    }).on('after_open.jstree', function (e, data) {
+        toggleNonImages(imageList);
     });
+}
+
+
+function toggleNonImages(imageList)
+{
+    if(imageList) {
+        $("[id$='.pdf']").hide();
+        $("[id$='.doc']").hide();
+        $("[id$='.docx']").hide();
+    } else {
+        $("[id$='.pdf']").show();
+        $("[id$='.doc']").show();
+        $("[id$='.docx']").show();
+    }   
 }
 
 
