@@ -374,8 +374,9 @@ function addNoContent(selector)
 function imageClick(that)
 {
     var pid = $(that).closest('.note-editor').attr('id').split('-').pop();
-
-    $('#chosenImage').attr('data-id', $(that).attr('id'));
+    var id = $(that).attr('id');
+    
+    $('#chosenImage').attr('data-id', id);
     $('#chosenImage').attr('data-src', $(that).attr('src'));
     $('#chosenImage').css('width', $(that).css('width'));
     $('#chosenImage').css('height', $(that).css('height'));
@@ -474,7 +475,8 @@ function makeEditable(selector, type)
                 ['changeImageSize', ['changeImageSize']],
                 ['moveImageUp', ['moveImageUp']],
                 ['moveImageDown', ['moveImageDown']],
-                ['link', ['linkDialogShow', 'unlink']]
+                ['link', ['linkDialogShow', 'unlink']],
+                ['insertCaption', ['insertCaption']]
             ],
             link: [
                 ['link', ['linkDialogShow', 'unlink']]
@@ -615,18 +617,19 @@ function saveChanges()
         var params = {};
         var imgIdList = [];
 
-        var imgId, imgWidth, imgHeight, uid_local, imgHref;
+        var imgId, imgWidth, imgHeight, uid_local, imgHref, imgDescription;
         $('#note-editor-' + id).find('.csc-textpic-imagewrap img').each(function (i, el) {
             imgId = $(this).attr('id');
             imgWidth = $(this).css('width');
             imgHeight = $(this).css('height');
             uid_local = $(this).attr('data-uid_local');
-            if($(this).parent().attr("href")) imgHref = $(this).parent().attr("href").split('?id=').pop();
+            if($(this).parent().attr('href')) imgHref = $(this).parent().attr("href").split('?id=').pop();
             if (imgId.indexOf('new') > 0) {
                 imgId = 'NEW' + uniqid();
                 //params["cmd[sys_file_reference][" + $('#chosenimage').attr('oldId') + "][delete]"] = 1;
             }
-
+            imgDescription = $(this).closest('.csc-textpic-image').find('.csc-textpic-caption').html();
+            
             params["data[sys_file_reference][" + imgId + "][uid_local]"] = 'sys_file_' + uid_local;
             params["data[sys_file_reference][" + imgId + "][uid_local]_list"] = 'sys_file_' + uid_local;
             params["data[sys_file_reference][" + imgId + "][pid]"] = pid;
@@ -635,6 +638,8 @@ function saveChanges()
             params["uc[inlineView][tt_content][" + id + "][sys_file_reference][" + imgId + "]"] = 1;
             params["data[sys_file_reference][" + imgId + "][link]_hr"] = imgHref;
             params["data[sys_file_reference][" + imgId + "][link]"] = imgHref;
+            params["data[sys_file_reference][" + imgId + "][description]"] = imgDescription;
+            params["control[active][sys_file_reference][" + imgId + "][description]"] = 1;
             imgIdList.push(imgId);
         });
         
@@ -1727,6 +1732,30 @@ $.extend($.summernote.plugins, {
             });
             var $moveImageDown = button.render();
             return $moveImageDown;
+        });
+    },
+    'insertCaption': function (context) {
+        var ui = $.summernote.ui;
+        context.memo('button.insertCaption', function () {
+            var button = ui.button({
+                contents: 'IC',
+                click: function (e) {
+                    var chosenImageSrc = $('#chosenImage').attr('data-src');
+                    if($('img[src="' + chosenImageSrc + '"]').closest('.csc-textpic-image').find('.csc-textpic-caption').length == 0) {
+                        if($('img[src="' + chosenImageSrc + '"]').parent('a')) {
+                            $('img[src="' + chosenImageSrc + '"]').parent().after('<figcaption class="csc-textpic-caption"></figcaption>');
+                        } else {
+                           $('img[src="' + chosenImageSrc + '"]').after('<figcaption class="csc-textpic-caption"></figcaption>');
+                        }
+                    } else {
+                        alert('There is already a caption');                        
+                    }
+                   //console.log('ibsert caption');
+                   //
+                }
+            });
+            var $insertCaption = button.render();
+            return $insertCaption;
         });
     }
 });

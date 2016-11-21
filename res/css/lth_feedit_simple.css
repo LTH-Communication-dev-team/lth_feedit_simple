@@ -1621,3 +1621,9 @@ a {
 }
 
 .btn-primary{color:#fff;background-color:#337ab7;border-color:#2e6da4}.btn-primary.focus,.btn-primary:focus{color:#fff;background-color:#286090;border-color:#122b40}.btn-primary:hover{color:#fff;background-color:#286090;border-color:#204d74}
+
+.csc-textpic-caption {
+    min-height:16px;
+    min-width:30px;
+    border: 1px black dotted;
+}
