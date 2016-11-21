@@ -2,7 +2,7 @@ $(document).ready(function () {
             
     $('.csc-textpic-text').children().unwrap();
 
-    makeEditable('.csc-default.textpic, .csc-default.text');
+    makeEditable('.csc-default.textpic, .csc-default.text', '');
 
     //makeSortable(document.getElementById('feEditSimple-contentTypeToolbar'));
     makeSortable(document.getElementById('feEditSimple-normalColWrapper'), 'connectedSortable');
@@ -283,7 +283,7 @@ $(document).ready(function () {
         if(displayObject['hiddenElement'] === 'Block' && preview_showHiddenRecords === '0') {
             //$('#preview_showHiddenRecords').val('1');
             var params = {};
-            console.log('275a');
+            //console.log('275a');
             params["TSFE_ADMIN_PANEL[preview_showHiddenRecords]"] = '1';
             $.ajax({
                 type: "POST",
@@ -299,7 +299,7 @@ $(document).ready(function () {
             //$('#preview_showHiddenPages').val('1');
             //location.reload(true);
             var params = {};
-            console.log('290a');
+            //console.log('290a');
             params["TSFE_ADMIN_PANEL[preview_showHiddenPages]"] = '1';
             $.ajax({
                 type: "POST",
@@ -373,16 +373,17 @@ function addNoContent(selector)
 
 function imageClick(that)
 {
+    var pid = $(that).closest('.note-editor').attr('id').split('-').pop();
+
     $('#chosenImage').attr('data-id', $(that).attr('id'));
     $('#chosenImage').attr('data-src', $(that).attr('src'));
     $('#chosenImage').css('width', $(that).css('width'));
     $('#chosenImage').css('height', $(that).css('height'));
-    $('#chosenImage').attr('data-pid', $(that).closest('.note-editor').attr('id').split('-').pop());
-
+    $('#chosenImage').attr('data-pid', pid);
 
     $('.imgSlider').bootstrapSlider({'value':parseInt($(that).css('width'))});
     $('.imgSlider').on("slide", function(slideEvt) {
-        //console.log(slideEvt);
+        addId(pid, '');
         
         var chosenImageSrc = $('#chosenImage').attr('data-src');
         var chosenImageRatio = $('#chosenImage').height() / $('#chosenImage').width();
@@ -457,7 +458,7 @@ function saveUserSettings(lang, recursiveDelete, copyLevels)
 }
 
 
-function makeEditable(selector)
+function makeEditable(selector, type)
 {
     //console.log(selector);
     $(selector).summernote({
@@ -492,6 +493,9 @@ function makeEditable(selector)
     }).on('summernote.editor.media.delete', function (target, editable) {
         addId(editable[0].id, 'deleteImg');
     });
+    if(type=='replace') {
+        addId(selector,'');
+    }
     
     $('.imgSlider').unwrap();
     
@@ -500,7 +504,7 @@ function makeEditable(selector)
 }
 
 
-function getImageWidthHeight(factor)
+/*function getImageWidthHeight(factor)
 {
     //console.log(((parseInt(factor) / 100)));
     var chosenImageWidth = parseInt($('#chosenImage').css('width')) * ((parseInt(factor) / 100));
@@ -513,7 +517,7 @@ function getImageWidthHeight(factor)
     }
     //console.log(Math.round(chosenImageWidth));
     return Array(Math.round(chosenImageWidth), Math.round(chosenImageHeight));
-}
+}*/
 
 
 function sendFile(file, editor, welEditable)
@@ -705,7 +709,7 @@ function addId(id, type)
         tempVal = $('#lth_feedit_simple-deleteIds').val() + ',' + id.replace('c','');
         $('#lth_feedit_simple-deleteIds').val(array_unique(tempVal.split(',')).join(','));
     } else {
-        tempVal = $('#lth_feedit_simple-saveIds').val() + ',' + id.replace('c','');
+        tempVal = $('#lth_feedit_simple-saveIds').val() + ',' + id.replace('c','').replace('#','');
         $('#lth_feedit_simple-saveIds').val(array_unique(tempVal.split(',')).join(','));
     }
 }
@@ -1121,7 +1125,7 @@ function feeditSimpleContentCommand(cmd, uid, imageOrientationId)
             var okMessage = {'header': 'New element', 'message': 'Content element successfully created'};
                         
             $('#note-editor-'+uid).after(template);
-            makeEditable('#new');
+            makeEditable('#new', '');
             enableContextMenu('#note-editor-new');
             $('#new').next().attr('id', 'note-editor-new');
             makeSortable(document.getElementById('feEditSimple-normalColWrapper'), 'connectedSortable');
@@ -1138,7 +1142,6 @@ function feeditSimpleContentCommand(cmd, uid, imageOrientationId)
 
 function insertImage(uid, type, imageOrientationId)
 {
-    //console.log(imageOrientationId + ';' + uid);
     if(imageOrientationId == '') {
         //console.log('???');
         imageOrientationId = $('#note-editor-' + uid).attr('data-imageorient');
@@ -1224,7 +1227,7 @@ function insertImage(uid, type, imageOrientationId)
             });
         }
         //make editable
-        makeEditable('#c' + uid);
+        makeEditable('#c' + uid, type);
         cancelRightClick();
     });
 }
