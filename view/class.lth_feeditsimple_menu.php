@@ -346,8 +346,9 @@ class lth_feeditsimple_menu {
                 
             </ul>
 		<input type="hidden" name="TSFE_ADMIN_PANEL[preview_showHiddenPages]" value="' . ($GLOBALS['BE_USER']->uc['TSFE_adminConfig']['preview_showHiddenPages'] ? 1 : 0) . '" id="preview_showHiddenPages" />
-		<input type="hidden" name="TSFE_ADMIN_PANEL[preview_showHiddenRecords]" value="' . ($GLOBALS['BE_USER']->uc['TSFE_adminConfig']['preview_showHiddenRecords'] ? 1 : 0) . '" id="preview_showHiddenRecords" />';
-                
+		<input type="hidden" name="TSFE_ADMIN_PANEL[preview_showHiddenRecords]" value="' . ($GLOBALS['BE_USER']->uc['TSFE_adminConfig']['preview_showHiddenRecords'] ? 1 : 0) . '" id="preview_showHiddenRecords" />
+                 <input type="hidden" name="beUserLang" id="beUserLang" value="' . $GLOBALS['BE_USER']->uc['lang'] . '"/>';
+
                 /* <div class="btn-group btn-toggle"> 
     <button class="btn btn-xs btn-default">ON</button>
     <button class="btn btn-xs btn-primary active">OFF</button>

@@ -150,6 +150,7 @@ class user_feeditsimple_adminpanel {
 	    }
             
 	    $beUserUid = $GLOBALS["BE_USER"]->user["uid"];
+
             $be_typo_user = $_COOKIE['be_typo_user'];
 		//$res = $GLOBALS['TYPO3_DB']->sql_query("select * from pages where uid=4");
 		//$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'table', 'uid='.intval($uid), 'groupby', 'orderby', 'limit') or die('175; '.mysql_error());
@@ -264,6 +265,8 @@ class user_feeditsimple_adminpanel {
                 //Summernote
                 'summernote.css' => $this->getLinkTag($extPath . 'vendor/summernote/summernote.css'),
                 'summernote.js' => $this->getScriptTag($extPath . 'vendor/summernote/summernote.js'),
+                'summernote-sv-SE.min.js' => $this->getScriptTag($extPath . 'vendor/summernote/lang/summernote-sv-SE.min.js'),
+                'summernote-uk-UA.min.js' => $this->getScriptTag($extPath . 'vendor/summernote/lang/summernote-uk-UA.min.js'),
                 //'jquery-ui.min.css' => $this->getLinkTag('fileadmin/templates/css/jquery-ui.min.css'),
                 
                 //Sortable

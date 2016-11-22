@@ -468,8 +468,15 @@ function saveUserSettings(lang, recursiveDelete, copyLevels)
 function makeEditable(selector, type)
 {
     //console.log(selector);
+    var beUserLang = $('#beUserLang').val();
+    if(beUserLang=='se' || beUserLang=='sv') {
+        beUserLang = 'sv-SE';
+    } else {
+        beUserLang = 'uk-UA';
+    }
     $(selector).summernote({
         airMode: true,
+        lang: beUserLang,
         height: 200,
         disableDragAndDrop: true,
         disableResizeImage: true,
@@ -499,6 +506,16 @@ function makeEditable(selector, type)
     }).on('summernote.change', function (customEvent, contents, $editable) {
         addId($(this).attr('id'), '');
     }).on('summernote.editor.media.delete', function (target, editable) {
+        $('#'+editable[0].id).remove();
+        $('.csc-textpic-imagecolumn:not(:has(img))').remove();
+        $('.csc-textpic-imagerow:not(:has(.csc-textpic-imagecolumn))').remove();
+        $('.csc-textpic-imagewrap:not(:has(img))').remove();
+        
+        /*var id = editable[0].id;
+        var uid_local = $('#'+id).attr('data-uid_local');
+        console.log($("img[data-uid_local='"+uid_local+"']").length);
+        $("img[data-uid_local='"+uid_local+"']").closest('.csc-textpic-image').find('.csc-textpic-caption').remove();*/
+        //console.log(target);
         addId(editable[0].id, 'deleteImg');
     });
     if(type=='replace') {
@@ -1624,6 +1641,7 @@ $.extend($.summernote.plugins, {
             var button = ui.button({
                 //className: 'note-btn-bold',
                 contents: '<i class="note-icon-pencil" />',
+                tooltip: 'insert/replace image',
                 click: function (e) {
                     $('#modalType').val('changeImage');
                     $('.note-image-popover').hide();
@@ -1649,6 +1667,7 @@ $.extend($.summernote.plugins, {
         context.memo('button.moveImageUp', function () {
             var button = ui.button({
                 contents: 'Up',
+                tooltip: 'move image up',
                 click: function (e) {
                     var imageArray = [];
                     var chosenImageIndex;
@@ -1704,6 +1723,7 @@ $.extend($.summernote.plugins, {
         context.memo('button.moveImageDown', function () {
             var button = ui.button({
                 contents: 'Down',
+                tooltip: 'move image down',
                 click: function (e) {
                     var imageArray = [];
                     var chosenImageIndex;
@@ -1757,7 +1777,9 @@ $.extend($.summernote.plugins, {
         var ui = $.summernote.ui;
         context.memo('button.insertCaption', function () {
             var button = ui.button({
-                contents: 'IC',
+                //contents: 'IC',
+                contents: '<i class="fa fa-sticky-note-o" />',
+                tooltip: 'insert caption',
                 click: function (e) {
                     var chosenImageSrc = $('#chosenImage').attr('data-src');
                     if($('img[src="' + chosenImageSrc + '"]').closest('.csc-textpic-image').find('.csc-textpic-caption').length == 0) {
