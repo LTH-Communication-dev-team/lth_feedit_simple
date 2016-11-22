@@ -338,7 +338,13 @@ $(document).ready(function () {
     </ul>');
 
     cancelRightClick();
-
+    
+ 
+     /*$(document).keydown(function(e){
+        if( e.keyCode == 13 )
+            console.log(e.target);
+        });
+*/
     //Document ready ends********************************************************************************************************************
 });
 
@@ -1599,6 +1605,15 @@ $.extend($.summernote.plugins, {
     /**
      * @param {Object} context - context object has status of editor.
      */
+    'brenter': function (context) {
+        this.events = {
+            'summernote.enter': function (we, e) {
+                // insert 2 br tags (if only one br tag is inserted the cursor won't go to the next line)
+                document.execCommand('insertHTML', false, '<p><br></p>');
+                e.preventDefault();
+            }
+        };
+    },
     'changeImage': function (context) {
         var ui = $.summernote.ui;
         context.memo('button.changeImage', function () {
