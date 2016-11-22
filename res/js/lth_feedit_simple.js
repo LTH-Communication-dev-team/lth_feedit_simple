@@ -864,6 +864,10 @@ function jstree()
         });
     }).on('after_open.jstree', function (e, data) {
         toggleNonImages(imageList);
+    }).on('hover_node.jstree',function(e,data){
+        //console.log(data);
+        $("[id='"+data.node.id+"']").prop('title', data.node.text);
+        //$("li[id*='/"+data.node.id+"']")
     });
 }
 
