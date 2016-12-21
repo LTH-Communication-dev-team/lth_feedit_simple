@@ -176,7 +176,7 @@ class user_feeditsimple_adminpanel {
 
 	    // loading template
 	    $templateFile = $this->modTSconfig['properties']['skin.']['templateFile'];
-	    $templateFile = ($templateFile ? $templateFile : t3lib_extMgm::siteRelPath('lth_feedit_simple') . 'res/template/feedit.tmpl');
+	    $templateFile = ($templateFile ? $templateFile : \TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple') . 'res/template/feedit.tmpl');
 	    $templateFile = $GLOBALS['TSFE']->tmpl->getFileName($templateFile);
 	    $this->template = $GLOBALS['TSFE']->tmpl->fileContent($templateFile);
 
@@ -192,7 +192,7 @@ class user_feeditsimple_adminpanel {
 	    if ($this->menuOpen) {
 		    $markers['INCLUDES'] = $this->getIncludes($syslang);
 	    } else {
-		    $markers['INCLUDES'] = $this->getLinkTag(t3lib_extMgm::siteRelPath('lth_feedit_simple') . 'res/css/fe_edit_closed.css');
+		    $markers['INCLUDES'] = $this->getLinkTag(\TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple') . 'res/css/fe_edit_closed.css');
 	    }
 
 	    $content = t3lib_parsehtml::getSubpart($this->template, '###MAIN_TEMPLATE###');
@@ -250,7 +250,7 @@ class user_feeditsimple_adminpanel {
 	  */
         protected function getIncludes($syslang)
 	{
-	    $extPath = t3lib_extMgm::siteRelPath('lth_feedit_simple');
+	    $extPath = \TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple');
 	    $includes = array(
                 
                 //bootstrap

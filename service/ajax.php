@@ -930,34 +930,10 @@ function renderContentElement($table, $uid)
             }
             //$cObjOutput = $cObj->editPanel('', $conf, $table . ':' . $uid, $contentElementRow);
     }
-    require_once(t3lib_extMgm::extPath('feEditSimple') . 'view/class.tx_feEditSimple_editpanel.php');
+    require_once(\TYPO3\CMS\Core\Utility\GeneralManagementUtility::extPath('feEditSimple') . 'view/class.tx_feEditSimple_editpanel.php');
     $panelObj = new tx_feEditSimple_editpanel;
     $cObjOutput = $panelObj->editPanel($cObjOutput,$conf,"$table:$uid",$contentElementRow,$table,array('move'=>0,'new'=>1,'edit'=>2,'hide'=>3,'unhide'=>4,'delete'=>5,'cut'=>6,'copy'=>7));
     
-/*
-            // Set a simplified template file for use in the AJAX response.  No title, meta tags, etc.
-            // @todo Should we account for footer data too?
-    $pageRenderer = $GLOBALS['TSFE']->getPageRenderer();
-    $pageRenderer->setTemplateFile(t3lib_extMgm::extPath('feEditSimple') . 'res/template/content_element.tmpl');
-    //$pageRenderer->setCharSet($GLOBALS['TSFE']->metaCharset);
-    $pageRenderer->enableConcatenateFiles();
-
-            // Set the BACK_PATH for the pageRenderer concatenation.
-            // FIXME should be removed when the sprite manager, RTE, and pageRenderer are on the same path about concatenation.
-    $GLOBALS['BACK_PATH'] = TYPO3_mainDir;
-
-    //$header = $this->renderHeaderData();
-    $content = $cObjOutput;
-
-    if ($GLOBALS['TSFE']->isINTincScript()) {
-            $GLOBALS['TSFE']->content = $content;
-            $GLOBALS['TSFE']->INTincScript();
-            $content = $GLOBALS['TSFE']->content;
-    }
-
-    //$this->ajaxObj->addContent('header', $header);
-    //$this->ajaxObj->addContent('content', $content);
-    */
     return $cObjOutput;
 }
 

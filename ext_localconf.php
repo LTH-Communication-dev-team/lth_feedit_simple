@@ -18,7 +18,7 @@ $userSettingsArray = json_decode($feeditsimpleUsersettings, TRUE);
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processCmdmapClass'][] = 'LTH\\get_menu\\Hooks\\ProcessCmdmap';
 $TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['postUserLookUp'][] = 'LTH\\lth_feedit_simple\\Hooks\\ProcessCmdmap->postUserLookUp';
 
-t3lib_extMgm::addTypoScript('lth_feedit_simple', 'setup', '
+\TYPO3\CMS\Core\Utility\GeneralManagementUtility::addTypoScript('lth_feedit_simple', 'setup', '
     #############################################
     ## TypoScript added by extension "lth_feedit_simple"
     #############################################

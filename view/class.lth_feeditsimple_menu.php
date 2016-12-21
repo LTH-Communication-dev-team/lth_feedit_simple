@@ -141,11 +141,11 @@ class lth_feeditsimple_menu {
 
 			// setting the base path for the icons
 		$this->imagePath = $this->modTSconfig['properties']['skin.']['imagePath'];
-		$this->imagePath = ($this->imagePath ? $this->imagePath : t3lib_extMgm::siteRelPath('lth_feedit_simple') . 'res/icons/');
+		$this->imagePath = ($this->imagePath ? $this->imagePath : \TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple') . 'res/icons/');
 
 			// loading template
 		$templateFile = $this->modTSconfig['properties']['skin.']['templateFile'];
-		$templateFile = ($templateFile ? $templateFile : t3lib_extMgm::siteRelPath('lth_feedit_simple') . 'res/template/feedit.tmpl');
+		$templateFile = ($templateFile ? $templateFile : \TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple') . 'res/template/feedit.tmpl');
 		$templateFile = $GLOBALS['TSFE']->tmpl->getFileName($templateFile);
 		$templateFile = $GLOBALS['TSFE']->tmpl->fileContent($templateFile);
 		$this->template = t3lib_parsehtml::getSubpart($templateFile, '###MENU_' . ($this->menuOpen ? 'OPENED' : 'CLOSED' ) . '###');
@@ -396,7 +396,7 @@ class lth_feeditsimple_menu {
                 
 
 		$markers = array(
-			'EXTPATH'   => t3lib_extMgm::siteRelPath('lth_feedit_simple'),
+			'EXTPATH'   => \TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple'),
 			'CSSPREFIX' => $this->cssPrefix
 		);
 
