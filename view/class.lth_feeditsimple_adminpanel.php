@@ -92,21 +92,26 @@ class user_feeditsimple_adminpanel {
 	{
             /*
              * http://vkans-th0.kansli.lth.se/index.php?id=9&TSFE_ADMIN_PANEL%5BDUMMY%5D=310202&TSFE_ADMIN_PANEL%5Bdisplay_top%5D=1&TSFE_ADMIN_PANEL%5Bdisplay_preview%5D=1&TSFE_ADMIN_PANEL%5Bpreview_showHiddenPages%5D=0&TSFE_ADMIN_PANEL%5Bpreview_showHiddenPages%5D=1&TSFE_ADMIN_PANEL%5Bpreview_showHiddenRecords%5D=0&TSFE_ADMIN_PANEL%5Bpreview_showHiddenRecords%5D=1&TSFE_ADMIN_PANEL%5Bpreview_simulateDate%5D_hr=&TSFE_ADMIN_PANEL%5Bpreview_simulateDate%5D=&TSFE_ADMIN_PANEL%5Bpreview_simulateUserGroup%5D=0&TSFE_ADMIN_PANEL%5Bdisplay_cache%5D=&TSFE_ADMIN_PANEL%5Bdisplay_edit%5D=&TSFE_ADMIN_PANEL%5Bdisplay_tsdebug%5D=&TSFE_ADMIN_PANEL%5Bdisplay_info%5D=#0
-             */
-	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && t3lib_div::_GP('type')!='200' && t3lib_div::_GP('type')!='77') {
+
+             * /typo3/index.php?route=%2Frecord%2Fedit&token=5b948f4dee711290eb9fc6530dc30052cf1d8775&edit%5Btt_content%5D%5B614%5D=edit&noView=0&feEdit=1&returnUrl=sysext/backend/Resources/Private/Templates/Close.html
+               /typo3/index.php?route=%2Frecord%2Fedit&token=5b948f4dee711290eb9fc6530dc30052cf1d8775&edit%5Btt_content%5D%5B606%5D=edit&noView=0&feEdit=1&returnUrl=sysext/backend/Resources/Private/Templates/Close.html
+             * * /typo3/index.php?route=%2Frecord%2Fedit&token=5b948f4dee711290eb9fc6530dc30052cf1d8775&edit%5Btt_content%5D%5B606%5D=edit&
+             *  */
+	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!='200' && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!='77') {
                 
+                //echo $location;
 			// set up general configuration
-		if (!count($this->admPanelTSconfig)) {
+		/*if (!count($this->admPanelTSconfig)) {
 			$this->admPanelTSconfig = t3lib_BEfunc::getModTSconfig($GLOBALS['TSFE']->id, 'admPanel');
 			$this->modTSconfig      = t3lib_BEfunc::getModTSconfig($GLOBALS['TSFE']->id, 'FeEdit');
 			$GLOBALS['TSFE']->determineId();
-		}
+		}*/
 
 			// check if frontend editing is enabled
-		if ($this->modTSconfig['properties']['disable'] || (!$GLOBALS['BE_USER']->frontendEdit instanceOf t3lib_FrontendEdit)) {
+		/*if ($this->modTSconfig['properties']['disable'] || (!$GLOBALS['BE_USER']->frontendEdit instanceOf t3lib_FrontendEdit)) {
 			$this->disabled = true;
 			return;
-		}
+		}*/
 
 			// check if the menu is already opened
 		if (!isset($GLOBALS['BE_USER']->uc['TSFE_adminConfig']['menuOpen']) || $GLOBALS['BE_USER']->uc['TSFE_adminConfig']['menuOpen']) {
@@ -129,8 +134,8 @@ class user_feeditsimple_adminpanel {
 	 */
 	public static function showMenuBar($params, $parent)
 	{
-	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && t3lib_div::_GP('type')!='200' && t3lib_div::_GP('type')!='77') {
-		$adminPanel = t3lib_div::makeInstance('user_feeditsimple_adminpanel');
+	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!='200' && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!='77') {
+		$adminPanel = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('user_feeditsimple_adminpanel');
 		$feEditContent = self::processAbsRefPrefix($parent, $adminPanel->display());
 		$parent->content = str_replace('</body>', $feEditContent . '</body>', $parent->content);
 	    }
@@ -145,11 +150,11 @@ class user_feeditsimple_adminpanel {
 	    */
 	public function display()
 	{
-	    if ($this->disabled || t3lib_div::_GP('type')=='77' || t3lib_div::_GP('type')=='200') {
+	    if ($this->disabled || \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')=='77' || \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')=='200') {
 		    return;
 	    }
-            
-	    $beUserUid = $GLOBALS["BE_USER"]->user["uid"];
+
+            $beUserUid = $GLOBALS["BE_USER"]->user["uid"];
 
             $be_typo_user = $_COOKIE['be_typo_user'];
 		//$res = $GLOBALS['TYPO3_DB']->sql_query("select * from pages where uid=4");
@@ -164,7 +169,7 @@ class user_feeditsimple_adminpanel {
 		    }
 		//$res = $GLOBALS['TYPO3_DB']->sql_query("CALL sp_logError('".$var1."', '".$var2."')");
             **/
-            
+
             //Language
             $syslang = $GLOBALS['TSFE']->config['config']['language'];
             if(!$syslang) {
@@ -176,13 +181,13 @@ class user_feeditsimple_adminpanel {
 
 	    // loading template
 	    $templateFile = $this->modTSconfig['properties']['skin.']['templateFile'];
-	    $templateFile = ($templateFile ? $templateFile : \TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple') . 'res/template/feedit.tmpl');
+	    $templateFile = ($templateFile ? $templateFile : \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('lth_feedit_simple') . 'res/template/feedit.tmpl');
 	    $templateFile = $GLOBALS['TSFE']->tmpl->getFileName($templateFile);
 	    $this->template = $GLOBALS['TSFE']->tmpl->fileContent($templateFile);
 
 	    $markers = array(
 		    // have a form for adminPanel processing and saving of vars
-		    //'HIDDEN_FORM' => '<form id="TSFE_ADMIN_PANEL_Form" name="TSFE_ADMIN_PANEL_Form" action="' . htmlspecialchars(t3lib_div::getIndpEnv('REQUEST_URI')) . '" method="post">' . $this->getAdmPanelFields() . '</form>',
+		    //'HIDDEN_FORM' => '<form id="TSFE_ADMIN_PANEL_Form" name="TSFE_ADMIN_PANEL_Form" action="' . htmlspecialchars(\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REQUEST_URI')) . '" method="post">' . $this->getAdmPanelFields() . '</form>',
 		    'MENU_BAR'    => $this->buildMenu(),
 		    'CSSPREFIX'   => $this->cssPrefix,
 	    );
@@ -192,11 +197,11 @@ class user_feeditsimple_adminpanel {
 	    if ($this->menuOpen) {
 		    $markers['INCLUDES'] = $this->getIncludes($syslang);
 	    } else {
-		    $markers['INCLUDES'] = $this->getLinkTag(\TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple') . 'res/css/fe_edit_closed.css');
+		    $markers['INCLUDES'] = $this->getLinkTag(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('lth_feedit_simple') . 'res/css/fe_edit_closed.css');
 	    }
 
-	    $content = t3lib_parsehtml::getSubpart($this->template, '###MAIN_TEMPLATE###');
-	    return t3lib_parsehtml::substituteMarkerArray($content, $markers, '###|###');
+	    $content =  \TYPO3\CMS\Core\Html\HtmlParser::getSubpart($this->template, '###MAIN_TEMPLATE###');
+	    return  \TYPO3\CMS\Core\Html\HtmlParser::substituteMarkerArray($content, $markers, '###|###');
 	}
         
         
@@ -250,7 +255,7 @@ class user_feeditsimple_adminpanel {
 	  */
         protected function getIncludes($syslang)
 	{
-	    $extPath = \TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple');
+	    $extPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('lth_feedit_simple');
 	    $includes = array(
                 
                 //bootstrap
@@ -263,8 +268,8 @@ class user_feeditsimple_adminpanel {
 		//'datetimepicker.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-datetimepicker.js'),
  
                 //Summernote
-                'summernote.css' => $this->getLinkTag($extPath . 'vendor/summernote/summernote.css'),
-                'summernote.js' => $this->getScriptTag($extPath . 'vendor/summernote/summernote.js'),
+                'summernote.css' => $this->getLinkTag($extPath . 'vendor/summernote/summernote_082.css'),
+                'summernote.js' => $this->getScriptTag($extPath . 'vendor/summernote/summernote_082.min.js'),
                 'summernote-sv-SE.min.js' => $this->getScriptTag($extPath . 'vendor/summernote/lang/summernote-sv-SE.min.js'),
                 'summernote-uk-UA.min.js' => $this->getScriptTag($extPath . 'vendor/summernote/lang/summernote-uk-UA.min.js'),
                 //'jquery-ui.min.css' => $this->getLinkTag('fileadmin/templates/css/jquery-ui.min.css'),
@@ -342,12 +347,12 @@ class user_feeditsimple_adminpanel {
 				'pObj' => &$this
 			);
 			foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['EXT:lth_feedit_simple/view/class.tx_feEditSimple_adminpanel.php']['buildMenu'] as $_funcRef) {
-				$content = t3lib_div::callUserFunction($_funcRef, $_params, $this);
+				$content = \TYPO3\CMS\Core\Utility\GeneralUtility::callUserFunction($_funcRef, $_params, $this);
 			}
 		}
 
 		if (!$content && !$this->modTSconfig['properties']['menuBar.']['disable']) {
-			$this->menuBar = t3lib_div::makeInstance('lth_feeditsimple_menu');
+			$this->menuBar = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('lth_feeditsimple_menu');
 
 				// add sections for menu
 			$this->menuBar->addToolbar('Actions',        'actionToolbar', false, '', true);
@@ -358,9 +363,9 @@ class user_feeditsimple_adminpanel {
 				// build the menus here
 			// @todo need to check permissions here too
 			$tsMenuBar  = $this->modTSconfig['properties']['menuBar.'];
-			$menuConfig = t3lib_div::trimExplode(',', ($tsMenuBar['config'] ? $tsMenuBar['config'] : 'action,type,clipboard,context'));
+			$menuConfig = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', ($tsMenuBar['config'] ? $tsMenuBar['config'] : 'action,type,clipboard,context'));
 			if (in_array('action', $menuConfig)) {
-				$tsActions = t3lib_div::trimExplode(',', $tsMenuBar['actionMenu'], true);
+				$tsActions = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $tsMenuBar['actionMenu'], true);
 				//@todo	Dead code so not yet localized.
 				if (in_array('page', $tsActions)) {
 					$this->menuBar->addItem('Actions', 'Page', 'fePageFunctions', '', 'Page functions', '');
@@ -386,12 +391,12 @@ class user_feeditsimple_adminpanel {
 			//$this->renderNewContentElementIcons($menuConfig, $tsMenuBar);
 
 			if (in_array('context', $menuConfig)) {
-				$tsContext = t3lib_div::trimExplode(',', $tsMenuBar['contextMenu']);
+				$tsContext = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $tsMenuBar['contextMenu']);
 				if (in_array('preview', $tsContext)) {
 					$this->menuBar->addItem('ContextActions', $GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:previewTitle'), '', '', $GLOBALS['LANG']->sL('LLL:EXT:feEditSimple/locallang.xml:previewTooltip'), '', 'button disabled');
 				}
 				/*if (in_array('logout', $tsContext)) {
-					$this->menuBar->addItem('ContextActions', $GLOBALS['LANG']->sL('LLL:EXT:lang/locallang_common.xml:logout'), $action='', $image='', $GLOBALS['LANG']->sL('LLL:EXT:feEditSimple/locallang.xml:logoutTooltip'), $onClick='', $btnClass='', $labelClass='', t3lib_div::getIndpEnv('TYPO3_SITE_URL') . 'typo3/logout.php?redirect=' . t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'));
+					$this->menuBar->addItem('ContextActions', $GLOBALS['LANG']->sL('LLL:EXT:lang/locallang_common.xml:logout'), $action='', $image='', $GLOBALS['LANG']->sL('LLL:EXT:feEditSimple/locallang.xml:logoutTooltip'), $onClick='', $btnClass='', $labelClass='', \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . 'typo3/logout.php?redirect=' . \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
 				}
 				if (in_array('close', $tsContext)) {
 					$this->menuBar->addItem('ContextActions', $GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:statusDeactivateEditing'), '', $image='', $GLOBALS['LANG']->sL('LLL:EXT:feEditSimple/locallang.xml:closeTooltip'), ' onclick="' . htmlspecialchars('document.TSFE_ADMIN_PANEL_Form.elements[\'TSFE_ADMIN_PANEL[menuOpen]\'].value=0; document.TSFE_ADMIN_PANEL_Form.submit(); return false;') . '"');
@@ -414,7 +419,7 @@ class user_feeditsimple_adminpanel {
 	 */
 	protected function renderNewContentElementIcons($menuConfig, $tsMenuBar) {
 		// get new content elements from cms wizard
-		$newCE = t3lib_div::makeInstance('lth_feeditsimple_newcontentelements');
+		$newCE = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('lth_feeditsimple_newcontentelements');
 		$newCE->main();
 
 		foreach ($newCE->menuItems as $group => $items) {
@@ -472,7 +477,7 @@ class user_feeditsimple_adminpanel {
 
 		// General TYPO3 configuration. Mirrors data available in backend context.
 		$configuration = array(
-			'siteUrl' => t3lib_div::getIndpEnv('TYPO3_SITE_URL'),
+			'siteUrl' => \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SITE_URL'),
 			'PATH_typo3' => $pathTYPO3,
 			'PATH_typo3_enc' => rawurlencode($pathTYPO3),
 			'TYPO3_mainDir' => TYPO3_mainDir
@@ -523,8 +528,8 @@ class user_feeditsimple_adminpanel {
 			var TYPO3 = {};
 
 			Ext.BLANK_IMAGE_URL = "' .
-				// t3lib_div::locationHeaderUrl() will include '/typo3/' in the URL
-				htmlspecialchars(t3lib_div::locationHeaderUrl('gfx/clear.gif')) .
+				// \TYPO3\CMS\Core\Utility\GeneralUtility::locationHeaderUrl() will include '/typo3/' in the URL
+				htmlspecialchars(\TYPO3\CMS\Core\Utility\GeneralUtility::locationHeaderUrl('gfx/clear.gif')) .
 			'";
 
 			TYPO3.configuration = ' . json_encode($configuration) . ';
@@ -544,7 +549,7 @@ class user_feeditsimple_adminpanel {
 			}
 			var TS = new typoSetup();';
 
-		$javascript = t3lib_div::wrapJS($javascript);
+		$javascript = \TYPO3\CMS\Core\Utility\GeneralUtility::wrapJS($javascript);
 
 		return $javascript;
 	}

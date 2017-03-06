@@ -1627,3 +1627,9 @@ a {
     min-width:30px;
     border: 1px black dotted;
 }
+
+.note-editor-temp {
+    min-width:197px;
+    height: 40px;
+    background-color:#bbb;
+}

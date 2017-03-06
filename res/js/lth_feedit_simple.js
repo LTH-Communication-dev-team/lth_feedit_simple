@@ -1,54 +1,15 @@
 $(document).ready(function () {
-            
+
     $('.csc-textpic-text').children().unwrap();
 
     makeEditable('.csc-default.textpic, .csc-default.text', '');
 
-    //makeSortable(document.getElementById('feEditSimple-contentTypeToolbar'));
-    makeSortable(document.getElementById('feEditSimple-normalColWrapper'), 'connectedSortable');
+    /*makeSortable(document.getElementById('feEditSimple-normalColWrapper'), 'connectedSortable');
     if($('#feEditSimple-rightColWrapper').length > 0) {
         makeSortable(document.getElementById('feEditSimple-rightColWrapper'), 'connectedSortable');
-    }
+    }*/
 
-    //move data from c... to note-editor...
-    $('.note-editor').each(function () {
-        $(this).attr('id', 'note-editor-' + $(this).prev().attr('id').replace('c', ''));
-        $(this).attr('class', 'note-editor ' + $(this).prev().attr('class').replace('csc-default ', ''));
-        $(this).attr('data-imageorient', $(this).prev().attr('data-imageorient'));
-    });
-
-    $('#lth_feedit_simple-saveChanges').click(function () {
-        saveChanges();
-    });
-
-    $('.note-link-text').parent().hide();
-    $('.note-link-url').parent().css('position','relative');
-    $('.note-link-url').after('<button title="Files and images" type="button" style="position:absolute;top:30px;left:420px;" class="btn editable-filemanager" \
-        data-toggle="modal" data-backdrop="static" href="#feeditSimple-modalBox">\
-        <i class="icon-folder-open"></i></button>\
-        '
-    );
-
-    var tmpArray = [];
-    $('.note-editor .csc-textpic-image img').each(function() {
-        $(this).click(function () {
-            imageClick(this);
-        });
-        var tmpData = $(this).closest('.note-editor').attr('data-orgimages');
-        if(tmpData) {
-            tmpData += ',';
-            tmpData += $(this).attr('id');
-        } else {
-            tmpData = $(this).attr('id');
-        }
-        $(this).closest('.note-editor').attr('data-orgimages', tmpData);
-        $(this).attr('width','');
-        $(this).attr('h','');
-        $(this).attr('data-id',$(this).attr('id'));
-    });
-    $('#imagesFromStart').val(tmpArray.join(','));
-    //$modal.on('show', function () { ... }
-
+    //modal boxes
     $("#feeditSimple-modalBox").on('shown.bs.modal', function (e) {
         if($('.note-link-url').is(':visible')) {
             $(this).find("li[data-type='page']").css('display','block');
@@ -91,19 +52,14 @@ $(document).ready(function () {
                 <div id="progress" class="progress">\
                     <div class="progress-bar progress-bar-success"></div>\
                 </div>');
-            
-            /*$(this).find('.modal-body').css({
-                width: '400px', //probably not needed
-                height: '400px' //probably not needed 
-            });*/
-            
-            //jstree($('#modalType').val());
+
             jstree();
         } else {
             toggleNonImages(imageList);     
         }
     });
 
+    //usersettings
     $('#feeditSimple-userSettingsButton').panelslider({
         side: 'right',
         duration: 200,
@@ -140,6 +96,7 @@ $(document).ready(function () {
         easingClose: null
     });
 
+    //help button
     $('#feeditSimple-helpButton').click(function(){
         /*side: 'right',
         duration: 200,
@@ -174,6 +131,7 @@ $(document).ready(function () {
         });
     });
 
+    //edit page
     $('#feeditSimple-editPageButton').panelslider({
         side: 'right',
         duration: 200,
@@ -217,7 +175,7 @@ $(document).ready(function () {
         easingClose: null
     });
 
-    
+    //add no content or context menu
     if($('#feEditSimple-normalColWrapper .csc-default').length == 0) {
         addNoContent('#feEditSimple-normalColWrapper');
     } else {
@@ -225,23 +183,26 @@ $(document).ready(function () {
         enableContextMenu('.note-editor');
     }
 
+    //hidden elements
     $('#feeditSimple-toggleHiddenElement').click(function () {
         var okMessage = {'header': 'Show/Hide', 'message': lth_feedit_simple_messages.display_hidden_elements_changed};
         //toggleHiddenObject('.note-editor.feEditSimple-hidden-1', 'hiddenElement', okMessage);
         toggleHiddenObject($(this).text(), 'hiddenElement', okMessage);
     });
 
+    //hidden in menu
     $('#feeditSimple-toggleHiddenInMenu').click(function () {
         var okMessage = {'header': 'Show/Hide', 'message': lth_feedit_simple_messages.display_hidden_in_menu_changed};
         toggleHiddenObject('.feEditSimple-hiddenInMenu-1', 'hiddenInMenu', okMessage)
     });
 
+    //hidden page
     $('#feeditSimple-toggleHiddenPage').click(function () {
         var okMessage = {'header': 'Show/Hide', 'message': lth_feedit_simple_messages.display_hidden_pages_changed};
         toggleHiddenObject('.feEditSimple-hiddenPage-1', 'hiddenPage', okMessage);
     });
 
-    
+    //formhandler
     if($('.Tx-Formhandler').length > 0) {
         $('#feeditSimple-formHandler').click(function () {
             ajaxCall('getFormHandler', '', '', '', $('body').attr('id'), '', '');
@@ -251,6 +212,7 @@ $(document).ready(function () {
         $('#feeditSimple-formHandler').css('opacity', '0.5');
     }
         
+    //add right column
     $('#feeditSimple-addRightColumn').click(function () {
         if($('#feEditSimple-rightColWrapper').length > 0) {
             alert(lth_feedit_simple_messages.there_is_already_a_right_column);
@@ -264,7 +226,8 @@ $(document).ready(function () {
             </div>\
             </div>');
             var tempIndex = addNoContent('#feEditSimple-rightColWrapper');
-            enableContextMenu(tempIndex);
+            //console.log(tempIndex);
+            enableContextMenuShort(tempIndex);
         }
     });    
 
@@ -339,12 +302,22 @@ $(document).ready(function () {
 
     cancelRightClick();
     
- 
-     /*$(document).keydown(function(e){
-        if( e.keyCode == 13 )
-            console.log(e.target);
-        });
-*/
+    //Save changes
+    $('#lth_feedit_simple-saveChanges').click(function () {
+        saveChanges();
+    });
+    
+    //remove cut items
+    var copycutitem = feeditSimpleGetCookie('feeditSimple-copycutitem');
+    if(copycutitem) {
+        copycutitemArray = copycutitem.split(':');
+        if(copycutitemArray[0]=='cut' && copycutitemArray[1]=='tt_content') {
+            $('#note-editor-' + copycutitemArray[2]).remove();
+            $('#c' + copycutitemArray[2]).remove();
+        }
+        //console.log(copycutitem);
+    }
+
     //Document ready ends********************************************************************************************************************
 });
 
@@ -372,8 +345,9 @@ function cancelRightClick()
 function addNoContent(selector)
 {
     var index = $('.note-editor-temp').length;
-    $(selector).prepend('<div id="note-editor-temp-'+index+'" class="note-editor-temp"><a href="javascript:" onclick="feeditSimpleContentCommand(\'Text and images\',\'temp-'+index+'\');">Click here to insert content</a></div>');
-    return 'note-editor-temp-'+index;
+    $(selector).prepend('<div id="note-editor-temp-'+index+'" class="note-editor-temp"></div>');
+    //<a href="javascript:" onclick="feeditSimpleContentCommand(\'Text and images\',\'temp-'+index+'\');">Click here to insert content</a>
+    return '#note-editor-temp-'+index;
 }
 
 
@@ -478,9 +452,9 @@ function makeEditable(selector, type)
         airMode: true,
         lang: beUserLang,
         height: 200,
-        disableDragAndDrop: true,
+        /*disableDragAndDrop: true,
         disableResizeImage: true,
-        disableResizeEditor: true,
+        disableResizeEditor: true,*/
         popover: {
             image: [
                 ['remove', ['removeMedia']],
@@ -517,6 +491,8 @@ function makeEditable(selector, type)
         $("img[data-uid_local='"+uid_local+"']").closest('.csc-textpic-image').find('.csc-textpic-caption').remove();*/
         //console.log(target);
         addId(editable[0].id, 'deleteImg');
+    }).on('summernote.focus', function (target) {
+        $('.note-popover').hide();
     });
     if(type=='replace') {
         addId(selector,'');
@@ -526,6 +502,42 @@ function makeEditable(selector, type)
     
     var chosenImageSrc = $('#chosenImage').attr('data-src');
     var chosenImageWidth = $('img[src="' + chosenImageSrc + '"]').css('width');
+    
+    //novo
+        //move data from c... to note-editor...
+    $('.note-editor').each(function () {
+        $(this).attr('id', 'note-editor-' + $(this).prev().attr('id').replace('c', ''));
+        $(this).attr('class', 'note-editor ' + $(this).prev().attr('class').replace('csc-default ', ''));
+        $(this).attr('data-imageorient', $(this).prev().attr('data-imageorient'));
+    });
+
+    //??????
+    $('.note-link-text').parent().hide();
+    $('.note-link-url').parent().css('position','relative');
+    $('.note-link-url').after('<button title="Files and images" type="button" style="position:absolute;top:30px;left:420px;" class="btn editable-filemanager" \
+        data-toggle="modal" data-backdrop="static" href="#feeditSimple-modalBox">\
+        <i class="icon-folder-open"></i></button>\
+        '
+    );
+
+    var tmpArray = [];
+    $('.note-editor .csc-textpic-image img').each(function() {
+        $(this).click(function () {
+            imageClick(this);
+        });
+        var tmpData = $(this).closest('.note-editor').attr('data-orgimages');
+        if(tmpData) {
+            tmpData += ',';
+            tmpData += $(this).attr('id');
+        } else {
+            tmpData = $(this).attr('id');
+        }
+        $(this).closest('.note-editor').attr('data-orgimages', tmpData);
+        $(this).attr('width','');
+        $(this).attr('h','');
+        $(this).attr('data-id',$(this).attr('id'));
+    });
+    $('#imagesFromStart').val(tmpArray.join(','));
 }
 
 
@@ -564,7 +576,7 @@ function sendFile(file, editor, welEditable)
 }
 
 
-function makeSortable(selector, group)
+/*function makeSortable(selector, group)
 {
     sortable = Sortable.create(selector, {
         group: group,
@@ -603,7 +615,7 @@ function makeSortable(selector, group)
             } 
         }
     });
-}
+}*/
 
 
 function saveChanges()
@@ -615,6 +627,7 @@ function saveChanges()
         //console.log(el);
         var id, extraUrl, pos, url, pid;
         var pid = $('body').attr('id');
+        var pageId = pid;
         var colId = $('#note-editor-' + el).closest('.connectedSortable').attr('id');
         var colPos = getColpos(colId);
         var formToken;
@@ -629,13 +642,17 @@ function saveChanges()
                     pid = '-' + $('#' + el).prevAll('.note-editor:first').attr('id').replace('note-editor-', '');
                 }
             }
-            url = '/typo3/alt_doc.php?edit[tt_content][' + pid + ']=new';
-            extraUrl = '&returnNewPageId=1';
+            //url = '/typo3/alt_doc.php?edit[tt_content][' + pid + ']=new';
+            //extraUrl = '&returnNewPageId=1';
             id = 'new';
         } else {
             id = el;
-            url = '/typo3/alt_doc.php?edit[tt_content][' + el + ']=edit';
+            //url = '/typo3/alt_doc.php?edit[tt_content][' + el + ']=edit';
         }
+        
+        var url = $('#lth_feedit_simple-location').val().replace('pages','tt_content').replace('%5B'+pageId+'%5D', '%5B'+id+'%5D');
+        //console.log(url);
+        
 
         var params = {};
         var imgIdList = [];
@@ -678,49 +695,60 @@ function saveChanges()
             deleteIdsArray = [];
         }
 
+        /*$.ajax({
+            url: 'index.php',
+            data: {
+                eID: 'lth_feedit_simple',
+                cmd: 'getLocation',
+                table: 'tt_content',
+                uid: id,
+                pid: pid,
+                sid: Math.random(),
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (data) {
+                console.log(data.content);
+                url = data.content;
+
+                //params['cmd'] = "edit";
+                
+            }
+        });*/
+        params["data[tt_content][" + id + "][imageorient]"] = imageorientId;
+
+        params["data[tt_content][" + id + "][colPos]"] = colPos;
+        params["data[tt_content][" + id + "][pid]"] = pid;
+        //params["data[tt_content]["+id+"][header]"] = $('#feeditsimple-elHeader').val();
+        params["data[tt_content][" + id + "][CType]"] = 'textpic';
+        params["data[tt_content][" + id + "][_TRANSFORM_bodytext]"] = 'RTE';
+        var bodytext = $('#note-editor-' + id).find('.lth_feeditsimple_content').html();
+        bodytext = bodytext.replace(/<p>&nbsp;<\/p>/gi,'').replace(/<p><\/p>/gi, '').replace(/\n+/g, '\n').replace(/<b><b>/gi, '<b>').replace(/<\/b><\/b>/gi, '</b>');
+        //<link 1524 - internal-link "Opens internal link in current window">
+        params["data[tt_content][" + id + "][bodytext]"] = bodytext;
+
+        if ($('#note-editor-' + id).find('.csc-textpic-imagewrap').length > 0) {
+            params["data[tt_content][" + id + "][image]"] = imgIdList.join();
+        }
+        params["doSave"] = '1';
+        //console.log(params);
         $.ajax({
+            //url: url + '&doSave=1' + extraUrl,
             url: url,
             type: 'post',
             dataType: 'json',
+            data: params,
             complete: function (data) {
-                formToken = $(data.responseText).find('input[name="formToken"]').val();
-
-                //params['cmd'] = "edit";
-                params["data[tt_content][" + id + "][imageorient]"] = imageorientId;
-
-                params["data[tt_content][" + id + "][colPos]"] = colPos;
-                params["data[tt_content][" + id + "][pid]"] = pid;
-                //params["data[tt_content]["+id+"][header]"] = $('#feeditsimple-elHeader').val();
-                params["data[tt_content][" + id + "][CType]"] = 'textpic';
-                params["data[tt_content][" + id + "][_TRANSFORM_bodytext]"] = 'RTE';
-                var bodytext = $('#note-editor-' + id).find('.lth_feeditsimple_content').html();
-                bodytext = bodytext.replace(/<p>&nbsp;<\/p>/gi,'').replace(/<p><\/p>/gi, '').replace(/\n+/g, '\n').replace(/<b><b>/gi, '<b>').replace(/<\/b><\/b>/gi, '</b>');
-                //<link 1524 - internal-link "Opens internal link in current window">
-                params["data[tt_content][" + id + "][bodytext]"] = bodytext;
-                
-                if ($('#note-editor-' + id).find('.csc-textpic-imagewrap').length > 0) {
-                    params["data[tt_content][" + id + "][image]"] = imgIdList.join();
-                }
-                params["formToken"] = formToken;
-                //console.log(params);
-                $.ajax({
-                    url: url + '&doSave=1' + extraUrl,
-                    type: 'post',
-                    dataType: 'json',
-                    data: params,
-                    complete: function (data) {
-                        $('#lth_feedit_simple-saveChanges').prop('disabled', true);
-                        var okMessage = {'header': 'Save', 'message': 'Content successfully saved'};
-                        showMessage(okMessage);
-                        if (id=='new') {
-                            var newId = data.responseText.split(']=edit&amp;doSave=1').shift().split('="/typo3/alt_doc.php?&amp;edit[tt_content][').pop();
-                            $('#new').attr('id', 'c' + newId);
-                            //$('#note-editor-new').attr('data-imageorient', $(this).prev().attr('data-imageorient'));
-                            $('#note-editor-new').attr('id', 'note-editor-' + newId);
-                            enableContextMenu('#note-editor-' + newId);
-                        }
-                    }
-                });
+                $('#lth_feedit_simple-saveChanges').prop('disabled', true);
+                var okMessage = {'header': 'Save', 'message': 'Content successfully saved'};
+                showMessage(okMessage);
+                /*if (id=='new') {
+                    var newId = data.responseText.split(']=edit&amp;doSave=1').shift().split('="/typo3/alt_doc.php?&amp;edit[tt_content][').pop();
+                    $('#new').attr('id', 'c' + newId);
+                    //$('#note-editor-new').attr('data-imageorient', $(this).prev().attr('data-imageorient'));
+                    $('#note-editor-new').attr('id', 'note-editor-' + newId);
+                    enableContextMenu('#note-editor-' + newId);
+                }*/
             }
         });
     });
@@ -1022,11 +1050,27 @@ function getContentTemplate(rel)
 function enableContextMenu(selector)
 {
     //console.log(selector);
-    var hideTest = '0';
-    var showTest = '0';
+    //var hideTest = '0';
+    //var showTest = '0';
+    /*$(selector).mousedown(function(event) {
+    switch (event.which) {
+        case 3:
+            $('.note-popover').hide();
+            break;
+    }
+});*/
+        
     $.contextMenu({
-        selector: selector, 
+        selector: selector,
+        events: {
+            show : function(options) {
+                if($('.note-popover').is(":visible")) {
+                    return false;
+                }
+            }
+        },
         callback: function(key, options) {
+            
             //var m = "clicked: " + key;
             //window.console && console.log(m) || alert(m);
             var keyArray = key.split('_');
@@ -1044,9 +1088,18 @@ function enableContextMenu(selector)
                 "disabled": function(){ return $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }
             },
             "Insert image_": {"name": "Insert image", "disabled": function(){ return $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }},
-            /*"Cut": {"name": "Cut"},
+            "Cut": {"name": "Cut"},
             "Copy": {"name": "Copy"},
-            "Paste": {"name": "Paste"},*/
+            "Paste": {
+                "name": "Paste",
+                "disabled": function(){ 
+                    return !feeditSimpleGetCookie('feeditSimple-copycutitem'); 
+                },
+                "items": {
+                    "pasteContentBefore": {"name": "Before"},
+                    "pasteContentAfter": {"name": "After"}
+                }
+            },
             "Hide": {"name": "Hide","disabled": function(){ return $(this).hasClass('feEditSimple-hidden-1') || $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }},
             "Show": {"name": "Show","disabled": function(){ return $(this).hasClass('feEditSimple-hidden-0') || $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }},
             "Delete": {"name": "Delete", "icon": "delete", "disabled": function(){ return $(this).closest('.note-editor').attr('id').split('-').pop() == 'new'; }},
@@ -1071,10 +1124,48 @@ function enableContextMenu(selector)
 }
 
 
+function enableContextMenuShort(selector)
+{
+    $.contextMenu({
+        selector: selector,
+        events: {
+            show : function(options) {
+                if($('.note-popover').is(":visible")) {
+                    return false;
+                }
+            }
+        },
+        callback: function(key, options) {
+            
+            //var m = "clicked: " + key;
+            //window.console && console.log(m) || alert(m);
+            var keyArray = key.split('_');
+            var uid = $(this).attr('id').replace('note-editor-','');
+            //var imageOrientationId = $(this).attr('data-imageorient');
+            feeditSimpleContentCommand(keyArray[0], uid, keyArray[1]);
+        },
+        items: {
+            "new_content": {
+                "name": "New content element after this",
+                "icon": "add",
+                "items": {
+                    "Text and images": {"name": "Text and images"}
+                }
+            },
+            "pasteContentAfter": {
+                "name": "Paste",
+                "disabled": function(){ 
+                    return !feeditSimpleGetCookie('feeditSimple-copycutitem'); 
+                }
+            }
+        }
+    });
+}
+
+
 function feeditSimpleContentCommand(cmd, uid, imageOrientationId)
 {
-    //var cmd = $(e.target).text();
-    
+      
     //var uid = context.attr('id').split('-').pop();
     var pageUid = $('body').attr('id');
     //console.log(cmd+uid+pageUid);
@@ -1086,47 +1177,60 @@ function feeditSimpleContentCommand(cmd, uid, imageOrientationId)
                 var okMessage = {'header': 'Delete', 'message': 'Content element successfully deleted'};
                 $('#note-editor-' + uid).remove();
                 $('#c' + uid).remove();
-                ajaxCall('deleteContent', 'tt_content', uid, '', '', okMessage, colId);
+                ajaxCall('deleteContent', 'tt_content', uid, '', pageUid, okMessage, colId);
             } else {
                 return false;
             }
             break;
         case 'Cut':
-            if (feeditSimpleSetCookie('feeditSimple-copycutitem', 'cut:tt_content:' + uid, 1)) {
+            if (feeditSimpleSetCookie('feeditSimple-copycutitem', 'cut:tt_content:' + uid + ':' + pageUid, 1)) {
                 var content = $('#c' + uid)[0].outerHTML;
                 $('#note-editor-' + uid).remove();
                 $('#c' + uid).remove();
-                var okMessage = {'header': 'Cut', 'message': 'Content element successfully cut'};
-                ajaxCall('setClipboard', 'tt_content', uid, '', '', okMessage, content);
+                //var okMessage = {'header': 'Cut', 'message': 'Content element successfully cut'};
+                ajaxCall('setClipboard', 'tt_content', uid, '', '', '', content);
             } else {
                 showMessage({'header': '500', 'message': 'no'});
             }
             break;
         case 'Copy':
             if (feeditSimpleSetCookie('feeditSimple-copycutitem', 'copy:tt_content:' + uid, 1)) {
-                var content = $('#c' + uid).outerHTML;
+                var content = $('#c' + uid)[0].outerHTML;
                 var okMessage = {'header': 'Copy', 'message': 'Content element successfully copied'};
                 ajaxCall('setClipboard', 'tt_content', uid, '', '', okMessage, content);
             } else {
                 showMessage({'header': '500', 'message': 'no'});
             }
             break;
-        case 'Paste':
+        case 'pasteContentBefore':
+        case 'pasteContentAfter':
             var pasteContent = feeditSimpleGetCookie('feeditSimple-copycutitem');
             if (pasteContent) {
-                var okMessage = {'header': 'Paste', 'message': 'Content element successfully pasted'};
-                ajaxCall('pasteContent', 'tt_content', pasteContent, uid, pageUid, okMessage);
+                //var okMessage = {'header': 'Paste', 'message': 'Content element successfully pasted'};
+                var pid = '-'+uid;
+                if(cmd=='pasteContentBefore') {
+                    if($('#c'+uid).prev().prev().attr('id')) {
+                        //There is an element before
+                        pid = $('#c'+uid).prev().prev().attr('id').replace('c','-');
+                    } else {
+                        //there is no element before
+                        //we have to use the pageid
+                        pid = pageUid;
+                    }
+                }
+               // console.log($('#c'+uid).prev().prev().attr('id'));
+                ajaxCall(cmd, 'tt_content', uid, pid, pageUid, '', pasteContent);
             } else {
                 showMessage({'header': '500', 'message': 'no'});
             }
             break;
         case 'Hide':
             var okMessage = {'header': 'Hide', 'message': 'Content element successfully hidden'};
-            ajaxCall('hideContent', 'tt_content', uid, '', '', okMessage);
+            ajaxCall('hideContent', 'tt_content', uid, '', pageUid, okMessage);
             break;
         case 'Show':
             var okMessage = {'header': 'Show', 'message': 'Content element successfully displayed'};
-            ajaxCall('showContent', 'tt_content', uid, '', '', okMessage);
+            ajaxCall('showContent', 'tt_content', uid, '', pageUid, okMessage);
             break;
         case 'Above, center':
         case 'Above, left':
@@ -1160,9 +1264,9 @@ function feeditSimpleContentCommand(cmd, uid, imageOrientationId)
             makeEditable('#new', '');
             enableContextMenu('#note-editor-new');
             $('#new').next().attr('id', 'note-editor-new');
-            makeSortable(document.getElementById('feEditSimple-normalColWrapper'), 'connectedSortable');
+            //makeSortable(document.getElementById('feEditSimple-normalColWrapper'), 'connectedSortable');
             if($('#feEditSimple-rightColWrapper').length > 0) {
-                makeSortable(document.getElementById('feEditSimple-rightColWrapper'), 'connectedSortable');
+                //makeSortable(document.getElementById('feEditSimple-rightColWrapper'), 'connectedSortable');
             }
             $('#note-editor-' + uid).closest('.connectedSortable').find('.note-editor-temp').remove();
             break;           
@@ -1267,6 +1371,13 @@ function insertImage(uid, type, imageOrientationId)
 
 function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
 {
+    var colId, colPos;
+    colId = $('#note-editor-' + uid).closest('.connectedSortable').attr('id');
+    if(colId) {
+        colPos = getColpos(colId);
+    } else {
+        colPos = '0';
+    }
     $.ajax({
         type: "POST",
         url: 'index.php',
@@ -1279,21 +1390,33 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
             pid: pid,
             pageUid: pageUid,
             contentToPaste: contentToPaste,
+            colPos: colPos,
             sid: Math.random()
         },
         success: function (data) {
-            if (cmd == 'pasteContent' && data.content && data.result == 200) {
-                //console.log($('#c'+pid).length);
-                //$('#c'+pid).toggle();
-                $('#c' + pid).next().after(data.content);
-                var uidArray = uid.split(':');
-                makeEditable('#c' + uidArray.pop(), '');
-                if($('#feEditSimple-rightColWrapper').length > 0) {
-                    makeSortable(document.getElementById('feEditSimple-rightColWrapper'), 'connectedSortable');
+            if ((cmd == 'pasteContentBefore' || cmd == 'pasteContentAfter') && data.content && data.result == 200) {
+
+                if(cmd=='pasteContentBefore') {
+                    //console.log(pid);
+                    if(parseInt(pid) >= 0) {
+                        //get first
+                        $('.csc-default').first().before(data.content);
+                    } else {
+                        $('#c' + pid.substring(1)).before(data.content);
+                    }
+                    
+                } else if(cmd=='pasteContentAfter' && pid.indexOf('temp') > 0) {
+                    //console.log($('.connectedSortable').closest().attr('id'));
+                    $('#note-editor-'+uid).replaceWith(data.content);
+                } else if(cmd=='pasteContentAfter') {
+                    console.log('#c' + pid.substring(1));
+                    $('#c' + pid.substring(1)).next().after(data.content);
                 }
-                if (data.oldUid) {
-                    feeditSimpleSetCookie('feeditSimple-copycutitem', 'copy:' + table + ':' + data.oldUid, 1);
-                }
+                
+                makeEditable('#c' + data.uid, '');
+                /*if($('#feEditSimple-rightColWrapper').length > 0) {
+                    //makeSortable(document.getElementById('feEditSimple-rightColWrapper'), 'connectedSortable');
+                }*/
             } else if (cmd === 'deleteContent' && data.result == 200) {
                 if($('#'+contentToPaste).find('.note-editor').length==0) {
                     addNoContent('#'+contentToPaste);

@@ -9,19 +9,20 @@ class Tx_Contentstage_Eid_ClearCache_FakeBEUSER {
            return true;
        }
 }
-tslib_eidtools::connectDB();
+//tslib_eidtools::connectDB();
 //require_once(PATH_t3lib.'class.t3lib_div.php');
 //require_once (PATH_t3lib.'class.t3lib_tcemain.php');
 
-$cmd = t3lib_div::_GP('cmd');
-$table = t3lib_div::_GP('table');
-$uid = t3lib_div::_GP('uid');
-$pid = t3lib_div::_GP('pid');
-$pageUid = t3lib_div::_GP('pageUid');
-$formToken = t3lib_div::_GP('formtoken');
-$contentToPaste = t3lib_div::_GP('contentToPaste');
-$path = t3lib_div::_GP('path');
-$sid = t3lib_div::_GP('sid');
+$cmd = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('cmd');
+$table = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('table');
+$uid = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('uid');
+$pid = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('pid');
+$pageUid = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('pageUid');
+$formToken = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('formtoken');
+$contentToPaste = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('contentToPaste');
+$colPos = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('colPos');
+$path = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('path');
+$sid = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('sid');
 
 $content = array();
 
@@ -50,17 +51,14 @@ switch($cmd) {
     case "getPageTree":
 	$content = getPageTree();
 	break; 
-    case "generateToken":
-	$content = generateToken($table, $uid, $formToken);
-	break;
-    case "moveContent":
-	$content = moveContent($cmd, $table, $uid, $pid, $pageUid);
+    case "getLocation":
+	$content = getLocation($table, $uid, $pid);
 	break;
     case "hideContent":
-	$content = hideContent($cmd, $table, $uid);
+	$content = hideContent($cmd, $table, $uid, $pageUid);
 	break;
     case "showContent":
-	$content = showContent($cmd, $table, $uid);
+	$content = showContent($cmd, $table, $uid, $pageUid);
 	break;
     case "getAbsolutePath":
 	$content = getAbsolutePath();
@@ -69,10 +67,11 @@ switch($cmd) {
 	$content = fileupload($path);
 	break;
     case "deleteContent":
-	$content = deleteContent($uid);
+	$content = deleteContent($uid, $pageUid);
 	break;    
-    case "pasteContent":
-	$content = pasteContent($uid, $table, $pid, $pageUid);
+    case "pasteContentBefore":
+    case "pasteContentAfter":
+	$content = pasteContent($cmd, $table, $pid, $pageUid, $contentToPaste, $colPos);
 	break;
     case "setClipboard":
 	$content = setClipboard($uid, $table, $contentToPaste);
@@ -158,7 +157,7 @@ function getSysFileId($uid)
 
 function getUserSettings()
 {
-    $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+    $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
     $GLOBALS['BE_USER']->start();
     $GLOBALS['BE_USER']->unpack_uc('');
     //$beuserId = $GLOBALS['BE_USER']->user['uid'];
@@ -176,7 +175,7 @@ function getUserSettings()
 
 function updateFeUserSettings($contentToPaste)
 {
-    $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+    $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
     $GLOBALS['BE_USER']->start();
     
     $beuserId = $GLOBALS['BE_USER']->user['uid'];
@@ -188,7 +187,7 @@ function saveUserSettings($contentToPaste)
 {
     $contentToPasteArray = json_decode($contentToPaste, true);
 
-    $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+    $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
     $GLOBALS['BE_USER']->start();
     //$GLOBALS['BE_USER']->unpack_uc('');
     
@@ -305,7 +304,7 @@ function getFiles($pageUid, $modalType)
         // the value this->formfield_status is set to empty in order to disable login-attempts to the backend account through this script
         // @todo 	Comment says its set to empty, but where does that happen?
 
-        $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication'); //t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
         $beuserFile_mountpoints = $GLOBALS['BE_USER']->user['file_mountpoints'];
@@ -481,7 +480,7 @@ function getPageTree()
         $btitle = '';
         $gtitle = '';
         
-        $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
         if($GLOBALS['BE_USER']->user['uid']) {
@@ -536,10 +535,19 @@ function getPageTree()
 
 //*****************************************CONTENT ELEMENTS************************************************************
 
-function deleteContent($uid)
+function deleteContent($uid, $pageUid)
 {
+    //Todo: kolla om posten ligger i urklipp. I så fall ta bort
     $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid='.intval($uid), array('deleted' => 1, 'tstamp' => time()));
     if($GLOBALS['TYPO3_DB']->sql_affected_rows() > 0) {
+        $GLOBALS['TCA'][$table]['ctrl']['sortby'] = 'sorting';
+        $tce = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
+        $tce->BE_USER = new Tx_Contentstage_Eid_ClearCache_FakeBEUSER();
+        $tce->BE_USER->user = array('username' => 'tx_contentstage_eId');
+        $tce->admin = true;
+        $tce->stripslashes_values = 0;
+        $tce->start(array(), array());
+        $tce->clear_cacheCmd($pageUid);
         return array('result' => 200);
     } else {
         return array('result' => 500);
@@ -558,14 +566,20 @@ function deleteContent($uid)
 }
 */
 
-function generateToken($table, $uid, $formToken)
+/*function getLocation($table, $uid, $pageUid)
 {
-    $newformToken = t3lib_div::hmac('editRecord', $formToken);
-    $returnArray = array();
-    $returnArray['content'] = $newformToken;
+    $location = \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('record_edit', array(
+                    "edit[$table][$uid]" => 'edit',
+                    //'defVals[tt_content][colPos]' => 0,
+                    //'defVals[tt_content][sys_language_uid]' => 0,
+                    'noView' => 0,
+                    'feEdit' => 1,
+                    'returnUrl' => 'sysext/backend/Resources/Private/Templates/Close.html'
+                ));
+    $returnArray['content'] = $location;
     return $returnArray;
 }
-
+*/
 
 function getAbsolutePath()
 {
@@ -578,16 +592,18 @@ function getAbsolutePath()
 function setClipboard($uid, $table, $contentToPaste)
 {
     if ($_COOKIE['be_typo_user']) {
-        $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
-        
-        if($GLOBALS['BE_USER']->user['uid']) {
+        $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => $GLOBALS['BE_USER']->user['uid'], 'crdate' => time()));
+        if(!$GLOBALS['BE_USER']->user['uid']===FALSE) {
             $beuserId = intval($GLOBALS['BE_USER']->user['uid']);
             $time = time();
             try {
-                $GLOBALS['TYPO3_DB']->sql_query("UPDATE be_users SET tx_feEditSimple_clipboard = '$contentToPaste', tstamp = $time"
-                    . " WHERE uid = $beuserId");
+                $GLOBALS['TYPO3_DB']->store_lastBuiltQuery = 1;
+                $GLOBALS['TYPO3_DB']->exec_UPDATEquery('be_users', 'uid='.intval($beuserId), array('tx_feEditSimple_clipboard' => $contentToPaste, "tstamp" => "$time"));
+                //$GLOBALS['TYPO3_DB']->sql_query("UPDATE be_users SET tx_feEditSimple_clipboard = '$contentToPaste', tstamp = $time"
+                //    . " WHERE uid = $beuserId");
                 if($GLOBALS['TYPO3_DB']->sql_affected_rows() > 0) {
                     return array('result' => 200);
                 } else {
@@ -606,7 +622,7 @@ function setClipboard($uid, $table, $contentToPaste)
 function getClipboard()
 {
     if ($_COOKIE['be_typo_user']) {
-        $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
 
@@ -631,7 +647,7 @@ function getClipboard()
 }
 
 
-function moveContent($cmd, $table, $uid, $pid, $pageUid, $oldUid = null)
+function moveContent($cmd, $pasteType, $table, $uid, $pid, $pageUid, $oldpageUid, $colPos, $uidToPaste)
 {
     $newSorting = null;
     $returnArray = array();
@@ -640,7 +656,7 @@ function moveContent($cmd, $table, $uid, $pid, $pageUid, $oldUid = null)
             
     // fake tcemain
     $GLOBALS['TCA'][$table]['ctrl']['sortby'] = 'sorting';
-    $tce = t3lib_div::makeInstance('t3lib_TCEmain');
+    $tce = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
     $tce->BE_USER = new Tx_Contentstage_Eid_ClearCache_FakeBEUSER();
     $tce->BE_USER->user = array('username' => 'tx_contentstage_eId');
     $tce->admin = true;
@@ -653,16 +669,43 @@ function moveContent($cmd, $table, $uid, $pid, $pageUid, $oldUid = null)
     }
 
     try {
-        $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($uid), array('pid' => intval($pageUid), 'sorting' => intval($newSorting)));
+        //$GLOBALS['TYPO3_DB']->store_lastBuiltQuery = 1;
+        $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($uid), array('pid' => intval($pageUid), 'colPos' => intval($colPos), 'sorting' => intval($newSorting)));
         if($GLOBALS['TYPO3_DB']->sql_affected_rows() > 0) {
             $returnArray['result'] = 200;
         } else {
             $returnArray['result'] = 500;
         }
-        if($cmd == 'cut' || $cmd == 'copy') {
+        /*if($cmd == 'cut' || $cmd == 'copy') {
             $returnArray = getClipboard();
             $returnArray['oldUid'] = $oldUid;
+        }*/
+        //$errata = $GLOBALS['TYPO3_DB']->debug_lastBuiltQuery;
+        //$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_devlog', array('msg' => $errata, 'crdate' => time()));
+        //$oTce = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_TCEmain');
+        $tce->start(array(), array());
+        $tce->clear_cacheCmd($pageUid);
+        if($oldpageUid <> $pageUid) {
+            $tce->start(array(), array());
+            $tce->clear_cacheCmd($pageUid);
         }
+        
+        $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
+        $GLOBALS['BE_USER']->start();
+        $beuserId = $GLOBALS['BE_USER']->user['uid'];
+        
+        if($beuserId) {
+            $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("tx_feEditSimple_clipboard","be_users","uid=".intval($beuserId));
+            $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+            $tx_feEditSimple_clipboard = $row['tx_feEditSimple_clipboard'];
+            if($pasteType=='copy') {
+                $returnArray['content'] = str_replace('<div id="c'.$uidToPaste.'"', '<div id="c'.$uid.'"', $tx_feEditSimple_clipboard);
+            } else {
+                $returnArray['content'] = $tx_feEditSimple_clipboard;
+            }
+            $GLOBALS['TYPO3_DB']->sql_free_result($res);
+        }
+        $returnArray['uid'] = $uid;
     } catch(Exception $e) {
         $returnArray['result'] = 500;
         echo $e->getMessage();
@@ -687,63 +730,64 @@ function initTSFE()
 }
 
 
-function pasteContent($uid, $table, $pid, $pageUid)
+function pasteContent($cmd, $table, $pid, $pageUid, $contentToPaste, $colPos)
 {
-    $uidArray = explode(':', $uid);
-    $pasteType = $uidArray[0];
-    $uidToPaste = $uidArray[2];
+    $contentToPasteArray = explode(':', $contentToPaste);
+    $pasteType = $contentToPasteArray[0];
+    $uidToPaste = $contentToPasteArray[2];
+    $oldpageUid = $contentToPasteArray[3];
     
     if($pasteType == 'cut') {
-        $returnArray = moveContent($pasteType, $table, "c$uidToPaste", "-c$pid", $pageUid, $uidToPaste);
+        $returnArray = moveContent($cmd, $pasteType, $table, $uidToPaste, $pid, $pageUid, $oldpageUid, $colPos, $uidToPaste);
+        setcookie("feeditSimple-copycutitem", "", time()-3600);
     } else if($pasteType == 'copy') {
         // get original record
+        //$GLOBALS['TYPO3_DB']->store_lastBuiltQuery = 1;
         $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, 'uid='.intval($uidToPaste));
-        $original_record = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-        $GLOBALS['TYPO3_DB']->sql_free_result($res);
-        
-        // insert the new record and get the new auto_increment id
+        $originalTtRecord = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+        $updateArray = array();
         $insertArray = array ('uid' => null);
         $res = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertArray);
-        $newId = $GLOBALS['TYPO3_DB']->sql_insert_id();
-
-        // generate the query to update the new record with the previous values
-        foreach ($original_record as $key => $value) {
+        $newTtId = $GLOBALS['TYPO3_DB']->sql_insert_id();
+        foreach ($originalTtRecord as $key => $value) {
             if ($key != 'uid') {
                 $updateArray[$key] = $value;
             }
         }
-        
-        // update the new record
         if(is_array($updateArray)) {
-            $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($newId), $updateArray);
+            $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($newTtId), $updateArray);
         }
-        
+
+        //$GLOBALS['TYPO3_DB']->store_lastBuiltQuery = 1;
+        $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'sys_file_reference', 'uid_foreign='.intval($uidToPaste));
+        while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
+            $originalSfRecord = $row;
+            $GLOBALS['TYPO3_DB']->store_lastBuiltQuery = 1;
+            $updateArray = array('uid_foreign' => $newTtId);
+                $insertArray = array ('uid' => null);
+                $GLOBALS['TYPO3_DB']->exec_INSERTquery('sys_file_reference', $insertArray);
+                $newSfId = $GLOBALS['TYPO3_DB']->sql_insert_id();
+            foreach ($originalSfRecord as $key => $value) {
+                if ($key != 'uid' && $key != 'uid_foreign') {
+                    $updateArray[$key] = $value;
+                }
+            }
+            if(is_array($updateArray)) {
+                $GLOBALS['TYPO3_DB']->exec_UPDATEquery('sys_file_reference', 'uid='.intval($newSfId), $updateArray);
+            }
+        }
+
+        $GLOBALS['TYPO3_DB']->sql_free_result($res);       
         // move the new record
-        moveContent($pasteType, $table, $newId, $parentUid, $pageUid, $uidToPaste);
-    }
-    
-
-    /*$tce = t3lib_div::makeInstance('t3lib_TCEmain');
-    $tce->stripslashes_values = 0;
-    $sortRes = $tce->getSortNumber($table,$uid,'-'.$parentUid);
-    
-    if(is_array($sortRes)) {
-        $newSorting = $sortRes['sortNumber'];
-    } else {
-        $newSorting = $sortRes;
+        $returnArray = moveContent($cmd, $pasteType, $table, $newTtId, $pid, $pageUid, $oldpageUid, $colPos, $uidToPaste);
     }
 
-    $res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($uid), array('pid' => $pid, 'sorting' => $newSorting, 'colpos' => $colpos)) or die("88; ".mysql_error());
-    
-    $returnArray = array();
-    $returnArray['colpos'] = $colpos;
-    $returnArray['content'] = renderContentElement($table, $uid);
-    */
     return $returnArray;
 }
 
-function hideContent($cmd, $table, $uid)
+function hideContent($cmd, $table, $uid, $pageUid)
 {
+    //to do: empty cache :(
     try {
         $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($uid), array('hidden' => 1, 'tstamp' => time()));
         if($GLOBALS['TYPO3_DB']->sql_affected_rows() > 0) {
@@ -751,12 +795,19 @@ function hideContent($cmd, $table, $uid)
         } else {
             return array('result' => 500);
         }
+        $tce = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
+        $tce->BE_USER = new Tx_Contentstage_Eid_ClearCache_FakeBEUSER();
+        $tce->BE_USER->user = array('username' => 'tx_contentstage_eId');
+        $tce->admin = true;
+        $tce->stripslashes_values = 0;
+        $tce->start(array(), array());
+        $tce->clear_cacheCmd($pageUid);
     } catch(Exception $e) {
         return array('result' => 500);
     }
 }
 
-function showContent($cmd, $table, $uid)
+function showContent($cmd, $table, $uid, $pageUid)
 {
     try {
         $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($uid), array('hidden' => 0, 'tstamp' => time()));
@@ -765,6 +816,13 @@ function showContent($cmd, $table, $uid)
         } else {
             return array('result' => 500);
         }
+        $tce = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\DataHandling\\DataHandler');
+        $tce->BE_USER = new Tx_Contentstage_Eid_ClearCache_FakeBEUSER();
+        $tce->BE_USER->user = array('username' => 'tx_contentstage_eId');
+        $tce->admin = true;
+        $tce->stripslashes_values = 0;
+        $tce->start(array(), array());
+        $tce->clear_cacheCmd($pageUid);
     } catch(Exception $e) {
         return array('result' => 500);
     }
@@ -805,7 +863,7 @@ function tmpContent($tmpContent)
         // the value this->formfield_status is set to empty in order to disable login-attempts to the backend account through this script
         // @todo 	Comment says its set to empty, but where does that happen?
 
-        $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
         $beuserid = $GLOBALS['BE_USER']->user['uid'];
@@ -813,7 +871,7 @@ function tmpContent($tmpContent)
 	$GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_feEditSimple_tmpcontent', 'cruser_id='.intval($beuserid));
 	
 	$insertArray = array('cruser_id' => $beuserid, 'crdate' => time(), tstamp => time(), 'tmpcontent' => $tmpContent);
-	$res = $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_feEditSimple_tmpcontent', $insertArray) or die("132; ".mysql_error());
+	$res = $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_feEditSimple_tmpcontent', $insertArray);
     }
 }
 
@@ -821,14 +879,14 @@ function tmpContent($tmpContent)
 function copyContentElement($cmd,$table,$uid,$pid,$parentUid)
 {
                         
-    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, 'uid='.intval($uid), '', '', '') or die('139; '.mysql_error());
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, 'uid='.intval($uid), '', '', '');
     $original_record = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
     
     if($parentUid) {
         $parentUidArray = explode(':',$parentUid);
         $parentUid = '-'.$parentUidArray[1];
             // Get sorting values
-        $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('colpos', $table, 'uid='.intval($parentUid), '', '', '') or die('104; '.mysql_error());
+        $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('colpos', $table, 'uid='.intval($parentUid), '', '', '');
         $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
         $colpos = $row['colpos'];
     } else {
@@ -851,7 +909,7 @@ function copyContentElement($cmd,$table,$uid,$pid,$parentUid)
 
         // insert the new record and get the new auto_increment id
     $insertArray = array ('uid' => null);
-    $res = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertArray) or die("126; ".mysql_error());
+    $res = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertArray);
     $newId = mysql_insert_id();
     
     // generate the query to update the new record with the previous values
@@ -889,7 +947,7 @@ function renderContentElement($table, $uid)
     require_once (PATH_t3lib.'class.t3lib_userauthgroup.php');
     require_once (PATH_t3lib.'class.t3lib_beuserauth.php');
     require_once (PATH_t3lib.'class.t3lib_tsfebeuserauth.php');
-    $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+    $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
     $GLOBALS['BE_USER']->OS = TYPO3_OS;
     $GLOBALS['BE_USER']->lockIP = $GLOBALS['TYPO3_CONF_VARS']['BE']['lockIP'];
     $GLOBALS['BE_USER']->workspace = 0;
@@ -904,7 +962,8 @@ function renderContentElement($table, $uid)
             $contentElementRow['uid'] = $uid;
     }
 
-    $cObj = t3lib_div::makeInstance('tslib_cObj');
+    //$cObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tslib_cObj');
+    $cObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer');
     //$cObj->start($contentElementRow, 'tt_content');
     //$conf = array('allow' => 'edit, new, delete, hide', 'cut', 'copy');
     $conf = array('allow' => 'move,new,edit,hide,unhide,delete,cut,copy', 'line' => 5, 'label' => '%s', 'onlyCurrentPid' => 1, 'previewBorder' => 4, 'edit.' => Array ( 'displayRecord' => 1 ) );
@@ -968,7 +1027,7 @@ function loadCategorySelector($uid)
         // the value this->formfield_status is set to empty in order to disable login-attempts to the backend account through this script
         // @todo 	Comment says its set to empty, but where does that happen?
 
-        $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
         $beuserid = $GLOBALS['BE_USER']->user['uid'];
@@ -1130,7 +1189,7 @@ function getPidForNewArticles($pageId)
 function deletePage($cmd, $pageUid)
 {
     if ($_COOKIE['be_typo_user']) {
-        $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
         $beuserid = $GLOBALS['BE_USER']->user['uid'];
@@ -1177,7 +1236,7 @@ function deletePage($cmd, $pageUid)
 function pastePage($cmd, $uid, $pageUid)
 {
     if ($_COOKIE['be_typo_user']) {
-        $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
         $GLOBALS['BE_USER']->admin = true;
@@ -1372,7 +1431,7 @@ function getLocalTCE($stripslashesValues = FALSE, $dontProcessTransformations = 
 function hideShowPage($cmd, $pageUid, $type)
 {
     if ($_COOKIE['be_typo_user']) {
-        $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
         $beuserid = $GLOBALS['BE_USER']->user['uid'];
@@ -1471,7 +1530,7 @@ function logout($url)
         // the value this->formfield_status is set to empty in order to disable login-attempts to the backend account through this script
         // @todo 	Comment says its set to empty, but where does that happen?
 
-        $GLOBALS['BE_USER'] = t3lib_div::makeInstance('t3lib_tsfeBeUserAuth');
+        $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
         $GLOBALS['BE_USER']->start();
         $GLOBALS['BE_USER']->unpack_uc('');
         $beuserid = $GLOBALS['BE_USER']->user['uid'];

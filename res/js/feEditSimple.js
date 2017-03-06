@@ -13,8 +13,7 @@ var feeditSimpleElementId;
 var colPos;
 
 $(document).ready(function()
-{
-    
+{    
     $('.lth_feeditsimple_contenta').dblclick(function() {
         /*if($('.wysihtml5-toolbar').length > 0) {
             return false;

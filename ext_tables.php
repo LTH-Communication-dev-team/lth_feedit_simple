@@ -3,7 +3,7 @@ if (!defined('TYPO3_MODE')) {
   die ('Access denied.');
 }
 
-$tempColumns = array(
+/*$tempColumns = array(
    'imagewidth' => array(
       'exclude' => 1,
       'l10n_mode' => 'mergeIfNotBlank',
@@ -37,4 +37,4 @@ $tempColumns = array(
         'imageoverlayPalette',
         ';;;;3-3-3,--linebreak--,imagewidth,imageheight',
         'after:description'
-);
+);*/

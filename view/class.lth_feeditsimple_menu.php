@@ -124,9 +124,9 @@ class lth_feeditsimple_menu {
 	 */
 	public function init() {
 
-		$this->cObj = t3lib_div::makeInstance('tslib_cObj');
+                $this->cObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer');
 		$this->pid  = intval($GLOBALS['TSFE']->id);
-		$this->modTSconfig = t3lib_BEfunc::getModTSconfig($this->pid, 'FeEdit');
+		$this->modTSconfig = \TYPO3\CMS\Backend\Utility\BackendUtility::getModTSconfig($this->pid, 'FeEdit');
 
 			// TODO: do we need this?
 		//$this->getUserListing();
@@ -141,14 +141,14 @@ class lth_feeditsimple_menu {
 
 			// setting the base path for the icons
 		$this->imagePath = $this->modTSconfig['properties']['skin.']['imagePath'];
-		$this->imagePath = ($this->imagePath ? $this->imagePath : \TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple') . 'res/icons/');
+		$this->imagePath = ($this->imagePath ? $this->imagePath : \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('lth_feedit_simple') . 'res/icons/');
 
 			// loading template
 		$templateFile = $this->modTSconfig['properties']['skin.']['templateFile'];
-		$templateFile = ($templateFile ? $templateFile : \TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple') . 'res/template/feedit.tmpl');
+		$templateFile = ($templateFile ? $templateFile : \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('lth_feedit_simple') . 'res/template/feedit.tmpl');
 		$templateFile = $GLOBALS['TSFE']->tmpl->getFileName($templateFile);
 		$templateFile = $GLOBALS['TSFE']->tmpl->fileContent($templateFile);
-		$this->template = t3lib_parsehtml::getSubpart($templateFile, '###MENU_' . ($this->menuOpen ? 'OPENED' : 'CLOSED' ) . '###');
+		$this->template =  \TYPO3\CMS\Core\Html\HtmlParser::getSubpart($templateFile, '###MENU_' . ($this->menuOpen ? 'OPENED' : 'CLOSED' ) . '###');
 	}
 
         /*function insertButtons()
@@ -317,6 +317,16 @@ class lth_feeditsimple_menu {
                     <span>'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:hideContentElementsRow').'</span>
                     </a>
                 </li>';*/
+                    
+                    $location = \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleUrl('record_edit', array(
+                    'edit[pages]['.$this->pid.']' => 'edit',
+                    //'defVals[tt_content][colPos]' => 0,
+                    //'defVals[tt_content][sys_language_uid]' => 0,
+                    'noView' => 1,
+                    'feEdit' => 0,
+                    'returnUrl' => 'sysext/backend/Resources/Private/Templates/Close.html'
+                ));
+                   // echo $location;
                 
                 $content .= '<li id="" class="">
                     <div id="msg-div"></div>
@@ -330,7 +340,7 @@ class lth_feeditsimple_menu {
                     <ul class="dropdown-menu">
                         <!-- <li><a id="feeditSimple-userSettingsButton" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userSettingsTooltip').'" href="#feeditSimple-sidePanel">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userSettings').'</a></li> -->
                         <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userBackendTooltip').'" href="/typo3/">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userBackend').'</a></li>
-                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogoutTooltip').'" href="/typo3/logout.php?redirect='.t3lib_div::getIndpEnv('TYPO3_REQUEST_URL').'">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogout').'</a></li>
+                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogoutTooltip').'" href="/typo3/logout.php?redirect='.\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL').'">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogout').'</a></li>
                     </ul>
                 </li>
                 
@@ -347,7 +357,9 @@ class lth_feeditsimple_menu {
             </ul>
 		<input type="hidden" name="TSFE_ADMIN_PANEL[preview_showHiddenPages]" value="' . ($GLOBALS['BE_USER']->uc['TSFE_adminConfig']['preview_showHiddenPages'] ? 1 : 0) . '" id="preview_showHiddenPages" />
 		<input type="hidden" name="TSFE_ADMIN_PANEL[preview_showHiddenRecords]" value="' . ($GLOBALS['BE_USER']->uc['TSFE_adminConfig']['preview_showHiddenRecords'] ? 1 : 0) . '" id="preview_showHiddenRecords" />
-                 <input type="hidden" name="beUserLang" id="beUserLang" value="' . $GLOBALS['BE_USER']->uc['lang'] . '"/>';
+                 <input type="hidden" name="beUserLang" id="beUserLang" value="' . $GLOBALS['BE_USER']->uc['lang'] . '"/>
+                 <input type="hidden" id="lth_feedit_simple-location" name="lth_feedit_simple-location" value="' . $location . '"/>
+                  ';
 
                 /* <div class="btn-group btn-toggle"> 
     <button class="btn btn-xs btn-default">ON</button>
@@ -396,7 +408,7 @@ class lth_feeditsimple_menu {
                 
 
 		$markers = array(
-			'EXTPATH'   => \TYPO3\CMS\Core\Utility\GeneralManagementUtility::siteRelPath('lth_feedit_simple'),
+			'EXTPATH'   => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::siteRelPath('lth_feedit_simple'),
 			'CSSPREFIX' => $this->cssPrefix
 		);
 
@@ -419,10 +431,10 @@ class lth_feeditsimple_menu {
                         //$markers['PAGE_EDIT_PANEL'] = $this->cObj->editPanel('', $conf);
 
 				// show all sections and accompanying items that are in the first row
-			$sectionParts  = t3lib_parsehtml::getSubpart($this->template, '###SECTIONS_FIRST_ROW###');
-			$templateSection    = t3lib_parsehtml::getSubpart($sectionParts, '###SECTION###');
-			$templateSingleItem = t3lib_parsehtml::getSubpart($sectionParts, '###SINGLE_ITEM###');
-			$templateSeparator  = t3lib_parsehtml::getSubpart($sectionParts, '###SEPARATOR###');
+			$sectionParts  =  \TYPO3\CMS\Core\Html\HtmlParser::getSubpart($this->template, '###SECTIONS_FIRST_ROW###');
+			$templateSection    =  \TYPO3\CMS\Core\Html\HtmlParser::getSubpart($sectionParts, '###SECTION###');
+			$templateSingleItem =  \TYPO3\CMS\Core\Html\HtmlParser::getSubpart($sectionParts, '###SINGLE_ITEM###');
+			$templateSeparator  =  \TYPO3\CMS\Core\Html\HtmlParser::getSubpart($sectionParts, '###SEPARATOR###');
 
 			$subparts = array(
 				'SECTIONS_FIRST_ROW'  => '',
@@ -446,20 +458,20 @@ class lth_feeditsimple_menu {
 						'SEPARATOR' => ($section['useSeparator'] ? $templateSeparator : ''),
 						'NAME'      => $item
 					);
-					$sectionMarkers['ITEMS'] .= t3lib_parsehtml::substituteMarkerArray($templateSingleItem, $itemMarkers, '###ITEM_|###');
+					$sectionMarkers['ITEMS'] .=  \TYPO3\CMS\Core\Html\HtmlParser::substituteMarkerArray($templateSingleItem, $itemMarkers, '###ITEM_|###');
 				}
 				if ($section['isInFirstRow']) {
-					$subparts['SECTIONS_FIRST_ROW'] .= t3lib_parsehtml::substituteMarkerArray($templateSection, $sectionMarkers, '###SECTION_|###');
+					$subparts['SECTIONS_FIRST_ROW'] .=  \TYPO3\CMS\Core\Html\HtmlParser::substituteMarkerArray($templateSection, $sectionMarkers, '###SECTION_|###');
 				} else {
-					$subparts['SECTIONS_SECOND_ROW'] .= t3lib_parsehtml::substituteMarkerArray($templateSection, $sectionMarkers, '###SECTION_|###');
+					$subparts['SECTIONS_SECOND_ROW'] .=  \TYPO3\CMS\Core\Html\HtmlParser::substituteMarkerArray($templateSection, $sectionMarkers, '###SECTION_|###');
 				}
 			}
 
 				// add section = showing users online
 			if ($this->userList) {
 				$userMarkers = array('USER_LIST' => $this->userList, 'USER_LABEL' => $this->getLL('usersOnPage'));
-				$subparts['USERLISTING'] = t3lib_parsehtml::getSubpart($this->template, '###USERLISTING###');
-				$subparts['USERLISTING'] = t3lib_parsehtml::substituteMarkerArray($subparts['USERLISTING'], $userMarkers, '###|###');
+				$subparts['USERLISTING'] =  \TYPO3\CMS\Core\Html\HtmlParser::getSubpart($this->template, '###USERLISTING###');
+				$subparts['USERLISTING'] =  \TYPO3\CMS\Core\Html\HtmlParser::substituteMarkerArray($subparts['USERLISTING'], $userMarkers, '###|###');
 			}
 
 			// replace each subpart
@@ -468,7 +480,7 @@ class lth_feeditsimple_menu {
 			}
 		}
 
-		$content = t3lib_parsehtml::substituteMarkerArray($this->template, $markers, '###|###');
+		$content =  \TYPO3\CMS\Core\Html\HtmlParser::substituteMarkerArray($this->template, $markers, '###|###');
 
 			// hook to add additional menu features, including a sidebar
 		if (is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['EXT:lth_feedit_simple/view/class.lth_feeditsimple_menu.php']['build'])) {
@@ -479,7 +491,7 @@ class lth_feeditsimple_menu {
 				'pObj' => &$this
 			);
 			foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['EXT:lth_feedit_simple/view/class.lth_feeditsimple_menu.php']['build'] as $_funcRef) {
-				$content = t3lib_div::callUserFunction($_funcRef, $_params, $this);
+				$content = \TYPO3\CMS\Core\Utility\GeneralUtility::callUserFunction($_funcRef, $_params, $this);
 			}
 		}
 		return $content;
