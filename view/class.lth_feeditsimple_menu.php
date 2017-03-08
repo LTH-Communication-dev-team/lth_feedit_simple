@@ -178,7 +178,7 @@ class lth_feeditsimple_menu {
             $userSettingsArray = array();
             if(isset($_COOKIE['feeditSimple-usersettings'])) {
                 $feeditsimpleUsersettings = $_COOKIE['feeditSimple-usersettings'];
-                //echo $feeditsimpleUsersettings;
+                echo $feeditsimpleUsersettings;
                 $userSettingsArray = json_decode($feeditsimpleUsersettings, TRUE);
             } else {
                 $userSettings = $this->getUserSettings($GLOBALS['BE_USER']->user['uid']);
