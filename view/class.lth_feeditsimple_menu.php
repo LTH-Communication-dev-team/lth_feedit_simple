@@ -178,11 +178,11 @@ class lth_feeditsimple_menu {
             $userSettingsArray = array();
             if(isset($_COOKIE['feeditSimple-usersettings'])) {
                 $feeditsimpleUsersettings = $_COOKIE['feeditSimple-usersettings'];
-                echo $feeditsimpleUsersettings;
+                //echo $feeditsimpleUsersettings;
                 $userSettingsArray = json_decode($feeditsimpleUsersettings, TRUE);
             } else {
                 $userSettings = $this->getUserSettings($GLOBALS['BE_USER']->user['uid']);
-                echo $userSettings;
+                //echo $userSettings;
                 if($userSettings) {
                     $feeditsimpleUsersettings = $userSettings;
                     $userSettingsArray = json_decode($feeditsimpleUsersettings, TRUE);
@@ -229,6 +229,7 @@ class lth_feeditsimple_menu {
                     $GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pagePastePageInto').
                     '</a></li>';
             }
+            echo '232' . $userSettingsArray['hiddenElement'];
             $content .= '
             <ul class="nav navbar-nav feeditSimple-mainMenu">
                 
