@@ -229,7 +229,7 @@ class lth_feeditsimple_menu {
                     $GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pagePastePageInto').
                     '</a></li>';
             }
-            echo '232' . $userSettingsArray['hiddenElement'];
+            echo '232b' . 'displayHiddenContent'.$userSettingsArray['hiddenElement'];
             $content .= '
             <ul class="nav navbar-nav feeditSimple-mainMenu">
                 
