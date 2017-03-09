@@ -271,7 +271,6 @@ class user_feeditsimple_adminpanel {
                 'summernote.css' => $this->getLinkTag($extPath . 'vendor/summernote/summernote_082.css'),
                 'summernote.js' => $this->getScriptTag($extPath . 'vendor/summernote/summernote_082.min.js'),
                 'summernote-sv-SE.min.js' => $this->getScriptTag($extPath . 'vendor/summernote/lang/summernote-sv-SE.min.js'),
-                'summernote-uk-UA.min.js' => $this->getScriptTag($extPath . 'vendor/summernote/lang/summernote-uk-UA.min.js'),
                 //'jquery-ui.min.css' => $this->getLinkTag('fileadmin/templates/css/jquery-ui.min.css'),
                 
                 //Sortable
