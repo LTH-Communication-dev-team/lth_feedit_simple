@@ -182,7 +182,6 @@ class lth_feeditsimple_menu {
                 $userSettingsArray = json_decode($feeditsimpleUsersettings, TRUE);
             } else {
                 $userSettings = $this->getUserSettings($GLOBALS['BE_USER']->user['uid']);
-                //echo $userSettings;
                 if($userSettings) {
                     $feeditsimpleUsersettings = $userSettings;
                     $userSettingsArray = json_decode($feeditsimpleUsersettings, TRUE);
@@ -229,7 +228,6 @@ class lth_feeditsimple_menu {
                     $GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pagePastePageInto').
                     '</a></li>';
             }
-            //displayHiddenContentnone
             $content .= '
             <ul class="nav navbar-nav feeditSimple-mainMenu">
                 

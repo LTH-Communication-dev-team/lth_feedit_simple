@@ -452,8 +452,8 @@ function makeEditable(selector, type)
         airMode: true,
         lang: beUserLang,
         height: 200,
-        /*disableDragAndDrop: true,
-        disableResizeImage: true,
+        disableDragAndDrop: true,
+        /*disableResizeImage: true,
         disableResizeEditor: true,*/
         popover: {
             image: [
@@ -494,6 +494,7 @@ function makeEditable(selector, type)
     }).on('summernote.focus', function (target) {
         $('.note-popover').hide();
     });
+    
     if(type=='replace') {
         addId(selector,'');
     }

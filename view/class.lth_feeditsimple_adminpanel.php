@@ -275,7 +275,7 @@ class user_feeditsimple_adminpanel {
                 //'jquery-ui.min.css' => $this->getLinkTag('fileadmin/templates/css/jquery-ui.min.css'),
                 
                 //Sortable
-                'sortable.js' => $this->getScriptTag($extPath . 'vendor/sortable/sortable.js'),
+                //'sortable.js' => $this->getScriptTag($extPath . 'vendor/sortable/sortable.js'),
                 
                 //wysihtml5
                 /*'bootstrap3-wysihtml5.all.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap3-wysihtml5.all.js'),
