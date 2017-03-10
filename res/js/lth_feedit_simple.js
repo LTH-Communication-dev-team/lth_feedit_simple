@@ -1750,7 +1750,7 @@ $.extend($.summernote.plugins, {
     /**
      * @param {Object} context - context object has status of editor.
      */
-    'brenter': function (context) {
+    /*'brenter': function (context) {
         this.events = {
             'summernote.enter': function (we, e) {
                 // insert 2 br tags (if only one br tag is inserted the cursor won't go to the next line)
@@ -1758,7 +1758,7 @@ $.extend($.summernote.plugins, {
                 e.preventDefault();
             }
         };
-    },
+    },*/
     'changeImage': function (context) {
         var ui = $.summernote.ui;
         context.memo('button.changeImage', function () {
