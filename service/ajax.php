@@ -91,8 +91,8 @@ switch($cmd) {
     case "showPageInMenu":
 	$content = hideShowPage($cmd, $pageUid, 0);
 	break;   
-    case "getFormHandler":
-        $content = getFormHandler($pageUid);
+    case "getFormManager":
+        $content = getFormManager($pageUid);
         break;
     case "loadCategorySelector":
         $content = loadCategorySelector($uid);
@@ -117,7 +117,16 @@ switch($cmd) {
         break;
     case 'updateCopiedPage':
         $content = updateCopiedPage($uid, $pageUid, $contentToPaste);
-        break; 
+        break;
+    case 'updateImgWidthHeight':
+        $content = updateImgWidthHeight($uid, $contentToPaste);
+        break;
+    case 'getLastUid':
+        $content = getLastUid($pageUid);
+        break;
+    case 'getPageData':
+        $content = getPageData($pageUid);
+        break;
 }
 
 
@@ -130,6 +139,64 @@ if($cmd === 'getFiles') {
 
 global $arrs;
 global $globalContent;
+
+
+function getPageData($pageUid)
+{
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("pid, title, subtitle, nav_title, hidden, deleted, sorting, starttime, "
+            . "endtime, hidden, nav_hide",
+            "pages","uid = " . intval($pageUid),"","","");
+    $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+    $uid = $row["pid"];
+    $title = $row["title"];
+    $subtitle = $row["subtitle"];
+    $nav_title = $row["nav_title"];
+    $hidden = $row["hidden"];
+    $deleted = $row["deleted"];
+    $sorting = $row["sorting"];
+    $starttime = $row["starttime"];
+    $endtime = $row["endtime"];
+    $sorting = $row["sorting"];
+    $hidden = $row["hidden"];
+    $nav_hide = $row["nav_hide"];
+    $GLOBALS['TYPO3_DB']->sql_free_result($res);
+    $returnArray = [];
+    $returnArray["pid"] = $uid;
+    $returnArray["title"] = $title;
+    $returnArray["subtitle"] = $subtitle;
+    $returnArray["nav_title"] = $nav_title;
+    $returnArray["hidden"] = $hidden;
+    $returnArray["deleted"] = $deleted;
+    $returnArray["starttime"] = $starttime;
+    $returnArray["endtime"] = $endtime;
+    $returnArray["sorting"] = $sorting;
+    $returnArray["hidden"] = $hidden;
+    $returnArray["nav_hide"] = $nav_hide;
+    return $returnArray;
+}
+
+
+function getLastUid($pageUid)
+{
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("uid,sorting","tt_content","pid = " . intval($pageUid),"","uid DESC","0,1");
+    $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+    $uid = $row["uid"];
+    $sorting = $row["sorting"];
+    $GLOBALS['TYPO3_DB']->sql_free_result($res);
+    $returnArray = [];
+    $returnArray["uid"] = $uid;
+    $returnArray["sorting"] = $sorting;
+    return $returnArray;
+}
+
+
+function updateImgWidthHeight($uid, $contentToPaste)
+{
+    $contentToPasteArray = json_decode($contentToPaste, true);
+    $GLOBALS['TYPO3_DB']->exec_UPDATEquery('sys_file_reference', 'uid='.intval($uid), array('imagewidth' => $contentToPasteArray[0], 'imageHeight' => $contentToPasteArray[1]));
+    $returnArray['result'] = 200;
+    return $returnArray;
+}
 
 
 function addFileToStorage($filePath)
@@ -204,11 +271,38 @@ function saveUserSettings($contentToPaste)
 }
 
 
-function getFormHandler($pageUid)
+function getFormManager($pageUid)
+{
+    $dataArray = array();
+    //$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid, params', 'tx_formhandler_log', 'pid='.intval($pageUid), '');
+    $sql = "SELECT uid, name, form_data, FROM_UNIXTIME(crdate) AS crdate FROM tx_pxaformenhancement_domain_model_form WHERE pid = " . intval($pageUid);
+    $sql .= " UNION ";
+    $sql .= "SELECT A.uid, A.mail AS name, GROUP_CONCAT(F.title, ':', A.value SEPARATOR '\n') AS form_data, FROM_UNIXTIME(A.crdate) AS crdate  
+FROM tx_powermail_domain_model_answer A JOIN tx_powermail_domain_model_field F ON A.field = F.uid 
+WHERE A.pid = " . intval($pageUid) . "
+GROUP BY A.mail ORDER BY crdate DESC";
+    $res = $GLOBALS['TYPO3_DB'] -> sql_query($sql);
+    while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
+        $dataArray[] = array("DT_RowId" => "row_" . $row['uid'], "name" => $row['name'], "form_data" => $row['form_data'], "crdate" => $row['crdate']);
+    }
+    $GLOBALS['TYPO3_DB']->sql_free_result($res);
+    $returnArray['data'] = $dataArray;
+    
+    return $returnArray;
+}
+
+
+function getFormManager_old($pageUid)
 {
     $arraySize = 0;
     $tempArray = array();
-    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid, params', 'tx_formhandler_log', 'pid='.intval($pageUid), '');
+    //$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid, params', 'tx_formhandler_log', 'pid='.intval($pageUid), '');
+    $sql = "SELECT uid, pid, name, form_data, FROM_UNIXTIME(crdate) AS crdate FROM tx_pxaformenhancement_domain_model_form WHERE pid = " . intval($pageUid) . " ORDER BY uid DESC";
+    $sql .= " UNION ";
+    $sql = "SELECT A.uid, A.pid, A.mail, GROUP_CONCAT(F.title, ':', A.value SEPARATOR '\n') 
+FROM tx_powermail_domain_model_answer A JOIN tx_powermail_domain_model_field F ON A.field = F.uid 
+WHERE A.pid = " . intval($pageUid) . "
+GROUP BY A.mail";
     $recordsTotal = $GLOBALS["TYPO3_DB"]->sql_num_rows($res);
     while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
         /*$uid = $row['uid'];
@@ -685,9 +779,9 @@ function moveContent($cmd, $pasteType, $table, $uid, $pid, $pageUid, $oldpageUid
         //$oTce = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_TCEmain');
         $tce->start(array(), array());
         $tce->clear_cacheCmd($pageUid);
-        if($oldpageUid <> $pageUid) {
+        if($oldpageUid != $pageUid) {
             $tce->start(array(), array());
-            $tce->clear_cacheCmd($pageUid);
+            $tce->clear_cacheCmd($oldpageUid);
         }
         
         $GLOBALS['BE_USER'] = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Backend\\FrontendBackendUserAuthentication');
@@ -734,6 +828,7 @@ function pasteContent($cmd, $table, $pid, $pageUid, $contentToPaste, $colPos)
 {
     $contentToPasteArray = explode(':', $contentToPaste);
     $pasteType = $contentToPasteArray[0];
+    $table = $contentToPasteArray[1];
     $uidToPaste = $contentToPasteArray[2];
     $oldpageUid = $contentToPasteArray[3];
     
@@ -743,15 +838,17 @@ function pasteContent($cmd, $table, $pid, $pageUid, $contentToPaste, $colPos)
     } else if($pasteType == 'copy') {
         // get original record
         //$GLOBALS['TYPO3_DB']->store_lastBuiltQuery = 1;
-        $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, 'uid='.intval($uidToPaste));
+        $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, 'uid='.intval(str_replace('c','',$uidToPaste)));
         $originalTtRecord = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
         $updateArray = array();
         $insertArray = array ('uid' => null);
         $res = $GLOBALS['TYPO3_DB']->exec_INSERTquery($table, $insertArray);
         $newTtId = $GLOBALS['TYPO3_DB']->sql_insert_id();
-        foreach ($originalTtRecord as $key => $value) {
-            if ($key != 'uid') {
-                $updateArray[$key] = $value;
+        if($originalTtRecord) {
+            foreach ($originalTtRecord as $key => $value) {
+                if ($key != 'uid') {
+                    $updateArray[$key] = $value;
+                }
             }
         }
         if(is_array($updateArray)) {
@@ -759,7 +856,7 @@ function pasteContent($cmd, $table, $pid, $pageUid, $contentToPaste, $colPos)
         }
 
         //$GLOBALS['TYPO3_DB']->store_lastBuiltQuery = 1;
-        $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'sys_file_reference', 'uid_foreign='.intval($uidToPaste));
+        $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'sys_file_reference', 'uid_foreign='.intval(str_replace('c','',$uidToPaste)));
         while ($row = $GLOBALS["TYPO3_DB"]->sql_fetch_assoc($res)) {
             $originalSfRecord = $row;
             $GLOBALS['TYPO3_DB']->store_lastBuiltQuery = 1;
@@ -789,7 +886,7 @@ function hideContent($cmd, $table, $uid, $pageUid)
 {
     //to do: empty cache :(
     try {
-        $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($uid), array('hidden' => 1, 'tstamp' => time()));
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval(str_replace('c','',$uid)), array('hidden' => 1, 'tstamp' => time()));
         if($GLOBALS['TYPO3_DB']->sql_affected_rows() > 0) {
             return array('result' => 200);
         } else {
@@ -810,7 +907,7 @@ function hideContent($cmd, $table, $uid, $pageUid)
 function showContent($cmd, $table, $uid, $pageUid)
 {
     try {
-        $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval($uid), array('hidden' => 0, 'tstamp' => time()));
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery($table, 'uid='.intval(str_replace('c','',$uid)), array('hidden' => 0, 'tstamp' => time()));
         if($GLOBALS['TYPO3_DB']->sql_affected_rows() > 0) {
             return array('result' => 200);
         } else {
@@ -1004,11 +1101,10 @@ function renderContentElement($table, $uid)
 */
 function getRow($table, $uid)
 {
-       $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, 'uid=' . $uid);
-       $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-       $GLOBALS['TYPO3_DB']->sql_free_result($res);
-
-       return $row;
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, 'uid=' . intval($uid));
+    $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+    $GLOBALS['TYPO3_DB']->sql_free_result($res);
+    return $row;
 }
 
 function loadCategorySelector($uid)

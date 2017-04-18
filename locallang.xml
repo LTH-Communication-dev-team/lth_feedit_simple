@@ -2,8 +2,16 @@
 <T3locallang>
 	<data type="array">
 		<languageKey index="default" type="array">
-                        <label index="page">Edit</label>
-			<label index="pageTooltip">Edit, move or delete the current page. Insert right column.</label>
+                        <label index="page">Page</label>
+			<label index="pageTooltip">Edit, move, hide or delete the current page.</label>
+                        <label index="pageNewPage">New page</label>
+                        <label index="pageNewPageTooltip">Create new page</label>
+                        <label index="pageNewPageBefore">Before this</label>
+                        <label index="pageNewPageBeforeTooltip">Create new page before this.</label>
+                        <label index="pageNewPageAfter">After this</label>
+                        <label index="pageNewPageAfterTooltip">Create new page after this.</label>
+                        <label index="pageNewPageInside">Inside this</label>
+                        <label index="pageNewPageInsideTooltip">Create new page inside this.</label>                       
 			<label index="pageEditPage">Edit Page Properties</label>
 			<label index="pageEditPageTooltip">Edit page properties of the current page.</label>
                         <label index="pageCutPage">Cut Page</label>
@@ -40,11 +48,11 @@
 			<label index="newInsertRightColumnTooltip">Insert right column.</label>
                         
                         <label index="tool">Tools</label>
-                        <label index="toolTooltip">Open File Manager and FormAdmin.</label>
-                        <label index="toolFileManager">File Manager</label>
+                        <label index="toolTooltip">Open Form Manager.</label>
+                        <label index="toolFormManager">Form Manager</label>
                         <label index="toolFileManagerTooltip">Open the Typo3 File Manager.</label>
-                        <label index="toolMailFormManager">Form Handler Manager</label>
-                        <label index="toolMailFormManagerTooltip">Open the Form Handler Manager.</label>
+                        <label index="toolFormManager">Form Manager</label>
+                        <label index="toolFormManagerTooltip">Open the Form Manager.</label>
                                                 
                         <label index="displayTooltip">Display.</label>
                         <label index="display">Display</label>
@@ -103,7 +111,7 @@
                         <label index="hideContentElementsRowTooltip">Hide insert content elements.</label>
                         <label index="hideContentElementsRow">Hide insert content elements</label>
                         
-                        <label index="saveButton">Save</label>
+                        <label index="saveButton">Save All</label>
 			<label index="saveCloseButton">Save &amp; Close</label>
 			<label index="closeButton">Close</label>
                         
@@ -134,8 +142,16 @@
 		</languageKey>
                 
                 <languageKey index="sv" type="array">
-                        <label index="page">Ändra</label>
-			<label index="pageTooltip">Ändra, flytta eller radera sidan.</label>
+                        <label index="page">Sida</label>
+			<label index="pageTooltip">Ändra, flytta, göm eller radera sidan.</label>
+                        <label index="pageNewPage">Ny sida</label>
+                        <label index="pageNewPageTooltip">Skapa ny sida.</label>
+                        <label index="pageNewPageBefore">Före denna</label>
+                        <label index="pageNewPageBeforeTooltip">Skapa ny sida före denna,</label>
+                        <label index="pageNewPageAfter">Efter denna</label>
+                        <label index="pageNewPageAfterTooltip">Skapa ny sida efter denna.</label>
+                        <label index="pageNewPageInside">Inuti denna</label>
+                        <label index="pageNewPageInsideTooltip">Skapa ny sida inuti denna.</label>  
 			<label index="pageEditPage">Ändra sidans egenskaper</label>
 			<label index="pageEditPageTooltip">Ändra sidans egenskaper.</label>
                         <label index="pageCutPage">Klipp ut sidan</label>
@@ -172,11 +188,11 @@
 			<label index="newInsertRightColumnTooltip">Infoga högerkolumn.</label>
                         
                         <label index="tool">Verktyg</label>
-                        <label index="toolTooltip">>Öppna Typo3s filhanterare och Form-Handler-Manager</label>
+                        <label index="toolTooltip">>Öppna Form-Manager</label>
                         <label index="toolFileManager">Filhanterare</label>
                         <label index="toolFileManagerTooltip">Öppna Typo3s filhanterare.</label>
-                        <label index="toolMailFormManager">Form-Handler-Manager</label>
-                        <label index="toolMailFormManagerTooltip">Öppna Typo3s filhanterare.</label>
+                        <label index="toolFormManager">Form-Manager</label>
+                        <label index="toolFormManagerTooltip">Öppna Form-Manager.</label>
                         
                         <label index="displayTooltip">Visa.</label>
                         <label index="display">Visa</label>
@@ -235,7 +251,7 @@
                         <label index="hideContentElementsRowTooltip">Göm infoga innehållselement.</label>
                         <label index="hideContentElementsRow">Göm infoga innehållselement</label>
                         
-                        <label index="saveButton">Spara</label>
+                        <label index="saveButton">Spara Allt</label>
 			<label index="saveCloseButton">Spara &amp; Stäng</label>
 			<label index="closeButton">Stäng</label>
                         

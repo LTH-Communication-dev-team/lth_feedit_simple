@@ -98,7 +98,6 @@ class user_feeditsimple_adminpanel {
              * * /typo3/index.php?route=%2Frecord%2Fedit&token=5b948f4dee711290eb9fc6530dc30052cf1d8775&edit%5Btt_content%5D%5B606%5D=edit&
              *  */
 	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!='200' && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!='77') {
-                
                 //echo $location;
 			// set up general configuration
 		/*if (!count($this->admPanelTSconfig)) {
@@ -153,7 +152,7 @@ class user_feeditsimple_adminpanel {
 	    if ($this->disabled || \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')=='77' || \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')=='200') {
 		    return;
 	    }
-
+            //$GLOBALS['BE_USER']->uc['TSFE_adminConfig']['preview_showHiddenPages'] = "0";
             $beUserUid = $GLOBALS["BE_USER"]->user["uid"];
 
             $be_typo_user = $_COOKIE['be_typo_user'];
@@ -268,9 +267,14 @@ class user_feeditsimple_adminpanel {
 		//'datetimepicker.js' => $this->getScriptTag($extPath . 'vendor/x-editable/js/bootstrap-datetimepicker.js'),
  
                 //Summernote
-                'summernote.css' => $this->getLinkTag($extPath . 'vendor/summernote/summernote_082.css'),
+                /*'summernote.css' => $this->getLinkTag($extPath . 'vendor/summernote/summernote_082.css'),
                 'summernote.js' => $this->getScriptTag($extPath . 'vendor/summernote/summernote_082.min.js'),
-                'summernote-sv-SE.min.js' => $this->getScriptTag($extPath . 'vendor/summernote/lang/summernote-sv-SE.min.js'),
+                'summernote-sv-SE.min.js' => $this->getScriptTag($extPath . 'vendor/summernote/lang/summernote-sv-SE.min.js'),*/
+                //ckeditor
+                'ckeditor.js' => $this->getScriptTag($extPath . 'vendor/ckeditor/ckeditor.js'),
+                'jqueryadapter.js' => $this->getScriptTag($extPath . 'vendor/ckeditor/adapters/jquery.js'),
+
+
                 //'jquery-ui.min.css' => $this->getLinkTag('fileadmin/templates/css/jquery-ui.min.css'),
                 
                 //Sortable
@@ -302,11 +306,11 @@ class user_feeditsimple_adminpanel {
                 'jquery.ui.position.min.js' => $this->getScriptTag($extPath . 'vendor/jquery-contextmenu/jquery.ui.position.min.js'),
                 
                 //load files needed for datatables
-                /*'jquery.dataTables.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/jquery.dataTables.min.css'),
-                'buttons.bootstrap.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/buttons.bootstrap.min.css'),
-                'buttons.dataTables.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/buttons.dataTables.min.css'),
-                'jquery.dataTables.min.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/jquery.dataTables.min.js'),
-                'dataTables.buttons.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/dataTables.buttons.js'),
+                'jquery.dataTables.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/datatables.min.css'),
+                /*'buttons.bootstrap.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/buttons.bootstrap.min.css'),
+                'buttons.dataTables.min.css' => $this->getLinkTag($extPath . 'vendor/datatables/css/buttons.dataTables.min.css'),*/
+                'jquery.dataTables.min.js' => $this->getScriptTag($extPath . 'vendor/datatables/datatables.min.js'),
+                /*'dataTables.buttons.js' => $this->getScriptTag($extPath . 'vendor/datatables/js/dataTables.buttons.js'),
                 'jszip.min.js' => $this->getScriptTag('//cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js'),
                 'pdfmake.min.js' => $this->getScriptTag('//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js'),
                 'vfs_fonts.js' => $this->getScriptTag('//cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js'),
@@ -326,7 +330,9 @@ class user_feeditsimple_adminpanel {
                 // load files needed for extension itself
                 'lth_feedit_simple.css' => $this->getLinkTag($extPath . 'res/css/lth_feedit_simple.css'), 		
 		'lth_feedit_simple.js' => $this->getScriptTag($extPath . 'res/js/lth_feedit_simple.js'),
-                'lth_feedit_simple_lang' => $this->getScriptTag($extPath . 'res/js/lth_feedit_simple_lang_' . $syslang . '.js')
+                'lth_feedit_simple_lang' => $this->getScriptTag($extPath . 'res/js/lth_feedit_simple_lang_' . $syslang . '.js'),
+                
+               
 	    );
             return implode(chr(10), $includes);
         }

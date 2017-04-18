@@ -140,32 +140,53 @@ $(document).ready(function () {
             $('.panel-header').html('<h1>Edit page properties</h1>');
             var url = '';
             var pid = $('body').attr('id');
-            if (pid === 'new') {
+            /*if (pid === 'new') {
                 url = '/typo3/alt_doc.php?edit[pages][' + pid + ']=new';
             } else {
                 url = '/typo3/alt_doc.php?edit[pages][' + pid + ']=edit';
-            }
-            var formToken, title, subtitle, nav_title = '';
-
+            }*/
             $.ajax({
-                url: url,
-                type: 'post',
+                type: "POST",
+                url: 'index.php',
                 dataType: 'json',
-                complete: function (data) {
-                    formToken = $(data.responseText).find('input[name="formToken"]').val();
+                data: {
+                    eID: 'lth_feedit_simple',
+                    cmd: 'getPageData',
+                    table: 'pages',
+                    pageUid: pid,
+                    sid: Math.random()
+                },
+                success: function (data) {
+                    var title = data.title;
+                    /*
+                    $("#div1").load("frame1.html", function(){
+        setValues();
+        //do more stuff after load
+    });
+    formToken = $(data.responseText).find('input[name="formToken"]').val();
                     title = $(data.responseText).find('input[name="data[pages][' + pid + '][title]"]').val();
                     subtitle = $(data.responseText).find('input[name="data[pages][' + pid + '][subtitle]"]').val();
                     nav_title = $(data.responseText).find('input[name="data[pages][' + pid + '][nav_title]"]').val();
-                    $('.panel-header').append('<input type="hidden" name="formToken" value="' + formToken + '" />');
+                     var t = new Date();
+t.setSeconds( 1370001284 );
+var formatted = t.format("dd.mm.yyyy hh:MM:ss");*/
+                    //$('.panel-header').append('<input type="hidden" name="formToken" value="' + formToken + '" />');
                     $('.panel-body').load("/typo3conf/ext/lth_feedit_simple/res/template/formelement.html?sid=" + Math.random() + " #editPage", function () {
-                        $('#inputTitle').val(title);
-                        $('#inputSubTitle').val(subtitle);
-                        $('#inputNavTitle').val(nav_title);
-                        $('#close-panel-bt').click(function () {
-                            $.panelslider.close();
-                        });
+                        //console.log($('#inputTitle').length);
+                        $('#inputTitle').attr("value", data.title);
+                        $('#inputSubTitle').attr("value", data.subtitle);
+                        $('#inputNavTitle').attr("value", data.nav_title);
+                        $('#hidden')[0].checked = parseInt(data.hidden);
+                        $('#nav_hide')[0].checked = parseInt(data.nav_hide);
+                        $(".ps-active-panel").css("z-index","999");
+
+                        var startTime = new Date(data.starttime);
+                        
+                        $('#datetimepicker1').datetimepicker({defaultDate:'1987/12/03'});
+                        $('#datetimepicker2').datetimepicker({useCurrent: false,defaultDate: data.endtime});
+                        $('#close-panel-bt').click(function () {});
                         $('#save-panel-bt').click(function () {
-                            savePageProperties();
+                            savePageProperties('edit','','');
                         });
                     });
                 }
@@ -173,6 +194,134 @@ $(document).ready(function () {
         },
         easingOpen: null,
         easingClose: null
+    });
+    
+    $('#feeditSimple-newPageAfterButton').panelslider({
+        side: 'right',
+        duration: 200,
+        clickClose: true,
+        onOpen: function () {
+            $('.panel-body').load("/typo3conf/ext/lth_feedit_simple/res/template/formelement.html?sid=" + Math.random() + " #editPage", function () {
+                //console.log($('#inputTitle').length);
+                $(".ps-active-panel").css("z-index","999");
+
+                $('#datetimepicker1').datetimepicker({});
+                $('#datetimepicker2').datetimepicker({});
+                $('#close-panel-bt').click(function () {});
+                $('#save-panel-bt').click(function () {
+                    savePageProperties('after','','');
+                });
+            });
+        }
+    });
+    
+    $('#feeditSimple-newPageInsideButton').panelslider({
+        side: 'right',
+        duration: 200,
+        clickClose: true,
+        onOpen: function () {
+            $('.panel-body').load("/typo3conf/ext/lth_feedit_simple/res/template/formelement.html?sid=" + Math.random() + " #editPage", function () {
+                //console.log($('#inputTitle').length);
+                $(".ps-active-panel").css("z-index","999");
+
+                $('#datetimepicker1').datetimepicker({});
+                $('#datetimepicker2').datetimepicker({});
+                $('#close-panel-bt').click(function () {});
+                $('#save-panel-bt').click(function () {
+                    savePageProperties('inside','','');
+                });
+            });
+        }
+    });
+    
+    
+    $('#feeditSimple-cutPageButton').click(function() {
+        if(feeditSimpleSetCookie('feeditSimple-copycutpage', 'cut:pages:'+$('body').attr('id'),1)) {
+            $("#feeditSimple-pastePageAfterButton").show();
+            $("#feeditSimple-pastePageIntoButton").show();
+            var okMessage = {'header' : 'Cut', 'message': 'Page successfully cut'};
+            showMessage(okMessage);
+        } else {
+            showMessage({'header' : '500', 'message': 'no'});
+        }
+    });
+
+
+    $('#feeditSimple-copyPageButton').click(function() {
+        if(feeditSimpleSetCookie('feeditSimple-copycutpage', 'copy:pages:'+$('body').attr('id'),1)) {
+            $("#feeditSimple-pastePageAfterButton").show();
+            $("#feeditSimple-pastePageIntoButton").show();
+            var okMessage = {'header' : 'Copy', 'message': 'Page successfully copied'};
+            showMessage(okMessage);
+        } else {
+            showMessage({'header' : '500', 'message': 'no'});
+        }
+    });
+    
+    
+    $('#feeditSimple-pastePageAfterButton').click(function() {
+        pastePage("after");
+    });
+    
+    
+    $('#feeditSimple-pastePageIntoButton').click(function() {
+        pastePage("into");
+    });
+    
+    
+    $('#feeditSimple-deletePageButton').click(function() {
+        if(confirm('Are you sure?')) {
+            /*
+             * /typo3/index.php?route=%2Frecord%2Fcommit&token=d008545fb758862ff7d0d8294006a3b20f9ce546&cmd[pages][43030][delete]=1
+             * &redirect=/typo3/index.php%3FM%3Dweb_layout%26moduleToken%3Da37f452d30364558f7251d330eee1caee12efe91%26id%3D0&vC=c508ce6f5a&prErr=1&uPT=1
+             * /typo3/index.php?route=%2Frecord%2Fedit&token=2da2b1aaddd394725f728516d26842b0d38a5bd0&edit%5Bpages%5D%5B43030%5D=edit
+             * &noView=1&feEdit=0&returnUrl=sysext%2Fbackend%2FResources%2FPrivate%2FTemplates%2FClose.html"
+             * 
+             * /typo3/index.php?route=%2Frecord%2Fcommit&token=2da2b1aaddd394725f728516d26842b0d38a5bd0&cmd%5Bpages%5D%5B43030%5D%5Bdelete%5D=1&noView=1&feEdit=0&returnUrl=sysext%2Fbackend%2FResources%2FPrivate%2FTemplates%2FClose.html
+Request Headers
+view source
+/typo3/index.php?ajaxID=%2Fajax%2Frecord%2Fprocess&ajaxToken=ba3fde9a556e471461fc3d821cab1d56fdc6f737&cmd[pages][43030][delete]=1
+             */
+            //var url = $('#lth_feedit_simple-location').val();
+            //var token = url.split('token=').pop().split('&edit%5Bpages').shift();
+            ///typo3/index.php?route=%2Frecord%2Fcommit&token=d008545fb758862ff7d0d8294006a3b20f9ce546&cmd[pages][43030][delete]=1&redirect=/new/sub/&vC=c508ce6f5a&prErr=1&uPT=1
+            ///typo3/index.php?route=%2Frecord%2Fcommit&token=2da2b1aaddd394725f728516d26842b0d38a5bd0&cmd%5Bpages%5D%5B43030%5D%5Bdelete%5D=1
+            //var url = '/typo3/index.php?route=%2Frecord%2Fcommit&token='+$('#commitToken').val()+'&cmd[pages]['+$('body').attr('id')+'][delete]=1&redirect=/new/sub/&vC='+$('#veriCode').val()+'&prErr=1&uPT=1';
+            //url = url.replace('%2Frecord%2Fedit','%2Frecord%2Fcommit').replace('edit%5Bpages%5D%5B','cmd%5Bpages%5D%5B').replace('%5D=edit','%5D%5Bdelete%5D=1').split('&noView=1').shift();
+            $.ajax({
+                //url: url + '&doSave=1' + extraUrl,
+                url: $('#lth_feedit_simple-commit_location').val(),
+                type: 'post',
+                dataType: 'json',
+                //data: params,
+                complete: function (data) {
+                    //var okMessage = {'header': 'Edit', 'message': 'Page properties successfully saved'};
+                    //showMessage(okMessage);
+                        var url = window.location.href.replace(/\/?$/, '/');
+                        var the_arr = url.split('/');
+                        the_arr.pop();
+                        the_arr.pop();
+                        url = the_arr.join('/');
+                        window.location.href = url;
+                }
+            });
+        }
+    });
+    
+    $("#feeditSimple-showPageButton").click(function() {
+        savePageProperties('edit','0','');        
+    });
+    
+    $("#feeditSimple-hidePageButton").click(function() {
+        savePageProperties('edit','1','');
+    });
+    
+    $("#feeditSimple-showPageInMenuButton").click(function() {
+        savePageProperties('edit','','0');
+    });
+    
+    $("#feeditSimple-hidePageInMenuButton").click(function() {
+        savePageProperties('edit','','1');
     });
 
     //add no content or context menu
@@ -202,14 +351,14 @@ $(document).ready(function () {
         toggleHiddenObject('.feEditSimple-hiddenPage-1', 'hiddenPage', okMessage);
     });
 
-    //formhandler
-    if($('.Tx-Formhandler').length > 0) {
-        $('#feeditSimple-formHandler').click(function () {
-            ajaxCall('getFormHandler', '', '', '', $('body').attr('id'), '', '');
+    //Form-manager
+    if($('.powermail_form').length > 0 || $('.tx_form').length > 0) {
+        $('#feeditSimple-formManager').click(function () {
+            ajaxCall('getFormManager', '', '', '', $('body').attr('id'), '', '');
         });
     } else {
-        $('#feeditSimple-formHandler').prop('disabled', true);
-        $('#feeditSimple-formHandler').css('opacity', '0.5');
+        $('#feeditSimple-formManager').prop('disabled', true);
+        $('#feeditSimple-formManager').css('opacity', '0.5');
     }
         
     //add right column
@@ -225,9 +374,9 @@ $(document).ready(function () {
             </div>\
             </div>\
             </div>');
-            var tempIndex = addNoContent('#feEditSimple-rightColWrapper');
+            addNoContent('#feEditSimple-rightColWrapper');
             //console.log(tempIndex);
-            enableContextMenuShort(tempIndex);
+            //enableContextMenuShort(tempIndex);
         }
     });    
 
@@ -239,11 +388,10 @@ $(document).ready(function () {
     var displayString = feeditSimpleGetCookie('feeditSimple-usersettings');
     if (displayString) {
         var displayObject = JSON.parse(unescape(displayString));
-        var preview_showHiddenPages = $('#preview_showHiddenPages').val();
-        var preview_showHiddenRecords = $('#preview_showHiddenRecords').val();
+        //var preview_showHiddenPages = $('#preview_showHiddenPages').val();
+        //var preview_showHiddenRecords = $('#preview_showHiddenRecords').val();
         
-        //console.log(displayObject['hiddenElement'] + preview_showHiddenRecords);
-        if(displayObject['hiddenElement'] === 'Block' && preview_showHiddenRecords === '0') {
+        /*if(displayObject['hiddenElement'] === 'Block' && preview_showHiddenRecords === '0') {
             //$('#preview_showHiddenRecords').val('1');
             var params = {};
             //console.log('275a');
@@ -268,14 +416,15 @@ $(document).ready(function () {
                 type: "POST",
                 url: "/",
                 data: params,
-                success: function(){    
+                
+                complete: function(){    
                     location.reload();   
-                }
+                },
             });
-        }
+        }*/
         
         if (displayObject['hiddenElement'] === 'None') {
-            //$('.note-editor.feEditSimple-hidden-1').hide();
+            $('.feEditSimple-hidden-1').hide();
         }
         if (displayObject['hiddenInMenu'] === 'Block') {
             $('.feEditSimple-hiddenInMenu-1').show(200);
@@ -311,15 +460,134 @@ $(document).ready(function () {
     var copycutitem = feeditSimpleGetCookie('feeditSimple-copycutitem');
     if(copycutitem) {
         copycutitemArray = copycutitem.split(':');
+        //console.log(copycutitem);
         if(copycutitemArray[0]=='cut' && copycutitemArray[1]=='tt_content') {
-            $('#note-editor-' + copycutitemArray[2]).remove();
-            $('#c' + copycutitemArray[2]).remove();
+            $('#' + copycutitemArray[2]).remove();
         }
         //console.log(copycutitem);
+    }
+    
+    //display pastepagebutton
+    if(feeditSimpleGetCookie('feeditSimple-copycutpage')) {
+        
+        $("#feeditSimple-pastePageAfterButton").parent().show();
+        $("#feeditSimple-pastePageIntoButton").parent().show();
     }
 
     //Document ready ends********************************************************************************************************************
 });
+
+
+function pastePage(type)
+{
+    if(confirm('Are you sure?')) {
+        var url;
+        var pageId = $('body').attr('id');
+        if(type==="after") {
+            pageId = "-"+pageId;
+        }
+        
+        var cookieData = feeditSimpleGetCookie('feeditSimple-copycutpage');
+        var cookieDataArray = cookieData.split(':');
+        var pasteType = cookieDataArray[0];
+        if(pasteType==="copy") {
+            url = $('#lth_feedit_simple-copy_location').val();
+        } else if(pasteType==="cut") {
+            url = $('#lth_feedit_simple-move_location').val();
+        }
+        url = url.replace('idToMoveTo',pageId);
+        var idToMove = cookieDataArray[2];
+        url = url.replace('idToMove',idToMove);
+        $.ajax({
+            url: url,
+            type: 'post',
+            dataType: 'json',
+            //data: params,
+            complete: function (data) {
+                //var okMessage = {'header': 'Edit', 'message': 'Page properties successfully saved'};
+                //showMessage(okMessage);
+                //feeditSimpleSetCookie('feeditSimple-copycutpage', 'copy:pages:'+data.oldUid,1);
+                feeditSimpleDeleteCookie('feeditSimple-copycutpage');
+                $("#feeditSimple-pastePageAfterButton").hide();
+                $("#feeditSimple-pastePageIntoButton").hide();
+                location.reload(true);
+            }
+        });
+    }
+}
+
+
+function savePageProperties(type, hidden, nav_hide)
+{
+    var pageId = $("body").attr("id");
+    var title = $('#inputTitle').val();
+    var subTitle = $('#inputSubTitle').val();
+    var navTitle = $('#inputNavTitle').val();;
+    var startTime = $('#datetimepicker1').val();
+    var endTime = $('#datetimepicker2').val();
+    if(hidden!=='1') hidden = $('#hidden').is(":checked");
+    if(nav_hide!=='1') nav_hide = $('#nav_hide').is(":checked");
+    var url = $('#lth_feedit_simple-location').val();
+    if(startTime) {
+        startTime = parseInt((new Date(startTime).getTime() / 1000).toFixed(0));
+    }
+    if(endTime) {
+        endTime = parseInt((new Date(endTime).getTime() / 1000).toFixed(0));
+    }
+    //console.log(startTime + ';' + endTime);
+    /*
+     * route:/record/edit
+token:9f24432ca6feed3aff90e3137dcab66cb4efa467
+edit[pages][43024]:new
+returnNewPageId:1
+    
+    <input type="hidden" id="lth_feedit_simple-location" name="lth_feedit_simple-location" 
+    value="/typo3/index.php?route=%2Frecord%2Fedit&amp;token=9f24432ca6feed3aff90e3137dcab66cb4efa467&amp;edit%5Bpages%5D%5B6%5D=edit&amp;noView=1&amp;feEdit=0&amp;returnUrl=sysext%2Fbackend%2FResources%2FPrivate%2FTemplates%2FClose.html">
+     */
+    var params = {};
+    if(type==='after' || type==='inside') {
+        url = url.replace('%5B'+pageId+'%5D', '%5Bnew%5D');
+        url = url.split('returnUrl=').shift() + 'returnNewPageId%3A1';
+        
+        if(type==='after') {
+            params["data[pages][new][pid]"] = '-'+pageId;
+        } else if(type==='inside') {
+            params["data[pages][new][pid]"] = pageId;
+        }
+        pageId = 'new';
+    }
+    if(hidden===true) {
+        hidden = 1;
+    } else if(hidden===false) {
+        hidden = 0;
+    }
+    if(nav_hide===true) {
+        nav_hide = 1;
+    } else if(nav_hide===false) {
+        nav_hide = 0;
+    }
+    params["data[pages]["+pageId+"][title]"] = title;
+    params["data[pages]["+pageId+"][nav_title]"] = navTitle;
+    params["data[pages]["+pageId+"][subtitle]"] = subTitle;
+    params["data[pages]["+pageId+"][starttime]"] = startTime;
+    params["data[pages]["+pageId+"][endtime]"] = endTime;
+    params["data[pages]["+pageId+"][hidden]"] = hidden;
+    params["data[pages]["+pageId+"][nav_hide]"] = nav_hide;
+    params["_savedok"] = 1;
+    //console.log(params);
+    $.ajax({
+        //url: url + '&doSave=1' + extraUrl,
+        url: url,
+        type: 'post',
+        dataType: 'json',
+        data: params,
+        complete: function (data) {
+            //var okMessage = {'header': 'Edit', 'message': 'Page properties successfully saved'};
+            //showMessage(okMessage);
+            location.reload(true);
+        }
+    });
+}
 
 
 function cancelRightClick()
@@ -344,10 +612,19 @@ function cancelRightClick()
 
 function addNoContent(selector)
 {
-    var index = $('.note-editor-temp').length;
-    $(selector).prepend('<div id="note-editor-temp-'+index+'" class="note-editor-temp"></div>');
+    //var index = $('.note-editor-temp').length;
+    //$(selector).prepend('<div id="note-editor-temp-'+index+'" class="note-editor-temp"></div>');
     //<a href="javascript:" onclick="feeditSimpleContentCommand(\'Text and images\',\'temp-'+index+'\');">Click here to insert content</a>
-    return '#note-editor-temp-'+index;
+    /*
+     * <div id="c814" class="csc-default feEditSimple-hidden-0 textpic cke_editable cke_editable_inline cke_contents_ltr cke_show_borders" data-sorting="4608" data-imageorient="0" 
+     * data-orgimages="" contenteditable="true" tabindex="0" spellcheck="false" role="textbox" aria-label="Rich Text-editor, c814" 
+     * title="Rich Text-editor, c814" aria-describedby="cke_105" style="position: relative;"><div class="lth_feeditsimple_content" contenteditable="true"><p>uuuuuu</p></div></div>
+     */
+    var content = '<div id="new" class="csc-default feEditSimple-hidden-0 textpic" data-sorting="10" data-imageorient="0" data-orgimages="" contenteditable="true" tabindex="0">';
+    content += '<div class="lth_feeditsimple_content" contenteditable="true"></div>';
+    $(selector).prepend(content);
+    makeEditable('#new','single');
+    //return '#note-editor-temp-'+index;
 }
 
 
@@ -438,8 +715,592 @@ function saveUserSettings(lang, recursiveDelete, copyLevels)
     });
 }
 
+function makeEditable(selector,type)
+{
+    //$(selector).ckeditor();
+    //CKEDITOR.disableAutoInline = true;
+    //CKEDITOR.inline(selector);
+    
+    
+    $(selector).attr("contenteditable","true");
+    CKEDITOR.disableAutoInline = true;
+    
+    //CKEDITOR.config.filebrowserBrowseUrl='typo3conf/ext/lth_feedit_simple/vendor/ckeditor/plugins/imageuploader/imgbrowser.php';
+    CKEDITOR.config.filebrowserBrowseUrl = 'typo3conf/ext/lth_feedit_simple/vendor/filemanager/dialog.php?type=2&editor=ckeditor&fldr=';
+    CKEDITOR.config.filebrowserUploadUrl = 'typo3conf/ext/lth_feedit_simple/vendor/filemanager/dialog.php?type=2&editor=ckeditor&fldr=';
+    CKEDITOR.config.filebrowserImageBrowseUrl = 'typo3conf/ext/lth_feedit_simple/vendor/filemanager/dialog.php?type=1&editor=ckeditor&fldr=';
+    CKEDITOR.config.toolbar = [
+        [ 'Source', '-', 'Bold', 'Italic', 'Image', 'Link', 'Unlink' ]
+    ];
 
-function makeEditable(selector, type)
+    $(selector).each(function() {
+        //console.log($(this).attr('id'));
+        CKEDITOR.inline($(this).attr('id'), {
+            // Allow some non-standard markup that we used in the introduction.
+            extraAllowedContent: 'a(documentation);abbr[title];code',
+            removePlugins: 'floatingspace,resize',
+            extraPlugins: 'filebrowser,sharedspace',
+            sharedSpaces: {
+                top: 'lth_feeditsimple_inner_content'
+            },
+            on: {
+                change: function( event ) {
+                    //var data = event.editor.getData();
+                    addId($(this).attr('name'), '');
+                    // Do sth with your data...
+                },
+                focus: function( event ) {
+                    $('#lth_feeditsimple_inner_content').toggle();
+                },
+                blur: function( event ) {
+                    $('#lth_feeditsimple_inner_content').toggle();
+                },
+                instanceReady: function( event ) {
+                    var id = $(this).attr('name');
+                    var pageId = $('body').attr('id');
+                    $('#'+id+' img').each(function(){
+                        imgWidth = $(this).css('width');
+                        imgHeight = $(this).css('height');
+                        $(this).css('width',imgWidth);
+                        $(this).css('height',imgHeight);
+                    });
+                    
+                    var editor = event.editor;
+                    
+                    editor.removeMenuItem('editdiv');
+                    editor.removeMenuItem('removediv');
+                                        
+                    editor.addCommand("content", {
+                        
+                    });
+                    editor.addCommand("new_content", {
+                        
+                    }); 
+                    editor.addCommand("new_content_before", {
+                        exec : function( editor ) {
+                            if($('#new').length === 0) {
+                                var newSorting = parseInt($('#'+id).attr('data-sorting')) - 1;
+                                var template = getContentTemplate('textpic');
+
+                                //var okMessage = {'header': 'New element', 'message': 'Content element successfully created'};
+
+                                $('#'+id).before(template);
+                                makeEditable('#new', 'single');
+                                $('#new').attr('data-sorting',newSorting);
+                            } else {
+                                alert('Just one new element at once');
+                            }
+                        }
+                    });
+                    editor.addCommand("new_content_after", {
+                        exec : function( editor ) {
+                            if($('#new').length === 0) {
+                                var newSorting = parseInt($('#'+id).attr('data-sorting')) + 1;
+                                var template = getContentTemplate('textpic');
+
+                                //var okMessage = {'header': 'New element', 'message': 'Content element successfully created'};
+
+                                $('#'+id).after(template);
+                                makeEditable('#new', 'single');
+                                $('#new').attr('data-sorting',newSorting);
+                            } else {
+                                alert('Just one new element at once');
+                            }
+                        }
+                    });
+                    editor.addCommand("delete_content", {
+                        exec : function( editor ) {
+                            if (confirm('Are you sure?!!')) {
+                                var pathName = window.location.pathname;
+                                if (pathName.indexOf('/') === 0){
+                                    pathName = pathName.replace('/','');
+                                }
+                                //ajaxCall('deleteContent', 'tt_content', id, '', pageId, okMessage, colId);
+                                /*
+                                 * ------WebKitFormBoundary9gP1Wr9BfBto850p
+                                Content-Disposition: form-data; name="TSFE_EDIT[cmd]"
+
+                                delete
+                                ------WebKitFormBoundary9gP1Wr9BfBto850p
+                                Content-Disposition: form-data; name="TSFE_EDIT[record]"
+
+                                tt_content:857
+                                ------WebKitFormBoundary9gP1Wr9BfBto850p--
+                                 */
+                                var params = {};
+                                params["TSFE_EDIT[cmd]"] = "delete";
+                                params["TSFE_EDIT[record]"] = "tt_content:"+id.replace('c','');
+                                //console.log(params);
+                                $.ajax({
+                                    //url: url + '&doSave=1' + extraUrl,
+                                    url: pathName,
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data: params,
+                                    complete: function (data) {
+                                        CKEDITOR.instances[id].destroy();
+                                        $('#' + id).remove();
+                                        var okMessage = {'header': 'Delete', 'message': 'Content element successfully deleted'};
+                                        showMessage(okMessage);
+                                    }
+                                });
+                            } else {
+                                return false;
+                            }
+                        }
+                    });
+                    editor.addCommand("cut_content", {
+                        exec : function( editor ) {
+                            if (feeditSimpleSetCookie('feeditSimple-copycutitem', 'cut:tt_content:' + id + ':' + pageId, 1)) {
+                                CKEDITOR.instances[id].destroy();
+                                var content = $('#' + id)[0].outerHTML;
+                                console.log(content);
+                                $('#' + id).remove();
+                                //var okMessage = {'header': 'Cut', 'message': 'Content element successfully cut'};
+                                ajaxCall('setClipboard', 'tt_content', id, '', '', '', content);
+                            } else {
+                                showMessage({'header': '500', 'message': 'no'});
+                            }
+                        }
+                    });
+                    editor.addCommand("copy_content", {
+                        exec : function( editor ) {
+                            if (feeditSimpleSetCookie('feeditSimple-copycutitem', 'copy:tt_content:' + id, 1)) {
+                                var content = $('#' + id)[0].outerHTML;
+                                var okMessage = {'header': 'Copy', 'message': 'Content element successfully copied'};
+                                ajaxCall('setClipboard', 'tt_content', id, '', '', okMessage, content);
+                            } else {
+                                showMessage({'header': '500', 'message': 'no'});
+                            }
+                        }
+                    });
+                    editor.addCommand("paste_content", {
+                        
+                    }); 
+                    editor.addCommand("paste_content_before", {
+                        exec : function( editor ) {
+                            var pasteContent = feeditSimpleGetCookie('feeditSimple-copycutitem');
+                            var pid;
+                            if (pasteContent) {
+                                //var okMessage = {'header': 'Paste', 'message': 'Content element successfully pasted'};
+                                if($('#'+id).prev().attr('id')) {
+                                    //There is an element before
+                                    pid = $('#'+id).prev().attr('id').replace('c','-');
+                                } else {
+                                    //there is no element before
+                                    //we have to use the pageid
+                                    pid = pageId;
+                                }
+                                //ajaxCall('pasteContentBefore', 'tt_content', id, pid, pageId, '', pasteContent);
+                                $.ajax({
+                                    url: 'index.php',
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data: {
+                                        eID: 'lth_feedit_simple',
+                                        contentToPaste: pasteContent,
+                                        cmd: 'pasteContentBefore',
+                                        table: 'tt_content',
+                                        uid: id,
+                                        pid: pid,
+                                        pageUid: pageId,
+                                        sid: Math.random(),
+                                    },
+                                    success: function (data) {
+                                        $('#'+id).before(data.content);
+                                    },
+                                    error: function (data) {
+                                        alert('Something went wrong');
+                                    }
+                                });
+                            } else {
+                                showMessage({'header': '500', 'message': 'no'});
+                            }
+                        }
+                    });
+                    editor.addCommand("paste_content_after", {
+                        exec : function( editor ) {
+                            var pasteContent = feeditSimpleGetCookie('feeditSimple-copycutitem');
+                            var pid;
+                            if (pasteContent) {
+                                //var okMessage = {'header': 'Paste', 'message': 'Content element successfully pasted'};
+                                pid = id.replace('c','-');
+                                //ajaxCall('pasteContentAfter', 'tt_content', id, pid, pageId, '', pasteContent);
+                                $.ajax({
+                                    url: 'index.php',
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data: {
+                                        eID: 'lth_feedit_simple',
+                                        contentToPaste: pasteContent,
+                                        cmd: 'pasteContentBefore',
+                                        table: 'tt_content',
+                                        uid: id,
+                                        pid: pid,
+                                        pageUid: pageId,
+                                        sid: Math.random(),
+                                    },
+                                    success: function (data) {
+                                        $('#'+id).after(data.content);
+                                    },
+                                    error: function (data) {
+                                        alert('Something went wrong');
+                                    }
+                                });
+                            } else {
+                                showMessage({'header': '500', 'message': 'no'});
+                            }
+                        }
+                    });
+                    
+                    editor.addCommand("hide_content", {
+                        exec: function( editor ) {
+                            //console.log('hide');
+                            var okMessage = {'header': 'Hide', 'message': 'Content element successfully hidden'};
+                            ajaxCall('hideContent', 'tt_content', id, '', pageId, okMessage);
+                        }
+                    });
+                    editor.addCommand("show_content", {
+                        exec: function( editor ) {
+                            //console.log('show');
+                            var okMessage = {'header': 'Show', 'message': 'Content element successfully displayed'};
+                            ajaxCall('showContent', 'tt_content', id, '', pageId, okMessage);
+                        }
+                    });
+                    editor.addCommand("insert_image", {
+                        
+                    });                    
+                    editor.addCommand("insert_image_0", {
+                        exec: function( editor ) {
+                            var okMessage = {'header': 'Image', 'message': 'Image successfully inserted'};
+                            insertImage(id, 'new', 0);
+                        }
+                    });
+                    editor.addCommand("insert_image_1", {
+                        exec: function( editor ) {
+                            var okMessage = {'header': 'Image', 'message': 'Image successfully inserted'};
+                            insertImage(id, 'new', 1);
+                        }
+                    });
+                    editor.addCommand("insert_image_2", {
+                        exec: function( editor ) {
+                            var okMessage = {'header': 'Image', 'message': 'Image successfully inserted'};
+                            insertImage(id, 'new', 2);
+                        }
+                    });
+                    editor.addCommand("insert_image_8", {
+                        exec: function( editor ) {
+                            var okMessage = {'header': 'Image', 'message': 'Image successfully inserted'};
+                            insertImage(id, 'new', 8);
+                        }
+                    });
+                    editor.addCommand("insert_image_9", {
+                        exec: function( editor ) {
+                            var okMessage = {'header': 'Image', 'message': 'Image successfully inserted'};
+                            insertImage(id, 'new', 9);
+                        }
+                    });
+                    editor.addCommand("insert_image_10", {
+                        exec: function( editor ) {
+                            var okMessage = {'header': 'Image', 'message': 'Image successfully inserted'};
+                            insertImage(id, 'new', 10);
+                        }
+                    });
+                    editor.addCommand("insert_image_17", {
+                        exec: function( editor ) {
+                            var okMessage = {'header': 'Image', 'message': 'Image successfully inserted'};
+                            insertImage(id, 'new', 17);
+                        }
+                    });
+                    editor.addCommand("insert_image_18", {
+                        exec: function( editor ) {
+                            var okMessage = {'header': 'Image', 'message': 'Image successfully inserted'};
+                            insertImage(id, 'new', 18);
+                        }
+                    });
+                    editor.addCommand("insert_image_25", {
+                        exec: function( editor ) {
+                            var okMessage = {'header': 'Image', 'message': 'Image successfully inserted'};
+                            insertImage(id, 'new', 25);
+                        }
+                    });
+                    editor.addCommand("insert_image_26", {
+                        exec: function( editor ) {
+                            var okMessage = {'header': 'Image', 'message': 'Image successfully inserted'};
+                            insertImage(id, 'new', 26);
+                        }
+                    });
+                    editor.addCommand("insert_caption", {
+                        exec: function( editor ) {
+                            var selection = editor.getSelection();
+                            var element = selection.getStartElement();
+                            var imgId = $(element).attr('id');
+                            if($('#'+imgId).parent().find('figcaption').length > 0) {
+                                alert('Just one caption!');
+                            } else {
+                                $('#'+imgId).after('<figcaption class="csc-textpic-caption">lorem ipsum</figcaption>');
+                            }
+                        }
+                    });
+                    editor.addCommand("remove_caption", {
+                        exec: function( editor ) {
+                            var selection = editor.getSelection();
+                            var element = selection.getStartElement();
+                            var imgId = $(element).attr('id');
+                            //console.log(imgId);
+                            if($('#'+imgId).parent().find('figcaption').length === 0) {
+                                alert('There is no caption!');
+                            } else {
+                                $('#'+imgId).parent().find('figcaption').remove();
+                            }
+                        }
+                    });
+                    ///
+                    editor.addMenuGroup('content', 2);
+                    //editor.addMenuGroup('delete_content', 3);
+                    editor.addMenuGroup('insert_image', 4);
+                    editor.addMenuGroup('insert_caption', 5);
+                    editor.addMenuGroup('remove_caption', 6);
+                    ///
+                    /*var new_content = {
+                        label : 'New content element after this',
+                        command : 'new_content',
+                        group : 'default'
+                    };
+                    var insert_image = {
+                        label : 'Insert image',
+                        command : 'insert_image',
+                        group : 'image'
+                    };*/
+                    editor.addMenuItems({
+                        content : {
+                            label : 'Content element',
+                            command : 'content',
+                            group : 'content',
+                            order : 1,
+                            getItems : function() {
+                                return {
+                                    new_content : CKEDITOR.TRISTATE_OFF,
+                                    cut_content : CKEDITOR.TRISTATE_OFF,
+                                    copy_content : CKEDITOR.TRISTATE_OFF,
+                                    paste_content : CKEDITOR.TRISTATE_OFF,
+                                    delete_content : CKEDITOR.TRISTATE_OFF,
+                                    hide_content : CKEDITOR.TRISTATE_OFF,
+                                    show_content : CKEDITOR.TRISTATE_OFF,
+                                };
+                            }
+                        },
+                        new_content : {
+                            label : 'New content...',
+                            group : 'content',
+                            command : 'new_content',
+                            order : 11,
+                            getItems : function() {
+                                return {
+                                    new_content_before : CKEDITOR.TRISTATE_OFF,
+                                    new_content_after : CKEDITOR.TRISTATE_OFF,
+                                };
+                            }
+                        },
+                        new_content_before : {
+                            label : 'before this',
+                            group : 'content',
+                            command : 'new_content_before',
+                            order : 111
+                        },
+                        new_content_after : {
+                            label : 'after this',
+                            group : 'content',
+                            command : 'new_content_after',
+                            order : 112
+                        },
+                        cut_content : {
+                            label : 'Cut content',
+                            group : 'content',
+                            command : 'cut_content',
+                            order : 12
+                        },
+                        copy_content : {
+                            label : 'Copy content',
+                            group : 'content',
+                            command : 'copy_content',
+                            order : 13
+                        },
+                        paste_content : {
+                            label : 'Paste content',
+                            group : 'content',
+                            command : 'paste_content',
+                            order : 14,
+                            getItems : function() {
+                                return {
+                                    paste_content_before : CKEDITOR.TRISTATE_OFF,
+                                    paste_content_after : CKEDITOR.TRISTATE_OFF,
+                                };
+                            }
+                        },
+                        paste_content_before : {
+                            label : 'before this',
+                            group : 'content',
+                            command : 'paste_content_before',
+                            order : 141
+                        },
+                        paste_content_after : {
+                            label : 'after this',
+                            group : 'content',
+                            command : 'paste_content_after',
+                            order : 142
+                        },
+                        delete_content : {
+                            label : 'Delete content',
+                            command : 'delete_content',
+                            group : 'content',
+                            order : 15
+                        },
+                        hide_content : {
+                            label : 'Hide content',
+                            command : 'hide_content',
+                            group : 'content',
+                            order : 16
+                        },
+                        show_content : {
+                            label : 'Show content',
+                            command : 'show_content',
+                            group : 'content',
+                            order : 17
+                        },
+                        insert_image : {
+                            label : 'Insert image',
+                            command : 'insert_image',
+                            group : 'insert_image',
+                            order : 4,
+                            getItems : function() {
+                                return {
+                                    insert_image_0 : CKEDITOR.TRISTATE_OFF,
+                                    insert_image_1 : CKEDITOR.TRISTATE_OFF,
+                                    insert_image_2 : CKEDITOR.TRISTATE_OFF,
+                                    insert_image_8 : CKEDITOR.TRISTATE_OFF,
+                                    insert_image_9 : CKEDITOR.TRISTATE_OFF,
+                                    insert_image_10 : CKEDITOR.TRISTATE_OFF,
+                                    insert_image_17 : CKEDITOR.TRISTATE_OFF,
+                                    insert_image_18 : CKEDITOR.TRISTATE_OFF,
+                                    insert_image_25 : CKEDITOR.TRISTATE_OFF,
+                                    insert_image_26 : CKEDITOR.TRISTATE_OFF,
+                                };
+                            }
+                        },
+                        // 2.2 Now add the child items to the group.
+                        insert_image_0 : {
+                            label : 'Above, center',
+                            group : 'insert_image',
+                            command : 'insert_image_0',
+                            order : 41
+                        },
+                        insert_image_1 : {
+                            label : 'Above, right',
+                            group : 'insert_image',
+                            command : 'insert_image_1',
+                            order : 42
+                        },
+                        insert_image_2 : {
+                            label : 'Above, left',
+                            group : 'insert_image',
+                            command : 'insert_image_2',
+                            order : 43
+                        },
+                        insert_image_8 : {
+                            label : 'Below, center',
+                            group : 'insert_image',
+                            command : 'insert_image_8',
+                            order : 44
+                        },
+                        insert_image_9 : {
+                            label : 'Below, right',
+                            group : 'insert_image',
+                            command : 'insert_image_9',
+                            order : 45
+                        },
+                        insert_image_10 : {
+                            label : 'Below, left',
+                            group : 'insert_image',
+                            command : 'insert_image_10',
+                            order : 46
+                        },
+                        insert_image_17 : {
+                            label : 'In text, right',
+                            group : 'insert_image',
+                            command : 'insert_image_17',
+                            order : 47
+                        },
+                        insert_image_18 : {
+                            label : 'In text, left',
+                            group : 'insert_image',
+                            command : 'insert_image_18',
+                            order : 48
+                        },
+                        insert_image_25 : {
+                            label : 'Beside Text, Right',
+                            group : 'insert_image',
+                            command : 'insert_image_25',
+                            order : 49
+                        },
+                        insert_image_26 : {
+                            label : 'Beside Text, left',
+                            group : 'insert_image',
+                            command : 'insert_image_26',
+                            order : 50
+                        },
+                        insert_caption : {
+                            label : 'Insert caption',
+                            group : 'insert_caption',
+                            command : 'insert_caption',
+                            order : 5
+                        },
+                        remove_caption : {
+                            label : 'Remove caption',
+                            group : 'remove_caption',
+                            command : 'remove_caption',
+                            order : 6
+                        },
+                    });
+                    
+                    editor.contextMenu.addListener( function( element, selection ) {
+                        return { 
+                            content : CKEDITOR.TRISTATE_OFF,
+                            insert_image : CKEDITOR.TRISTATE_OFF,
+                            insert_caption : CKEDITOR.TRISTATE_OFF,
+                            remove_caption : CKEDITOR.TRISTATE_OFF,
+                        };
+                    });
+                    if($('#'+id).hasClass('feEditSimple-hidden-0')) {
+                        editor.removeMenuItem('show_content');
+                    } else {
+                        editor.removeMenuItem('hide_content');
+                    }
+                    
+                    if(type==='single') {
+                        editor.focus();
+                    }
+                    ///
+                    /*
+                     *                     "Above, center_0": {"name": "Above, center"},
+                    "Above, right_1": {"name": "Above, right"},
+                    "Above, left_2": {"name": "Above, left"},
+                    "Below, center_8": {"name": "Below, center"},
+                    "Below, right_9": {"name": "Below, right"},
+                    "Below, left_10": {"name": "Below, left"},
+                    "In text, right_17": {"name": "In text, right"},
+                    "In text, left_18": {"name": "In text, left"},
+                    "Beside Text, Right_25": {"name": "Beside Text, Right"},
+                    "Beside Text, Left_26": {"name": "Beside Text, Left"}
+                     */
+                }
+            },
+            allowedContent: true,
+        });
+    });
+}
+
+function makeEditable_old(selector, type)
 {
     //console.log(selector);
     var beUserLang = $('#beUserLang').val();
@@ -626,43 +1487,55 @@ function saveChanges()
 
     $(saveIdsArray).each(function (i, el) {
         //console.log(el);
-        var id, extraUrl, pos, url, pid;
-        var pid = $('body').attr('id');
-        var pageId = pid;
-        var colId = $('#note-editor-' + el).closest('.connectedSortable').attr('id');
+        var id, cleanId, extraUrl, pos, url, pid;
+        var pageId = $('body').attr('id');
+        var pid = $('#' + el).prev().attr('id');
+        if(pid) {
+            pid = '-' + pid.replace('c','');
+        } else {
+            pid = pageId;
+        }
+        //var colId = $('#note-editor-' + el).closest('.connectedSortable').attr('id');
+        var colId = $('#'+el).closest('.connectedSortable').attr('id');
         var colPos = getColpos(colId);
+        
         var formToken;
         var extraUrl = '';
 
-        var imageorientId = $('#note-editor-' + el).attr('data-imageorient');
+        //var imageorientId = $('#note-editor-' + el).attr('data-imageorient');
+        var imageorientId = $('#' + el).attr('data-imageorient');
 
         if (el == 'new') {
-            pos = pid;
+            /*pos = pid;
             if ($('#' + el).prevAll('.note-editor')) {
                 if($('#' + el).prevAll('.note-editor:first').attr('id')) {
                     pid = '-' + $('#' + el).prevAll('.note-editor:first').attr('id').replace('note-editor-', '');
                 }
-            }
+            }*/
             //url = '/typo3/alt_doc.php?edit[tt_content][' + pid + ']=new';
             //extraUrl = '&returnNewPageId=1';
             id = 'new';
+            cleanId = 'new';
         } else {
             id = el;
+            cleanId = el.replace('c','');
             //url = '/typo3/alt_doc.php?edit[tt_content][' + el + ']=edit';
         }
-        
-        var url = $('#lth_feedit_simple-location').val().replace('pages','tt_content').replace('%5B'+pageId+'%5D', '%5B'+id+'%5D');
-        //console.log(url);
+        var url = $('#lth_feedit_simple-location').val().replace('pages','tt_content').replace('%5B'+pageId+'%5D', '%5B'+cleanId+'%5D');
         
 
         var params = {};
         var imgIdList = [];
 
         var imgId, imgWidth, imgHeight, uid_local, imgHref, imgDescription;
-        $('#note-editor-' + id).find('.csc-textpic-imagewrap img').each(function (i, el) {
+        //$('#note-editor-' + id).find('.csc-textpic-imagewrap img').each(function (i, el) {
+        $('#' + id).find('.csc-textpic-imagewrap img').each(function (i, el) {
             imgId = $(this).attr('id');
             imgWidth = $(this).css('width');
             imgHeight = $(this).css('height');
+            if(imgId && imgWidth && imgHeight) {
+                ajaxCall('updateImgWidthHeight','sys_file_reference', imgId, '', '', '', JSON.stringify(Array(imgWidth.replace('px',''),imgHeight.replace('px',''))))
+            }
             uid_local = $(this).attr('data-uid_local');
             if($(this).parent().attr('href')) imgHref = $(this).parent().attr("href").split('?id=').pop();
             if (imgId.indexOf('new') > 0) {
@@ -670,21 +1543,26 @@ function saveChanges()
                 //params["cmd[sys_file_reference][" + $('#chosenimage').attr('oldId') + "][delete]"] = 1;
             }
             imgDescription = $(this).closest('.csc-textpic-image').find('.csc-textpic-caption').html();
-            
+            var imgDescriptionControl = 1;
+            if(!imgDescription) {
+                imgDescription = '';
+                imgDescriptionControl = 0;
+            }
             params["data[sys_file_reference][" + imgId + "][uid_local]"] = 'sys_file_' + uid_local;
             params["data[sys_file_reference][" + imgId + "][uid_local]_list"] = 'sys_file_' + uid_local;
-            params["data[sys_file_reference][" + imgId + "][pid]"] = pid;
-            params["data[sys_file_reference][" + imgId + "][imagewidth]_hr"] = imgWidth;
-            params["data[sys_file_reference][" + imgId + "][imageheight]_hr"] = imgHeight;
-            params["uc[inlineView][tt_content][" + id + "][sys_file_reference][" + imgId + "]"] = 1;
-            params["data[sys_file_reference][" + imgId + "][link]_hr"] = imgHref;
+            params["data[sys_file_reference][" + imgId + "][pid]"] = pageId;
+            //params["data[sys_file_reference][" + imgId + "][imagewidth]"] = parseInt(imgWidth.replace('px',''));
+            //params["data[sys_file_reference][" + imgId + "][imageheight]"] = parseInt(imgHeight.replace('px',''));
+            params["uc[inlineView][tt_content][" + cleanId + "][sys_file_reference][" + imgId + "]"] = 1;
+            //params["data[sys_file_reference][" + imgId + "][link]_hr"] = imgHref;
             params["data[sys_file_reference][" + imgId + "][link]"] = imgHref;
             params["data[sys_file_reference][" + imgId + "][description]"] = imgDescription;
-            params["control[active][sys_file_reference][" + imgId + "][description]"] = 1;
+            params["control[active][sys_file_reference][" + imgId + "][description]"] = imgDescriptionControl;
             imgIdList.push(imgId);
         });
         
-        var imagesFromStartList = $('#note-editor-'+el).attr('data-orgimages');
+        //var imagesFromStartList = $('#note-editor-'+el).attr('data-orgimages');
+        var imagesFromStartList = $('#c'+el).attr('data-orgimages');
         if(imagesFromStartList) {
             var deleteIdsArray = $(imagesFromStartList.split(',')).not(imgIdList).get();
             $(deleteIdsArray).each(function (i, el1) {
@@ -696,40 +1574,25 @@ function saveChanges()
             deleteIdsArray = [];
         }
 
-        /*$.ajax({
-            url: 'index.php',
-            data: {
-                eID: 'lth_feedit_simple',
-                cmd: 'getLocation',
-                table: 'tt_content',
-                uid: id,
-                pid: pid,
-                sid: Math.random(),
-            },
-            type: 'post',
-            dataType: 'json',
-            success: function (data) {
-                console.log(data.content);
-                url = data.content;
+        params["data[tt_content][" + cleanId + "][imageorient]"] = imageorientId;
 
-                //params['cmd'] = "edit";
-                
-            }
-        });*/
-        params["data[tt_content][" + id + "][imageorient]"] = imageorientId;
-
-        params["data[tt_content][" + id + "][colPos]"] = colPos;
-        params["data[tt_content][" + id + "][pid]"] = pid;
-        //params["data[tt_content]["+id+"][header]"] = $('#feeditsimple-elHeader').val();
-        params["data[tt_content][" + id + "][CType]"] = 'textpic';
-        params["data[tt_content][" + id + "][_TRANSFORM_bodytext]"] = 'RTE';
-        var bodytext = $('#note-editor-' + id).find('.lth_feeditsimple_content').html();
+        params["data[tt_content][" + cleanId + "][colPos]"] = colPos;
+        params["data[tt_content][" + cleanId + "][pid]"] = pid;
+        //params["data[tt_content]["+cleanId+"][header]"] = $('#feeditsimple-elHeader').val();
+        params["data[tt_content][" + cleanId + "][CType]"] = 'textpic';
+        params["data[tt_content][" + cleanId + "][_TRANSFORM_bodytext]"] = 'RTE';
+        //var bodytext = $('#note-editor-' + id).find('.lth_feeditsimple_content').html();
+        var bodytext = $('#' + id).find('.lth_feeditsimple_content').html();
+        //bodytext.find('.csc-textpic-imagewrap').remove();
+        //bodytext = bodytext.html();
         bodytext = bodytext.replace(/<p>&nbsp;<\/p>/gi,'').replace(/<p><\/p>/gi, '').replace(/\n+/g, '\n').replace(/<b><b>/gi, '<b>').replace(/<\/b><\/b>/gi, '</b>');
+        //console.log(bodytext);
         //<link 1524 - internal-link "Opens internal link in current window">
-        params["data[tt_content][" + id + "][bodytext]"] = bodytext;
+        params["data[tt_content][" + cleanId + "][bodytext]"] = bodytext;
 
-        if ($('#note-editor-' + id).find('.csc-textpic-imagewrap').length > 0) {
-            params["data[tt_content][" + id + "][image]"] = imgIdList.join();
+        //if ($('#note-editor-' + id).find('.csc-textpic-imagewrap').length > 0) {
+        if ($('#' + id).find('.csc-textpic-imagewrap').length > 0) {
+            params["data[tt_content][" + cleanId + "][image]"] = imgIdList.join();
         }
         params["doSave"] = '1';
         //console.log(params);
@@ -741,15 +1604,34 @@ function saveChanges()
             data: params,
             complete: function (data) {
                 $('#lth_feedit_simple-saveChanges').prop('disabled', true);
+                $('#lth_feedit_simple-saveChanges').css('color','white');
                 var okMessage = {'header': 'Save', 'message': 'Content successfully saved'};
                 showMessage(okMessage);
-                /*if (id=='new') {
-                    var newId = data.responseText.split(']=edit&amp;doSave=1').shift().split('="/typo3/alt_doc.php?&amp;edit[tt_content][').pop();
-                    $('#new').attr('id', 'c' + newId);
-                    //$('#note-editor-new').attr('data-imageorient', $(this).prev().attr('data-imageorient'));
-                    $('#note-editor-new').attr('id', 'note-editor-' + newId);
-                    enableContextMenu('#note-editor-' + newId);
-                }*/
+                if(id==='new') {
+                    $.ajax({
+                        type: "POST",
+                        url: 'index.php',
+                        dataType: 'json',
+                        data: {
+                            eID: 'lth_feedit_simple',
+                            cmd: 'getLastUid',
+                            pageUid: pageId,
+                            sid: Math.random()
+                        },
+                        success: function(data){    
+                            var newId = data.uid;
+                            var newSorting = data.sorting;
+                            if(newId) {
+                                newId = 'c'+newId;
+                                
+                                CKEDITOR.instances['new'].destroy();
+                                $('#new').attr('sorting',newSorting);
+                                $('#new').attr('id',newId);
+                                makeEditable(newId);
+                            }
+                        }
+                    });
+                }
             }
         });
     });
@@ -762,11 +1644,13 @@ function addId(id, type)
     //console.log(id + ';' + type);
     var tempVal;
     $('#lth_feedit_simple-saveChanges').prop('disabled', false);
+    $('#lth_feedit_simple-saveChanges').css('color','orange');
     if (type === 'deleteImg') {
         tempVal = $('#lth_feedit_simple-deleteIds').val() + ',' + id.replace('c','');
         $('#lth_feedit_simple-deleteIds').val(array_unique(tempVal.split(',')).join(','));
     } else {
-        tempVal = $('#lth_feedit_simple-saveIds').val() + ',' + id.replace('c','').replace('#','');
+        //tempVal = $('#lth_feedit_simple-saveIds').val() + ',' + id.replace('c','').replace('#','');
+        tempVal = $('#lth_feedit_simple-saveIds').val() + ',' + id;
         $('#lth_feedit_simple-saveIds').val(array_unique(tempVal.split(',')).join(','));
     }
 }
@@ -958,6 +1842,7 @@ function showMessage(message)
 
 function getColpos(columnId)
 {
+    if(!columnId) return '0';
     var columnType = columnId.split('-').pop();
     var colPos = '0';
     switch (columnType) {
@@ -1017,6 +1902,12 @@ function feeditSimpleSetCookie(name, value, expires, domain, secure)
 }
 
 
+function feeditSimpleDeleteCookie(name)
+{
+  document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
+
 //extract cType
 function getCtype(rel)
 {
@@ -1029,7 +1920,7 @@ function getCtype(rel)
 function getContentTemplate(rel)
 {
     var templateArray = {'textpic': '<div id="new" class="csc-default" title="">\
-        <div contentEditable=true class="lth_feeditsimple_content" data-text="Enter text here: Please save the element to insert images etc"></div>\
+        <div contenteditable="true" class="lth_feeditsimple_content" data-text="Enter text here: Please save the element to insert images etc"></div>\
         </div>'
     };
     var CType;
@@ -1264,7 +2155,7 @@ function feeditSimpleContentCommand(cmd, uid, imageOrientationId)
             $('#note-editor-'+uid).after(template);
             makeEditable('#new', '');
             enableContextMenu('#note-editor-new');
-            $('#new').next().attr('id', 'note-editor-new');
+            $('#new').next().attr('id', 'note-editor-new').removeClass('csc-default');
             //makeSortable(document.getElementById('feEditSimple-normalColWrapper'), 'connectedSortable');
             if($('#feEditSimple-rightColWrapper').length > 0) {
                 //makeSortable(document.getElementById('feEditSimple-rightColWrapper'), 'connectedSortable');
@@ -1281,7 +2172,8 @@ function insertImage(uid, type, imageOrientationId)
 {
     if(imageOrientationId == '') {
         //console.log('???');
-        imageOrientationId = $('#note-editor-' + uid).attr('data-imageorient');
+        //imageOrientationId = $('#note-editor-' + uid).attr('data-imageorient');
+        imageOrientationId = $('#c' + uid).attr('data-imageorient');
         //console.log(imageOrientationId);
         if(!imageOrientationId) {
             imageOrientationId = '17';
@@ -1365,15 +2257,16 @@ function insertImage(uid, type, imageOrientationId)
         }
         //make editable
         makeEditable('#c' + uid, type);
-        cancelRightClick();
+        //cancelRightClick();
     });
 }
 
 
 function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
 {
+    //console.log(uid+cmd);
     var colId, colPos;
-    colId = $('#note-editor-' + uid).closest('.connectedSortable').attr('id');
+    colId = $('#' + uid).closest('.connectedSortable').attr('id');
     if(colId) {
         colPos = getColpos(colId);
     } else {
@@ -1395,36 +2288,13 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
             sid: Math.random()
         },
         success: function (data) {
-            if ((cmd == 'pasteContentBefore' || cmd == 'pasteContentAfter') && data.content && data.result == 200) {
-
-                if(cmd=='pasteContentBefore') {
-                    //console.log(pid);
-                    if(parseInt(pid) >= 0) {
-                        //get first
-                        $('.csc-default').first().before(data.content);
-                    } else {
-                        $('#c' + pid.substring(1)).before(data.content);
-                    }
-                    
-                } else if(cmd=='pasteContentAfter' && pid.indexOf('temp') > 0) {
-                    //console.log($('.connectedSortable').closest().attr('id'));
-                    $('#note-editor-'+uid).replaceWith(data.content);
-                } else if(cmd=='pasteContentAfter') {
-                    console.log('#c' + pid.substring(1));
-                    $('#c' + pid.substring(1)).next().after(data.content);
-                }
-                
-                makeEditable('#c' + data.uid, '');
-                /*if($('#feEditSimple-rightColWrapper').length > 0) {
-                    //makeSortable(document.getElementById('feEditSimple-rightColWrapper'), 'connectedSortable');
-                }*/
-            } else if (cmd === 'deleteContent' && data.result == 200) {
+            if (cmd === 'deleteContent' && data.result == 200) {
                 if($('#'+contentToPaste).find('.note-editor').length==0) {
                     addNoContent('#'+contentToPaste);
                 }
             } else if (cmd === 'hideContent' && data.result == 200) {
-                $('#note-editor-' + uid).removeClass('feEditSimple-hidden-0');
-                $('#note-editor-' + uid).addClass('feEditSimple-hidden-1');                
+                $('#' + uid).removeClass('feEditSimple-hidden-0');
+                $('#' + uid).addClass('feEditSimple-hidden-1');                
                 var displayString = feeditSimpleGetCookie('feeditSimple-usersettings');
                 if (displayString) {
                     var displayObject = JSON.parse(unescape(displayString));
@@ -1433,8 +2303,8 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                     }
                 }
              } else if (cmd === 'showContent' && data.result == 200) {
-                $('#note-editor-' + uid).removeClass('feEditSimple-hidden-1');
-                $('#note-editor-' + uid).addClass('feEditSimple-hidden-0');
+                $('#' + uid).removeClass('feEditSimple-hidden-1');
+                $('#' + uid).addClass('feEditSimple-hidden-0');
              } else if (cmd === 'pastePageAfter' || cmd === 'pastePageInto') {
                 if (data.oldUid) {
                     feeditSimpleSetCookie('feeditSimple-copycutpage', 'copy:pages:' + data.oldUid, 1);
@@ -1497,33 +2367,79 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
 
                 pageTree.treeview('collapseAll', {silent: true});
                 pageTreeContainer.show();
-            } else if (cmd === 'getFormHandler') {
-                if (!data.columns) {
+            } else if (cmd === 'getFormManager') {
+                
+                var buttonCommon = {
+                    exportOptions: {
+                        format: {
+                            body: function ( data, row, column, node ) {
+                                // Strip $ from salary column to make it numeric
+                                //console.log(row);
+                                
+                                if(column > 2) {
+                                    var exportData = "";
+                                    var dataArray = data.split("\n");
+                                    for (var i = 0; i < dataArray.length; i++) {
+                                        if(exportData!=="") {
+                                            exportData += "\t";
+                                        }
+                                        exportData += dataArray[i].split(":").pop();
+                                        /*
+                                         * 
+                                         * var dateSplit = sValue.split(".");
+                            y = "20"+dateSplit[2], m = parseInt(dateSplit[1]-1), d=parseInt(dateSplit[0]);
+                                         */
+                                        
+                                    }
+                                    return exportData;
+                                } else {
+                                    return data;
+                                }
+                            }
+                        }
+                    }
+                };
+                /*if (!data.columns) {
                     alert('no data');
                     return false;
-                }
-                var resultColumns = [];
-                var tableContent = '<thead><tr>';
-                $.each(data.columns, function (i, value) {
+                }*/
+                //var resultColumns = [];
+                //var tableContent = '<thead><tr>';
+                /*$.each(data.columns, function (i, value) {
 
                     var obj = {sTitle: value};
 
                     resultColumns.push(obj);
                     tableContent += '<th>' + value + '</th>';
-                });
+                });*/
                 //console.log(data.data);
-                tableContent += '</tr></thead>';
-                tableContent += '<tbody></tbody>';
-                $('#feeditSimple-modalBox-2 .modal-body').html('<table id="feeditSimple-formhandlerTable" class="display" width="100%"></table>');
+                //tableContent += '</tr></thead>';
+                //tableContent += '<tbody></tbody>';
+                var style = "<style>td.details-control {background: url('/typo3conf/ext/lth_feedit_simple/vendor/datatables/images/details_open.png') no-repeat center center; cursor: pointer;}tr.details td.details-control { background: url('/typo3conf/ext/lth_feedit_simple/vendor/datatables/images/details_close.png') no-repeat center center;}</style>";
+                $('#feeditSimple-modalBox-2 .modal-body').html(style+'<table id="feeditSimple-formManagerTable" class="display" width="100%"><thead><tr><th></th><th>Date</th><th>Name</th></tr></thead></table>');
 
-                $('#feeditSimple-modalBox-2 .modal-header h3').html('Formhandler admin');
+                $('#feeditSimple-modalBox-2 .modal-header h3').html('Form Manager');
                 $('#feeditSimple-modalBox-2 .modal-footer').html('');
 
-                $('#feeditSimple-formhandlerTable').DataTable({
+                var dt = $('#feeditSimple-formManagerTable').DataTable({
+                    paging: false,
                     "aaData": data.data,
-                    "aoColumns": resultColumns,
+                    //"aoColumns": resultColumns,
+                    "columns": [
+                        {
+                            "class":          "details-control",
+                            "orderable":      false,
+                            "data":           null,
+                            "defaultContent": ""
+                        },
+                        { "data": "crdate" },
+                        { "data": "name" },
+                        { "data": "form_data", "visible":false }
+                    ],
+                    "order": [[1, 'asc']],
                     dom: 'Bfrtip',
-                    buttons: [
+
+                    /*buttons: [
                         {
                             extend: 'collection',
                             text: 'Export',
@@ -1533,21 +2449,50 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                             ]
                         },
                         'colvis'
+                    ]*/
+                    buttons: [
+                        $.extend( true, {}, buttonCommon, {
+                            extend: 'copyHtml5'
+                        } )/*,
+                        $.extend( true, {}, buttonCommon, {
+                            extend: 'excelHtml5'
+                        } ),
+                        $.extend( true, {}, buttonCommon, {
+                            extend: 'csvHtml5'
+                        } )*/
                     ]
                 });
-                
-                /*
-                 * buttons: ['copyHtml5',
-                        'excelHtml5',
-                        'csvHtml5',
-                        'pdfHtml5',
-                        'colvis'
-                        {
-                            extend: 'colvis',
-                            //columns: ':not(:first-child)'
+                var detailRows = [];
+ 
+                $('#feeditSimple-formManagerTable tbody').on( 'click', 'tr td.details-control', function () {
+                    var tr = $(this).closest('tr');
+                    var row = dt.row( tr );
+                    var idx = $.inArray( tr.attr('id'), detailRows );
+ 
+                    if ( row.child.isShown() ) {
+                        tr.removeClass( 'details' );
+                        row.child.hide();
+
+                        // Remove from the 'open' array
+                        detailRows.splice( idx, 1 );
+                    } else {
+                            tr.addClass( 'details' );
+                            row.child( format( row.data() ) ).show();
+
+                            // Add to the 'open' array
+                            if ( idx === -1 ) {
+                                detailRows.push( tr.attr('id') );
+                            }
                         }
-                    ]
-                 */
+                    } );
+
+                    // On each draw, loop over the `detailRows` array and show any child rows
+                    dt.on( 'draw', function () {
+                        $.each( detailRows, function ( i, id ) {
+                            $('#'+id+' td.details-control').trigger( 'click' );
+                        } );
+                    } );
+                
 
                 $("#feeditSimple-modalBox-2").modal({
                     persist: true,
@@ -1559,7 +2504,7 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                 });
 
                 $("#feeditSimple-modalBox-2").on('shown', function () {
-                    var tableWidth = $('#feeditSimple-formhandlerTable').width() + 50;
+                    var tableWidth = $('#feeditSimple-formManagerTable').width() + 50;
                     if (!tableWidth) {
                         tableWidth = '800';
                         //tableHeight = '800';
@@ -1584,6 +2529,19 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
             showMessage({message: '500', header: '1676'});
         }
     });
+}
+
+
+function format ( d ) {
+    if(d.form_data) {
+        var content="";
+        var formDataArray = d.form_data.split("\n");
+        for (var i = 0; i < formDataArray.length; i++) {
+            content += formDataArray[i]+"<br />";
+            //Do something
+        }
+    }
+    return content;
 }
 
 
@@ -1629,8 +2587,8 @@ function toggleHiddenObject(label, myType, okMessage)
         
         feeditSimpleSetCookie('feeditSimple-usersettings', JSON.stringify(displayObject), 0);
         var pageId = $('body').attr('id');
-        var url = 'index.php?id=' + pageId + '&TSFE_ADMIN_PANEL%5Bdisplay_preview%5D=1&TSFE_ADMIN_PANEL%5Bpreview_showHiddenPages%5D='+showHiddenPages+'&TSFE_ADMIN_PANEL%5Bpreview_showHiddenRecords%5D='+showHiddenRecords;
-        
+        var url = 'index.php?id=' + pageId + '&TSFE_ADMIN_PANEL%5Bdisplay_preview%5D=1&TSFE_ADMIN_PANEL%5Bpreview_showHiddenPages%5D='+showHiddenPages+'&TSFE_ADMIN_PANEL%5Bpreview_showHiddenRecords%5D='+showHiddenRecords+'55B';
+        //         index.php?                 &TSFE_ADMIN_PANEL%5Bdisplay_preview%5D=1&TSFE_ADMIN_PANEL%5Bpreview_showHiddenPages%5D=                  0&TSFE_ADMIN_PANEL%5Bpreview_showHiddenRecords%5D=0&TSFE_ADMIN_PANEL%5Bpreview_simulateDate%5D_hr=&TSFE_ADMIN_PANEL%5Bpreview_simulateDate%5D=&TSFE_ADMIN_PANEL%5Bpreview_simulateUserGroup%5D=0&TSFE_ADMIN_PANEL%5Bdisplay_cache%5D=1&TSFE_ADMIN_PANEL%5Bcache_noCache%5D=0&TSFE_ADMIN_PANEL%5Bcache_clearCacheLevels%5D=2&TSFE_ADMIN_PANEL%5Bcache_clearCacheId%5D=6&TSFE_ADMIN_PANEL%5Bdisplay_edit%5D=1&TSFE_ADMIN_PANEL%5Bedit_displayFieldIcons%5D=0&TSFE_ADMIN_PANEL%5Bedit_displayFieldIcons%5D=1&TSFE_ADMIN_PANEL%5Bedit_displayIcons%5D=0&TSFE_ADMIN_PANEL%5Bedit_displayIcons%5D=1&TSFE_ADMIN_PANEL%5Bdisplay_tsdebug%5D=1&TSFE_ADMIN_PANEL%5Btsdebug_tree%5D=0&TSFE_ADMIN_PANEL%5Btsdebug_displayTimes%5D=0&TSFE_ADMIN_PANEL%5Btsdebug_displayMessages%5D=0&TSFE_ADMIN_PANEL%5Btsdebug_LR%5D=0&TSFE_ADMIN_PANEL%5Btsdebug_displayContent%5D=0&TSFE_ADMIN_PANEL%5Btsdebug_displayQueries%5D=0&TSFE_ADMIN_PANEL%5Btsdebug_forceTemplateParsing%5D=0&TSFE_ADMIN_PANEL%5Bdisplay_info%5D=#TSFE_ADMIN_PANEL
         ajaxCall('updateFeUserSettings','pages','','','','',JSON.stringify(displayObject));
         
         $.ajax({
@@ -1746,19 +2704,19 @@ function uniqid(prefix, more_entropy)
 
 // Extends plugins for adding changeImage.
 //  - plugin is external module for customizing.
-$.extend($.summernote.plugins, {
-    /**
-     * @param {Object} context - context object has status of editor.
-     */
-    /*'brenter': function (context) {
-        this.events = {
-            'summernote.enter': function (we, e) {
-                // insert 2 br tags (if only one br tag is inserted the cursor won't go to the next line)
-                document.execCommand('insertHTML', false, '<p><br></p>');
-                e.preventDefault();
-            }
-        };
-    },*/
+/*$.extend($.summernote.plugins, {
+    
+     //@param {Object} context - context object has status of editor.
+     
+    //'brenter': function (context) {
+    //    this.events = {
+    //        'summernote.enter': function (we, e) {
+    //            // insert 2 br tags (if only one br tag is inserted the cursor won't go to the next line)
+    //            document.execCommand('insertHTML', false, '<p><br></p>');
+    //            e.preventDefault();
+    //        }
+    //    };
+    //},
     'changeImage': function (context) {
         var ui = $.summernote.ui;
         context.memo('button.changeImage', function () {
@@ -1923,7 +2881,8 @@ $.extend($.summernote.plugins, {
             return $insertCaption;
         });
     }
-});
+});*/
+
 
 $.fn.outerHTML = function () {
     return $('<div />').append(this.eq(0).clone()).html();

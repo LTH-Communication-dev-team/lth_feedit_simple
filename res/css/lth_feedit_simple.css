@@ -8,8 +8,49 @@
  * (Styles for the editing forms inside the lightbox are located in
  * fe_formsOnPage.css)
  */
+
+.feEditSimple-hidden-0 {
+    opacity:1;
+}
+
+.feEditSimple-hidden-1 {
+    opacity:.2;
+}
+
+.xdsoft_datetimepicker{z-index:1151 !important;}
+
+.cke_chrome {
+    border:none!important;
+    
+}
+.cke_2_top {
+    background-color:#000 !important;
+    border-bottom-color:#000 !important;
+}
 body, #lu_header_wrapper {
-    padding-top: 32px;
+    padding-top: 45px;
+}
+
+#lth_feeditsimple_inner_content {
+    display:none;
+}
+
+#lth_feedit_simple-saveChanges {
+    width:112px;
+    height:35px;
+    background-color:#4c4c4c !important;
+    border:0px !important;
+    color: #fff !important;
+    font-size: 16px !important;
+}
+
+/*.cke_top  {
+    background-color:#000 !important;
+    border: 0px !important;
+}*/
+
+.lth_feedit_simple-saveChanges {
+    float:right;
 }
 
 .sidepanel {
@@ -38,26 +79,6 @@ body, #lu_header_wrapper {
     height: 15px;
     cursor: pointer;
 }
-/*.bootstrap-wysihtml5-insert-link-modal {
-    height: 200px;
-}*/
-
-.bootstrap-wysihtml5-insert-link-modal a {
-    text-decoration: none;
-}
-
-.bootstrap-wysihtml5-insert-link-modal a.btn, .modal a.btn {
-    color: #000;
-}
-
-.bootstrap-wysihtml5-insert-link-modal a.btn.btn-primary, .modal a.btn.btn-primary {
-    color: #fff;
-}
-
-.modal th {
-    background-color: #fff;
-    color: #000;
-}
 
 .csc-default {
     border-bottom: 1px #08C dashed;
@@ -69,10 +90,10 @@ body, #lu_header_wrapper {
     padding: 0px;
 }
 
-.dropdown:hover .dropdown-menu {
+/*.dropdown:hover .dropdown-menu {
     display: block;
     margin-top: 0; // remove the gap so it doesn't close
- }
+ }*/
 
 div#feEditSimple-bodyattach {
 	behavior: url(typo3conf/ext/lth_feedit_simple/res/css/csshover3-source.htc);
@@ -124,6 +145,19 @@ div.feEditSimple-menuToolbar div.feEditSimple-spacer {
 
 .dropdown a {
     text-decoration: none;
+    color:#fff;
+}
+
+.glyphicon-user {
+    background-color: #666666;
+    color: white;
+    padding: 10px;
+    font-size: 6em;
+    border-radius: 50%;
+}
+
+.glyphicon-save {
+    padding-left:10px;
 }
 
 .dropdown-header {
@@ -192,7 +226,6 @@ div#feEditSimple-menuBar div.feEditSimple-secondRow,
 div#feEditSimple-menuBar div.feEditSimple-fourthRow {
 	clear: both;
 	overflow: hidden;
-	
 	width: 100%;
 }
 
@@ -239,146 +272,6 @@ div#feEditSimple-menuBar div.feEditSimple-fourthRow {
 div.feEditSimple-menuToolbar {
 	margin: 1px;
 	height: 24px;
-}
-
-/* ---------------------- Top Menu: Actions ---------------------------- */
-div#feEditSimple-actionToolbar {
-	margin-right: 20px;
-}
-
-/* ---------------------- Top Menu: Close Button on the right ---------------------------- */
-div#feEditSimple-contextToolbar {
-	display: block;
-	position: absolute;
-	right: 0;
-	top: 0;
-}
-
-div#feEditSimple-menuBar div#feEditSimple-contextToolbar a.feEditSimple-button {
-	float: right;
-	display: block;
-}
-
-/* ---------------------- Top Menu: Page edit buttons on the left ---------------------------- */
-div#feEditSimple-menuBar div#feEditSimple-pageEditToolbar {
-	float: left;
-	width: 80%;
-}
-
-div#feEditSimple-menuBar div#feEditSimple-pageEditToolbar div.feEditSimple-allWrapper {
-	display: block;
-}
-
-div#feEditSimple-menuBar div#feEditSimple-pageEditToolbar a.feEditSimple-button {
-	float: left;
-	display: block;
-}
-
-div#feEditSimple-menuBar div#feEditSimple-pageEditToolbar div#feEditSimple-showHiddenContent {
-	float: left;
-	padding: 7px 0px 2px 10px;
-	color: #ddd;
-	font-size: 12px;
-}
-
-div#feEditSimple-menuBar div#feEditSimple-pageEditToolbar div#feEditSimple-showHiddenContent input#feEditSimple-showHiddenContent-input {
-	vertical-align: -2px;
-}
-
-/* ---------------------- Top Menu: List of Content Element Types ---------------------------- */
-div#feEditSimple-contentTypeToolbar {
-	z-index: 500;
-	overflow: visible;
-	float: left;
-	width: 80%;
-	margin-left: 20px;
-	height: 32px;
-	text-align: left;
-}
-
-div#feEditSimple-contentTypeToolbar-inner {
-	height: 32px;
-	overflow: hidden;
-	position: absolute;
-	left: 20px;
-	text-align: left;
-	z-index: 9200;
-}
-
-div#feEditSimple-contentTypeToolbar-scroller {
-	width: 2000px; /** needs to be an abnormal amount */
-}
-
-div#feEditSimple-contentTypeToolbar-arrLeft,
-div#feEditSimple-contentTypeToolbar-arrRight {
-	cursor: pointer;
-	width: 20px;
-	float: left;
-	color: #000;
-	font-weight: normal;
-	font-size: 20px;
-	z-index: 9500;
-	position: relative;
-	line-height: 31px;
-	text-align: center;
-	background: url(../icons/menubar/menu2_back.png) repeat-x 0 0;
-}
-
-div#feEditSimple-contentTypeToolbar-arrRight {
-	float: right;
-}
-
-img.feEditSimple-buttonImage {
-	vertical-align: middle;
-	float: left;
-	margin: 4px 0 0;
-}
-
-div#feEditSimple-contextToolbar img.feEditSimple-buttonImage {
-	margin: 11px 3px 0 6px;
-}
-
-div.x-dd-drag-proxy a.feEditSimple-contentTypeItem,
-div#feEditSimple-menuBar a.feEditSimple-contentTypeItem {
-	background: none;
-	width: auto;
-	margin: 0;
-	height: 32px;
-	padding: 0 6px;
-}
-
-div.x-dd-drag-proxy a.feEditSimple-button span,
-div#feEditSimple-menuBar div#feEditSimple-contentTypeToolbar a.feEditSimple-button span {
-	float: left;
-	line-height: 32px;
-	padding-left: 3px;
-}
-
-span.feEditSimple-buttonLabel {
-	color: #000;
-	margin-left: 3px;
-	font-size: 11px;
-	line-height: 32px;
-}
-
-div#feEditSimple-menuBar .feEditSimple-contentTypeItem {
-	border-right: 1px dotted #afafaf;
-}
-
-.feEditSimple-contentTypeItem {
-	display: block; /*opera*/
-	display: inline-block; /*ie*/
-	margin: 0;
-	text-decoration: none !important;
-	color: #ddd;
-	cursor: move;
-	padding: 0 10px;
-	height: 34px;
-}
-
-div.x-dd-drag-proxy {
-	background: #e0e0e0;
-	border: 1px dotted #999;
 }
 
 /* ---------------------- Top Menu: clipboard ---------------------------- */
@@ -447,240 +340,6 @@ div.x-dd-drag-proxy {
 
 .feEditSimple-noBorder {
 	border: none !important;
-}
-
-/* ---------------------- DROP ZONE for Draggable ---------------------------- */
-.feEditSimple-dropzone {
-	width: 100%;
-	height: 40px;
-	margin: 10px 0;
-	border: 1px dashed #888;
-	background: #e0e0e0;
-}
-
-.feEditSimple-dropzoneText {
-	margin: 10px;
-	padding-left: 20px;
-	background: transparent url(../icons/hovermenu/drop.png) no-repeat;
-}
-
-.feEditSimple-dropzoneActive {
-	background: #FFFF30 !important;
-}
-
-dl.feEditSimple-menuUserlist {
-	font-size: 80%;
-	float: right;
-	margin-top: 5px;
-	margin-right: 160px;
-	width: auto;
-	overflow: hidden;
-}
-
-dl.feEditSimple-menuUserlist dt {
-	display: inline;
-	float: left;
-}
-
-dl.feEditSimple-menuUserlist dd {
-	display: inline;
-	float: left;
-	cursor: help;
-	margin: 0px;
-	padding: 0px;
-	padding-left: 3px;
-}
-
-/* ---------------------- HOVERMENU ---------------------------- */
-div.feEditSimple-allWrapper,
-div.feEditSimple-contentWrapper {
-	position: relative;
-	padding: 4px;
-	margin: 20px 0 4px 0;
-	overflow: visible;
-	min-height: 0; /* Min height added for IE hasLayout issues. */
-}
-
-div.feEditSimple-allWrapper form {
-	min-height: 0;
-	margin: 0;
-}
-
-div.feEditSimple-allWrapper {
-	border: 1px dashed #bbb;
-	margin: 1px;
-	padding: 0;
-}
-
-div.feEditSimple-allWrapperHover {
-	background-image: url(../icons/hovermenu/content_background.png);
-	border: 1px solid #888;
-	margin: 1px;
-}
-
-/* Give IE6 a solid colored background since it can't handle PNG alpha transparency */
-* html div.feEditSimple-allWrapperHover {
-	background-image: none;
-	background-color: #e0e0e0 !important;
-}
-
-div.feEditSimple-clickContentToEdit {
-	cursor: pointer;
-}
-
-div.feEditSimple-contentWrapper {
-	margin: 0;
-	padding: 0;
-}
-
-div.feEditSimple-contentWrapper .formsOnPage {
-	background-color: white;
-}
-
-div.feEditSimple-allWrapper div.feEditSimple-editPanelDiv {
-	position: absolute;
-	top: -20px;
-	left: 0;
-	z-index: 85;
-	margin: -1px;
-	padding: 0;
-	background-color: #ccc;
-	color: #444;
-	width: 100%;
-	min-width: 400px;
-	height: 21px;
-	border: 1px solid #888;
-	border-bottom: 1px solid #aaa;
-	overflow: visible;
-	background: url(../icons/hovermenu/background.png) repeat-x;
-}
-
-div.feEditSimple-editPanelDiv a img,
-.formsOnPage a img,
-.formsOnPage img {
-	border-width: 0;
-}
-
-div.feEditSimple-contentWrapper div.feEditSimple-editPanelDiv {
-	position: static !important;
-}
-
-div.feEditSimple-contentWrapper .formsOnPage {
-	position: relative;
-	z-index: 400;
-}
-
-.feEditSimple-hiddenElement .feEditSimple-contentWrapper,
-.hidden .formsOnPage, .feEditSimple-hidden-1, .feEditSimple-hiddenInMenu-1, .feEditSimple-hiddenPage-1 {
-	opacity: 0.5;
-	-ms-filter: "alpha(opacity=50)";
-}
-
-.feEditSimple-hidden-0 {
-    opacity: 1;
-    -ms-filter: "alpha(opacity=100)";
-}
-
-.feEditSimple-label,
-input.feEditSimple-editButton,
-.feEditSimple-dragHandle {
-	float: left !important;
-	padding: 2px 3px 0 22px;
-	margin: 2px 2px 0;
-	border: none;
-	border-right: 1px dotted #aaa;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 11px;
-	color: #646;
-	width: auto;
-}
-
-div.feEditSimple-contentWrapperSmall input.feEditSimple-editButton {
-	width: 20px;
-	text-indent: 20px;
-	padding-left: 0;
-	padding-right: 0;
-	background-position: 0px 50%;
-}
-
-div.feEditSimple-contentWrapperSmall div.feEditSimple-editPanelDiv {
-	min-width: 170px;
-}
-
-.feEditSimple-label {
-	font-weight: bold;
-	padding-left: 0;
-}
-
-input.feEditSimple-editButton:hover,
-.feEditSimple-dragHandle:hover {
-	cursor: pointer;
-}
-
-input.feEditSimple-editButton.newRecordAction,
-input.feEditSimple-editButton.newPageAction {
-	background: url(../icons/hovermenu/new.png) no-repeat 3px 50%;
-}
-
-input.feEditSimple-editButton.editAction {
-	background: url(../icons/hovermenu/edit.png) no-repeat 3px 50%;
-}
-
-input.feEditSimple-editButton.cutAction {
-	background: url(../icons/hovermenu/cut.png) no-repeat 3px 50%;
-}
-
-input.feEditSimple-editButton.copyAction {
-	background: url(../icons/hovermenu/copy.png) no-repeat 3px 50%;
-}
-
-input.feEditSimple-editButton.pasteAction {
-	background: url(../icons/hovermenu/clip_pasteafter.png) no-repeat 3px 50%;
-}
-
-input.feEditSimple-editButton.hideAction {
-	background: url(../icons/hovermenu/hide.png) no-repeat 3px 50%;
-}
-
-input.feEditSimple-editButton.unhideAction {
-	background: url(../icons/hovermenu/unhide.png) no-repeat 3px 50%;
-}
-
-input.feEditSimple-editButton.deleteAction {
-	background: url(../icons/hovermenu/delete.png) no-repeat 3px 50%;
-}
-
-input.feEditSimple-editButton.dragAction,
-.feEditSimple-dragHandle {
-	background: url(../icons/hovermenu/drag.png) no-repeat 3px 50%;
-}
-
-input.feEditSimple-editButton.upAction {
-	background: url(../icons/hovermenu/up.png) no-repeat 3px 50%;
-}
-
-input.feEditSimple-editButton.downAction {
-	background: url(../icons/hovermenu/down.png) no-repeat 3px 50%;
-}
-
-.feEditSimple-dragHandle {
-	float: right !important;
-	border: none;
-	height: 16px;
-	padding: 2px 3px 0 25px;
-}
-
-.doCut {
-	background-color: #f8e0e0;
-}
-
-.doCopy {
-	background-color: #d8f0d8;
-}
-
-div.feEditSimple-contentWrapper form.typo3-editPanel {
-	float: right;
-	border-width: 0 !important;
 }
 
 /*------------------Modified-----------------------------------------------*/
@@ -1516,36 +1175,6 @@ div.feEditSimple-contentWrapperSmall .start-grid-8 {
   }
 }
 
-/*.feeditSimple-placeHolder {
-    height:50%;
-    width: 50%;
-}*/
-
-#feeditSimple-jstree .folder { background:url('file_sprite.png') right bottom no-repeat; }
-#feeditSimple-jstree .file { background:url('file_sprite.png') 0 0 no-repeat; }
-#feeditSimple-jstree .file-pdf { background-position: -32px 0 }
-#feeditSimple-jstree .file-as { background-position: -36px 0 }
-#feeditSimple-jstree .file-c { background-position: -72px -0px }
-#feeditSimple-jstree .file-iso { background-position: -108px -0px }
-#feeditSimple-jstree .file-htm, #feeditSimple-jstree .file-html, #feeditSimple-jstree .file-xml, #feeditSimple-jstree .file-xsl { background-position: -126px -0px }
-#feeditSimple-jstree .file-cf { background-position: -162px -0px }
-#feeditSimple-jstree .file-cpp { background-position: -216px -0px }
-#feeditSimple-jstree .file-cs { background-position: -236px -0px }
-#feeditSimple-jstree .file-sql { background-position: -272px -0px }
-#feeditSimple-jstree .file-xls, #feeditSimple-jstree .file-xlsx { background-position: -362px -0px }
-#feeditSimple-jstree .file-h { background-position: -488px -0px }
-#feeditSimple-jstree .file-crt, #feeditSimple-jstree .file-pem, #feeditSimple-jstree .file-cer { background-position: -452px -18px }
-#feeditSimple-jstree .file-php { background-position: -108px -18px }
-#feeditSimple-jstree .file-jpg, .file-JPG, .file-JPEG, #feeditSimple-jstree .file-jpeg, #feeditSimple-jstree .file-png, #feeditSimple-jstree .file-gif, #feeditSimple-jstree .file-bmp { background-position: -126px -18px }
-#feeditSimple-jstree .file-ppt, #feeditSimple-jstree .file-pptx { background-position: -144px -18px }
-#feeditSimple-jstree .file-rb { background-position: -180px -18px }
-#feeditSimple-jstree .file-text, #feeditSimple-jstree .file-txt, #feeditSimple-jstree .file-md, #feeditSimple-jstree .file-log, #feeditSimple-jstree .file-htaccess { background-position: -254px -18px }
-#feeditSimple-jstree .file-doc, #feeditSimple-jstree .file-docx { background-position: -362px -18px }
-#feeditSimple-jstree .file-zip, #feeditSimple-jstree .file-gz, #feeditSimple-jstree .file-tar, #feeditSimple-jstree .file-rar { background-position: -416px -18px }
-#feeditSimple-jstree .file-js { background-position: -434px -18px }
-#feeditSimple-jstree .file-css { background-position: -144px -0px }
-#feeditSimple-jstree .file-fla { background-position: -398px -0px }
-
 #note-editor-noNormalContent, #note-editor-noRightContent {
     height: 30px;
 }
@@ -1557,11 +1186,24 @@ div.feEditSimple-contentWrapperSmall .start-grid-8 {
 }
 
 .navbar-nav>li>a {
-    padding:5px 5px 5px 15px;
+    padding:10px 5px 5px 15px;
+    color: #fff !important;
 }
 
 .navbar {
-    min-height:30px;
+    min-height:45px;
+    
+}
+
+.navbar-default {
+    border:0px !important;
+    background-color:#000 !important;
+    background-image:none !important;
+    font-size:14px !important;
+}
+
+.navbar-default li {
+    list-style-type: none;
 }
 
 .dropdown a {
@@ -1618,4 +1260,53 @@ div.feEditSimple-contentWrapperSmall .start-grid-8 {
     min-width:197px;
     height: 40px;
     background-color:#bbb;
+}
+
+/************************************/
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    -webkit-border-radius: 0 6px 6px 6px;
+    -moz-border-radius: 0 6px 6px;
+    border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover>.dropdown-menu {
+    display: block;
+}
+
+.dropdown-submenu>a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-right: -10px;
+}
+
+.dropdown-submenu:hover>a:after {
+    border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+    float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+    left: -100%;
+    margin-left: 10px;
+    -webkit-border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+    border-radius: 6px 0 6px 6px;
 }

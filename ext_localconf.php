@@ -15,8 +15,8 @@ $feeditsimpleUsersettings = $_COOKIE['feeditSimple-usersettings'];
 $userSettingsArray = json_decode($feeditsimpleUsersettings, TRUE);
 
 //login hook
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processCmdmapClass'][] = 'LTH\\get_menu\\Hooks\\ProcessCmdmap';
-$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['postUserLookUp'][] = 'LTH\\lth_feedit_simple\\Hooks\\ProcessCmdmap->postUserLookUp';
+//$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processCmdmapClass'][] = 'LTH\\get_menu\\Hooks\\ProcessCmdmap';
+//$TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['postUserLookUp'][] = 'LTH\\lth_feedit_simple\\Hooks\\ProcessCmdmap->postUserLookUp';
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTypoScript('lth_feedit_simple', 'setup', '
     #############################################
@@ -62,4 +62,5 @@ $TYPO3_CONF_VARS['SC_OPTIONS']['t3lib/class.t3lib_userauth.php']['postUserLookUp
         imagecols.keepItems = 1, 2, 3, 4
         imagecols.types.textpic.keepItems = 1, 2
     }
+    TCEMAIN.table.pages.disableHideAtCopy = 1
 ');

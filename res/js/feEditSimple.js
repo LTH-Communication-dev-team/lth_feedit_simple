@@ -1911,7 +1911,7 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                 
                 pageTree.treeview('collapseAll', { silent: true });
                 pageTreeContainer.show();
-            } else if(cmd === 'getFormHandler') {
+            } else if(cmd === 'getFormManager') {
                 var resultColumns = [];
                 var tableContent = '<thead><tr>';
                 $.each(data.columns, function(i, value){
@@ -1924,9 +1924,9 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                 //console.log(data.data);
                 tableContent += '</tr></thead>';
                 tableContent += '<tbody></tbody>';
-                $('.modal-body').html('<table id="feeditSimple-formhandlerTable" class="display" width="100%"></table>');
+                $('.modal-body').html('<table id="feeditSimple-formManagerTable" class="display" width="100%"></table>');
 
-                $('#feeditSimple-formhandlerTable').DataTable({
+                $('#feeditSimple-formManagerTable').DataTable({
                     /*"aaData": data.data,
                     "aoColumns": [ resultColumns ],
                     "sPaginationType": "full_numbers",
@@ -1954,7 +1954,7 @@ function ajaxCall(cmd, table, uid, pid, pageUid, okMessage, contentToPaste)
                 });
         
                 $("#feeditSimple-modalBox").on('shown', function() {
-                    var tableWidth = $('#feeditSimple-formhandlerTable').width() + 50;
+                    var tableWidth = $('#feeditSimple-formManagerTable').width() + 50;
                     //var tableHeight = $('#feeditSimple-formhandlerTable').height()+200;
                     if(!tableWidth) {
                         tableWidth = '800';
