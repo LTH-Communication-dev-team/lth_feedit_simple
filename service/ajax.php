@@ -127,6 +127,9 @@ switch($cmd) {
     case 'getPageData':
         $content = getPageData($pageUid);
         break;
+    case 'getImgSysUid':
+        $content = getImgSysUid($contentToPaste);
+        break;
 }
 
 
@@ -139,6 +142,18 @@ if($cmd === 'getFiles') {
 
 global $arrs;
 global $globalContent;
+
+
+function getImgSysUid($contentToPaste)
+{
+    $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery("uid","sys_file","identifier = '$contentToPaste'");
+    $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+    $uid = $row["uid"];
+    $GLOBALS['TYPO3_DB']->sql_free_result($res);
+    $returnArray = [];
+    $returnArray["uid"] = $uid;
+    return $returnArray;
+}
 
 
 function getPageData($pageUid)

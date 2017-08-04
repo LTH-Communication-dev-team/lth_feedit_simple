@@ -3,6 +3,8 @@ $(document).ready(function () {
     $('.csc-textpic-text').children().unwrap();
 
     makeEditable('.csc-default.textpic, .csc-default.text', '');
+    
+    modifyDialog();
 
     /*makeSortable(document.getElementById('feEditSimple-normalColWrapper'), 'connectedSortable');
     if($('#feEditSimple-rightColWrapper').length > 0) {
@@ -137,6 +139,7 @@ $(document).ready(function () {
         duration: 200,
         clickClose: true,
         onOpen: function () {
+            $('#feeditSimple-pageMenu').toggleClass('open');
             $('.panel-header').html('<h1>Edit page properties</h1>');
             var url = '';
             var pid = $('body').attr('id');
@@ -201,6 +204,7 @@ var formatted = t.format("dd.mm.yyyy hh:MM:ss");*/
         duration: 200,
         clickClose: true,
         onOpen: function () {
+            $('#feeditSimple-pageMenu').toggleClass('open');
             $('.panel-body').load("/typo3conf/ext/lth_feedit_simple/res/template/formelement.html?sid=" + Math.random() + " #editPage", function () {
                 //console.log($('#inputTitle').length);
                 $(".ps-active-panel").css("z-index","999");
@@ -211,6 +215,7 @@ var formatted = t.format("dd.mm.yyyy hh:MM:ss");*/
                 $('#save-panel-bt').click(function () {
                     savePageProperties('after','','');
                 });
+                //$('#feeditSimple-newPageButton').parent().parent().collapse();
             });
         }
     });
@@ -220,6 +225,7 @@ var formatted = t.format("dd.mm.yyyy hh:MM:ss");*/
         duration: 200,
         clickClose: true,
         onOpen: function () {
+            $('#feeditSimple-pageMenu').toggleClass('open');
             $('.panel-body').load("/typo3conf/ext/lth_feedit_simple/res/template/formelement.html?sid=" + Math.random() + " #editPage", function () {
                 //console.log($('#inputTitle').length);
                 $(".ps-active-panel").css("z-index","999");
@@ -730,16 +736,41 @@ function makeEditable(selector,type)
     CKEDITOR.config.filebrowserUploadUrl = 'typo3conf/ext/lth_feedit_simple/vendor/filemanager/dialog.php?type=2&editor=ckeditor&fldr=';
     CKEDITOR.config.filebrowserImageBrowseUrl = 'typo3conf/ext/lth_feedit_simple/vendor/filemanager/dialog.php?type=1&editor=ckeditor&fldr=';
     CKEDITOR.config.toolbar = [
-        [ 'Source', '-', 'Bold', 'Italic', 'Image', 'Link', 'Unlink' ]
+        [ 'Bold', 'Italic', 'Image', 'Link', 'Unlink', 'PasteText', 'BulletedList', 'Outdent', 'Indent', 'Format', 'btgrid' ]
     ];
 
+/*
+ * CKEDITOR.on( 'dialogDefinition', function( ev )
+   {
+      // Take the dialog name and its definition from the event data.
+      var dialogName = ev.data.name;
+      var dialogDefinition = ev.data.definition;
+  
+      // Check if the definition is from the dialog we're
+      // interested in (the 'image' dialog). This dialog name found using DevTools plugin
+      if ( dialogName == 'image' )
+      {
+         // Remove the 'Link' and 'Advanced' tabs from the 'Image' dialog.
+         dialogDefinition.removeContents( 'link' );
+         dialogDefinition.removeContents( 'advanced' );
+  
+         // Get a reference to the 'Image Info' tab.
+         var infoTab = dialogDefinition.getContents( 'info' );
+  
+         // Remove unnecessary widgets/elements from the 'Image Info' tab.         
+         infoTab.remove( 'txtHSpace');
+         infoTab.remove( 'txtVSpace');
+      }
+   });
+ */
     $(selector).each(function() {
         //console.log($(this).attr('id'));
         CKEDITOR.inline($(this).attr('id'), {
             // Allow some non-standard markup that we used in the introduction.
+            customConfig: 'editableConfig.js',
             extraAllowedContent: 'a(documentation);abbr[title];code',
             removePlugins: 'floatingspace,resize',
-            extraPlugins: 'filebrowser,sharedspace',
+            extraPlugins: 'filebrowser,sharedspace,btgrid,widget,widgetselection,dialog,image2',
             sharedSpaces: {
                 top: 'lth_feeditsimple_inner_content'
             },
@@ -747,7 +778,7 @@ function makeEditable(selector,type)
                 change: function( event ) {
                     //var data = event.editor.getData();
                     addId($(this).attr('name'), '');
-                    // Do sth with your data...
+                    console.log($(this).attr('name'));
                 },
                 focus: function( event ) {
                     $('#lth_feeditsimple_inner_content').toggle();
@@ -854,7 +885,7 @@ function makeEditable(selector,type)
                             if (feeditSimpleSetCookie('feeditSimple-copycutitem', 'cut:tt_content:' + id + ':' + pageId, 1)) {
                                 CKEDITOR.instances[id].destroy();
                                 var content = $('#' + id)[0].outerHTML;
-                                console.log(content);
+                                //console.log(content);
                                 $('#' + id).remove();
                                 //var okMessage = {'header': 'Cut', 'message': 'Content element successfully cut'};
                                 ajaxCall('setClipboard', 'tt_content', id, '', '', '', content);
@@ -1300,6 +1331,48 @@ function makeEditable(selector,type)
     });
 }
 
+
+function modifyDialog()
+{
+    CKEDITOR.on( 'dialogDefinition', function( ev ) {
+        // Take the dialog name and its definition from the event data
+        var dialogName = ev.data.name,
+            dialogDefinition = ev.data.definition;
+
+        if ( dialogName == 'image' ) {
+            var onOk = dialogDefinition.onOk;
+
+            dialogDefinition.onOk = function( e ) {
+                var input = this.getContentElement( 'info', 'txtUrl' );
+                var imageSrcUrl = input.getValue();
+                console.log(imageSrcUrl);
+                input.setValue( imageSrcUrl );
+
+                        onOk && onOk.apply( this, e );
+                $.ajax({
+                    type: "POST",
+                    url: 'index.php',
+                    dataType: 'json',
+                    data: {
+                        eID: 'lth_feedit_simple',
+                        cmd: 'getImgSysUid',
+                        contentToPaste: decodeURIComponent(imageSrcUrl).split("fileadmin").pop(),
+                        sid: Math.random()
+                    },
+                    success: function(data){    
+                        //console.log(data.uid);
+                        $("img[src='"+imageSrcUrl+"']").attr("data-uid_local",data.uid);
+                        //! Manipulate imageSrcUrl and set it 
+                        
+                    }
+                });
+                
+            };
+        }
+
+    });
+}
+
 function makeEditable_old(selector, type)
 {
     //console.log(selector);
@@ -1534,11 +1607,11 @@ function saveChanges()
             imgWidth = $(this).css('width');
             imgHeight = $(this).css('height');
             if(imgId && imgWidth && imgHeight) {
-                ajaxCall('updateImgWidthHeight','sys_file_reference', imgId, '', '', '', JSON.stringify(Array(imgWidth.replace('px',''),imgHeight.replace('px',''))))
+                //ajaxCall('updateImgWidthHeight','sys_file_reference', imgId, '', '', '', JSON.stringify(Array(imgWidth.replace('px',''),imgHeight.replace('px',''))))
             }
             uid_local = $(this).attr('data-uid_local');
             if($(this).parent().attr('href')) imgHref = $(this).parent().attr("href").split('?id=').pop();
-            if (imgId.indexOf('new') > 0) {
+            if (imgId.indexOf('new') != -1) {
                 imgId = 'NEW' + uniqid();
                 //params["cmd[sys_file_reference][" + $('#chosenimage').attr('oldId') + "][delete]"] = 1;
             }
@@ -1551,8 +1624,8 @@ function saveChanges()
             params["data[sys_file_reference][" + imgId + "][uid_local]"] = 'sys_file_' + uid_local;
             params["data[sys_file_reference][" + imgId + "][uid_local]_list"] = 'sys_file_' + uid_local;
             params["data[sys_file_reference][" + imgId + "][pid]"] = pageId;
-            //params["data[sys_file_reference][" + imgId + "][imagewidth]"] = parseInt(imgWidth.replace('px',''));
-            //params["data[sys_file_reference][" + imgId + "][imageheight]"] = parseInt(imgHeight.replace('px',''));
+            params["data[sys_file_reference][" + imgId + "][imagewidth]"] = parseInt(imgWidth.replace('px',''));
+            params["data[sys_file_reference][" + imgId + "][imageheight]"] = parseInt(imgHeight.replace('px',''));
             params["uc[inlineView][tt_content][" + cleanId + "][sys_file_reference][" + imgId + "]"] = 1;
             //params["data[sys_file_reference][" + imgId + "][link]_hr"] = imgHref;
             params["data[sys_file_reference][" + imgId + "][link]"] = imgHref;
@@ -1585,7 +1658,7 @@ function saveChanges()
         var bodytext = $('#' + id).find('.lth_feeditsimple_content').html();
         //bodytext.find('.csc-textpic-imagewrap').remove();
         //bodytext = bodytext.html();
-        bodytext = bodytext.replace(/<p>&nbsp;<\/p>/gi,'').replace(/<p><\/p>/gi, '').replace(/\n+/g, '\n').replace(/<b><b>/gi, '<b>').replace(/<\/b><\/b>/gi, '</b>');
+        if(bodytext) bodytext = bodytext.replace(/<p>&nbsp;<\/p>/gi,'').replace(/<p><\/p>/gi, '').replace(/\n+/g, '\n').replace(/<b><b>/gi, '<b>').replace(/<\/b><\/b>/gi, '</b>');
         //console.log(bodytext);
         //<link 1524 - internal-link "Opens internal link in current window">
         params["data[tt_content][" + cleanId + "][bodytext]"] = bodytext;
@@ -2173,23 +2246,24 @@ function insertImage(uid, type, imageOrientationId)
     if(imageOrientationId == '') {
         //console.log('???');
         //imageOrientationId = $('#note-editor-' + uid).attr('data-imageorient');
-        imageOrientationId = $('#c' + uid).attr('data-imageorient');
+        imageOrientationId = $('#' + uid).attr('data-imageorient');
         //console.log(imageOrientationId);
         if(!imageOrientationId) {
             imageOrientationId = '17';
         }
     }
-    var noOfImages = $('#note-editor-' + uid).find('.csc-textpic-image').length;
-    var innerContainer = $('#note-editor-' + uid + ' .note-editable');
+    var noOfImages = $('#' + uid).find('.csc-textpic-image').length;
+    var innerContainer = $('#' + uid);
     var image;
     
     $.get('/typo3conf/ext/lth_feedit_simple/res/template/contentelement.html', function (response) {
         var responseContent = $(response).filter("[data-imageOrient='" + imageOrientationId + "']").html();
-        if (innerContainer.find('.csc-textpicHeader').length > 0) {
+        
+        /*if (innerContainer.find('.csc-textpicHeader').length > 0) {
             var header = $(innerContainer).find('.csc-textpicHeader').text();
         } else if (innerContainer.prev('h2').length > 0) {
             var header = $(innerContainer).prev('h2').text();
-        }
+        }*/
 
         //Replace content in template
         var content = '<div class="lth_feeditsimple_content">' + $(innerContainer).find('.lth_feeditsimple_content').html() + '</div>';
@@ -2197,7 +2271,7 @@ function insertImage(uid, type, imageOrientationId)
         var newImage = '<figure class="csc-textpic-image csc-textpic-last">\
             <img id="new' + noOfImages + '" data-id="new' + noOfImages + '" class="feeditSimple-placeHolder" style="height:100px; width:100px;" src="typo3conf/ext/lth_feedit_simple/res/icons/placeholder.png" alt="" />\
             </figure>';
-        
+        //console.log(noOfImages);
         if(noOfImages == 0 && type == 'new') {
             image = newImage;
         } else if(noOfImages > 0 && type == 'new') {
@@ -2221,8 +2295,8 @@ function insertImage(uid, type, imageOrientationId)
 
         responseContent = responseContent.replace('###IMAGE###', image);
         responseContent = responseContent.replace('###CONTENT###', content);
-        
-        if (header) {
+        //console.log(responseContent);
+        /*if (header) {
             //there is a header :( and we have to deal with it
             if ($(responseContent).find('.csc-textpicHeader').length > 0 && innerContainer.prev('h2').length > 0) {
                 //There is a header in the template and a header ouside in the original
@@ -2242,19 +2316,19 @@ function insertImage(uid, type, imageOrientationId)
 
             responseContent = responseContent.replace('<div class="csc-textpicHeader">###HEADER###</div>', '');
             //responseContent = responseContent.replace('###HEADER###', '<h2>' + header + '</h2>');
-        }
+        }*/
         
         $(innerContainer).html(responseContent);
-        $('#note-editor-' + uid).attr('data-imageorient', imageOrientationId);
+        $('#c' + uid).attr('data-imageorient', imageOrientationId);
 
         //$('[id="new' + newIndex + '"]').click(function () {*/
-        if(type=='new') {
+        /*if(type=='new') {
             $('#new' + noOfImages).click(function () {
                 $('#chosenImage').attr('data-src', $(this).attr('src'));
                 $('#chosenImage').attr('data-pid', $(this).closest('.note-editor').attr('id').split('-').pop());
                 imageClick($(this));
             });
-        }
+        }*/
         //make editable
         makeEditable('#c' + uid, type);
         //cancelRightClick();

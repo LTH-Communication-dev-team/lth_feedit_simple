@@ -230,7 +230,7 @@ class lth_feeditsimple_menu {
             $content .= '<li class="">
             <ul class="nav navbar-nav feeditSimple-mainMenu">
                 
-               <li id="" class="dropdown" title="">
+               <li id="feeditSimple-pageMenu" class="dropdown" title="">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:pageTooltip').'">
                         <span class="icon-white-edit"></span>
                         '.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:page').'
@@ -379,7 +379,7 @@ class lth_feeditsimple_menu {
                     <ul class="dropdown-menu">
                         <!-- <li><a id="feeditSimple-userSettingsButton" title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userSettingsTooltip').'" href="#feeditSimple-sidePanel">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userSettings').'</a></li> -->
                         <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userBackendTooltip').'" href="/typo3/">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userBackend').'</a></li>
-                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogoutTooltip').'" href="/typo3/logout.php?redirect='.\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL').'">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogout').'</a></li>
+                        <li><a title="'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogoutTooltip').'" href="/typo3/logout.php?redirect_url='.\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL').'">'.$GLOBALS['LANG']->sL('LLL:EXT:lth_feedit_simple/locallang.xml:userLogout').'</a></li>
                     </ul>
                 </li>
                 

@@ -1310,3 +1310,151 @@ div.feEditSimple-contentWrapperSmall .start-grid-8 {
     -moz-border-radius: 6px 0 6px 6px;
     border-radius: 6px 0 6px 6px;
 }
+
+//Ckeditor
+/*
+Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.md or http://ckeditor.com/license
+*/
+
+/* --- Image2: Styles corresponding with config.image2_alignClasses and config.image2_captionedClass --- */
+
+.image-captioned
+{
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.image-left {
+    float: left;
+    margin-left: .5em;
+    margin-right: 2em;
+}
+
+.image-right {
+    float: right;
+    margin-left: 2em;
+    margin-right: .5em;
+}
+
+.image-center {
+    text-align: center;
+}
+
+.image-center > figure {
+    display: inline-block;
+}
+
+/* --- Image2: "Clean" --- */
+
+.clean
+{
+    border: 0;
+    background: none;
+    padding: 0;
+}
+
+.clean > figcaption
+{
+    margin-top: .5em;
+    font-size: .7em;
+    text-align: right;
+}
+
+/* --- Image2: "Polarized" --- */
+
+.polarized
+{
+    border: 0;
+    border-radius: 0;
+    position: relative;
+    background: #f7f7f7;
+    box-shadow: 1px 1px 0 #eee;
+}
+
+.polarized,
+.polarized ~ .cke_widget_drag_handler_container
+{
+    -webkit-transform: rotate(-5deg);
+    -moz-transform: rotate(-5deg);
+    -ms-transform: rotate(-5deg);
+    transform: rotate(-5deg);
+
+    -webkit-transform-origin: bottom left;
+    -moz-transform-origin: bottom left;
+    -ms-transform-origin: bottom left;
+    transform-origin: bottom left;
+}
+
+.polarized > figcaption
+{
+    color: #777;
+    margin-top: 5px;
+    right: 20px;
+    font-size: .8em;
+    font-style: italic;
+    text-align: right;
+}
+
+.polarized figcaption:before
+{
+    content: '— ';
+}
+
+figure.polarized
+{
+    padding: 20px 20px 40px 20px;
+}
+
+img.polarized
+{
+    border: 20px solid #f7f7f7;
+}
+
+/* --- Code Snippet: "Narrow Code" --- */
+
+pre.narrow
+{
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* --- Code Snippet: "Fancy JavaScript" --- */
+
+pre.fancy
+{
+    position: relative;
+}
+
+pre.fancy > code
+{
+    background: rgb(14,14,14);
+    background: -moz-linear-gradient(top, rgba(14,14,14,1) 0%, rgba(70,70,70,1) 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(14,14,14,1)), color-stop(100%,rgba(70,70,70,1)));
+    background: -webkit-linear-gradient(top, rgba(14,14,14,1) 0%,rgba(70,70,70,1) 100%);
+    background: -o-linear-gradient(top, rgba(14,14,14,1) 0%,rgba(70,70,70,1) 100%);
+    background: -ms-linear-gradient(top, rgba(14,14,14,1) 0%,rgba(70,70,70,1) 100%);
+    background: linear-gradient(to bottom, rgba(14,14,14,1) 0%,rgba(70,70,70,1) 100%);
+
+    box-shadow: inset 0 0 6px rgba(0,0,0,.5);
+    border-radius: 8px;
+    text-shadow: 0px 1px 0 #000;
+    border: 5px solid #ccc;
+
+    padding: 20px;
+}
+
+pre.fancy > code.language-javascript:after
+{
+    content: '';
+    background: url(js.png);
+    background-repeat: no-repeat;
+    background-size: 30px 30px;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    border-radius: 0 6px 0 0;
+}

@@ -6,6 +6,8 @@
 CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here. For example:
 	// config.language = 'fr';
-        config.uiColor = '#000000';
+        config.uiColor = '#ff0000';
         config.skin = 'moono-dark';
+        config.image2_alignClasses = [ 'image-left', 'image-center', 'image-right' ];
+        config.image2_captionedClass = 'image-captioned';
 };
