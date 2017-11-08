@@ -97,7 +97,7 @@ class user_feeditsimple_adminpanel {
                /typo3/index.php?route=%2Frecord%2Fedit&token=5b948f4dee711290eb9fc6530dc30052cf1d8775&edit%5Btt_content%5D%5B606%5D=edit&noView=0&feEdit=1&returnUrl=sysext/backend/Resources/Private/Templates/Close.html
              * * /typo3/index.php?route=%2Frecord%2Fedit&token=5b948f4dee711290eb9fc6530dc30052cf1d8775&edit%5Btt_content%5D%5B606%5D=edit&
              *  */
-	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!='200' && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!='77') {
+	    if (is_object($GLOBALS['BE_USER']) && $GLOBALS['TSFE']->beUserLogin && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!='200' && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('type')!='77' && \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('dmail_html')!='1') {
                 //echo $location;
 			// set up general configuration
 		/*if (!count($this->admPanelTSconfig)) {
